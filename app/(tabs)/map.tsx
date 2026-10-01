@@ -1,17 +1,16 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { View, Text, StyleSheet, Pressable, TextInput, FlatList, Keyboard, KeyboardAvoidingView, Platform } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, Text, StyleSheet, Pressable, TextInput, FlatList, Keyboard, KeyboardAvoidingView, Platform, useWindowDimensions } from 'react-native';
 import MapView, { Marker, type Region } from '../../components/maps/NativeMap';
 import * as Location from 'expo-location';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import Animated, { useSharedValue, useAnimatedStyle, withSpring, withTiming, FadeInUp } from 'react-native-reanimated';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming, Easing } from 'react-native-reanimated';
 import { Search, X, ArrowLeft, Settings, MapPin } from 'lucide-react-native';
 import { Image } from 'expo-image';
 import { supabase } from '../../lib/supabase';
 import { JORDAN_REGION } from '../../constants/jordan';
 import { COLORS, RADIUS } from '../../constants/colors';
 import { useProfile } from '../../hooks/useAuth';
-import { MapPreviewCard } from '../../components/maps/PreviewCard';
 import { EmptyState } from '../../components/ui/States';
 import { Stars } from '../../components/ui/Card';
 
@@ -24,20 +23,20 @@ export default function MapHome() {
   const mapRef = useRef<any>(null);
   const inputRef = useRef<TextInput>(null);
   const { profile } = useProfile();
+  const { height: SH } = useWindowDimensions();
 
   const [region] = useState<Region>({ ...JORDAN_REGION });
   const [markers, setMarkers] = useState<MarkerItem[]>([]);
-  const [selected, setSelected] = useState<MarkerItem | null>(null);
   const [expanded, setExpanded] = useState(false);
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<any[]>([]);
   const [searching, setSearching] = useState(false);
   const reqId = useRef(0);
 
-  // Reanimated: compact bar -> expanded panel
-  const panelY = useSharedValue(600);
+  // Fast, smooth bottom-sheet: single ease-out slide from below the screen —
+  // no spring bounce, no up-and-down wobble.
+  const panelY = useSharedValue(SH);
   const panelOpacity = useSharedValue(0);
-  const barScale = useSharedValue(1);
 
   useEffect(() => {
     (async () => {
@@ -70,25 +69,22 @@ export default function MapHome() {
 
   const openSearch = () => {
     setExpanded(true);
-    panelY.value = withSpring(0, { damping: 26, stiffness: 260 });
-    panelOpacity.value = withTiming(1, { duration: 220 });
-    barScale.value = withTiming(1.02, { duration: 180 });
+    panelY.value = withTiming(0, { duration: 230, easing: Easing.out(Easing.cubic) });
+    panelOpacity.value = withTiming(1, { duration: 200 });
     setTimeout(() => inputRef.current?.focus(), 250);
   };
 
   const closeSearch = () => {
     Keyboard.dismiss();
-    panelY.value = withTiming(600, { duration: 260 });
-    panelOpacity.value = withTiming(0, { duration: 200 });
-    barScale.value = withTiming(1, { duration: 180 });
-    setTimeout(() => { setExpanded(false); }, 260);
+    panelY.value = withTiming(SH, { duration: 200, easing: Easing.in(Easing.cubic) });
+    panelOpacity.value = withTiming(0, { duration: 180 });
+    setTimeout(() => { setExpanded(false); }, 210);
   };
 
   const panelStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: panelY.value }],
     opacity: panelOpacity.value,
   }));
-  const barStyle = useAnimatedStyle(() => ({ transform: [{ scale: barScale.value }] }));
 
   // Debounced server-side search (200-300ms), cancel outdated via reqId
   useEffect(() => {
@@ -98,7 +94,7 @@ export default function MapHome() {
     setSearching(true);
     const h = setTimeout(async () => {
       try {
-        const { data, error } = await supabase.rpc('search_companies', { p_q: query.trim(), p_limit: 25, p_offset: 0 });
+        const { data, error } = await supabase.rpc('search_places', { p_q: query.trim(), p_limit: 25, p_offset: 0 });
         if (my !== reqId.current) return; // outdated — drop
         if (error) throw error;
         setResults(data ?? []);
@@ -107,11 +103,6 @@ export default function MapHome() {
     }, 250);
     return () => clearTimeout(h);
   }, [query, expanded]);
-
-  const focusMarker = useCallback((mk: MarkerItem) => {
-    setSelected(mk);
-    mapRef.current?.animateToRegion({ latitude: mk.lat, longitude: mk.lng, latitudeDelta: 0.2, longitudeDelta: 0.2 }, 600);
-  }, []);
 
   const openDetail = (mk: MarkerItem) => {
     if (mk.kind === 'company') router.push(`/company/${mk.raw.id}` as any);
@@ -129,8 +120,8 @@ export default function MapHome() {
             key={mk.id}
             coordinate={{ latitude: mk.lat, longitude: mk.lng }}
             pinColor={pinColor(mk.kind)}
-            onPress={() => focusMarker(mk)}
-            opacity={selected?.id === mk.id ? 1 : 0.85}
+            title={lang === 'ar' ? (mk.raw.name_ar ?? mk.raw.title_ar) : (mk.raw.name_en ?? mk.raw.title_en)}
+            onPress={() => openDetail(mk)}
           />
         ))}
       </MapView>
@@ -150,16 +141,9 @@ export default function MapHome() {
         </Pressable>
       </View>
 
-      {/* Selected marker preview */}
-      {selected && !expanded ? (
-        <Animated.View entering={FadeInUp.duration(250)} style={s.preview}>
-          <MapPreviewCard item={selected.raw} onView={() => openDetail(selected)} />
-        </Animated.View>
-      ) : null}
-
       {/* Compact floating search bar (~90% opaque white, subtle border) */}
       {!expanded ? (
-        <Animated.View style={[s.barWrap, barStyle]}>
+        <Animated.View style={s.barWrap}>
           <Pressable accessibilityRole="search" accessibilityLabel={t('map.searchLabel')} onPress={openSearch} style={s.bar}>
             <Search color={COLORS.secondaryText} size={18} />
             <Text style={s.barText}>{t('map.searchPlaceholder')}</Text>
@@ -202,6 +186,14 @@ export default function MapHome() {
               contentContainerStyle={{ paddingBottom: 40 }}
               renderItem={({ item }) => {
                 const name = lang === 'ar' ? item.name_ar : item.name_en;
+                const href = item.kind === 'company' ? `/company/${item.id}`
+                  : item.kind === 'monument' ? `/monument/${item.id}`
+                  : `/event/${item.id}`;
+                const kindTxt = item.kind === 'company'
+                  ? (lang === 'ar' ? 'شركة' : 'Company')
+                  : item.kind === 'monument'
+                    ? (lang === 'ar' ? 'معلم' : 'Monument')
+                    : (lang === 'ar' ? 'فعالية' : 'Event');
                 return (
                   <Pressable
                     accessibilityRole="button"
@@ -211,14 +203,14 @@ export default function MapHome() {
                       closeSearch();
                       if (item.lat && item.lng) {
                         mapRef.current?.animateToRegion({ latitude: item.lat, longitude: item.lng, latitudeDelta: 0.2, longitudeDelta: 0.2 }, 600);
-                        setSelected({ id: `c-${item.id}`, kind: 'company', lat: item.lat, lng: item.lng, raw: item });
                       }
-                      router.push(`/company/${item.id}` as any);
+                      router.push(href as any);
                     }}
                   >
-                    <Image source={{ uri: item.cover_url ?? item.logo_url ?? undefined }} style={s.cardImg} contentFit="cover" cachePolicy="memory-disk" />
+                    <Image source={{ uri: item.image_url ?? undefined }} style={s.cardImg} contentFit="cover" cachePolicy="memory-disk" />
                     <View style={s.cardBody}>
                       <Text style={s.cardName} numberOfLines={1}>{name}</Text>
+                      <Text style={s.kind}>{kindTxt}{item.location ? ` · ${item.location}` : ''}</Text>
                       {(item.avg_rating ?? item.rating) ? (
                         <Stars value={item.avg_rating ?? item.rating} />
                       ) : (
@@ -249,7 +241,6 @@ const s = StyleSheet.create({
   avatarTxt: { fontWeight: '800', color: COLORS.primaryDark },
   profileName: { marginLeft: 8, fontWeight: '600', fontSize: 13, color: COLORS.text, flexShrink: 1 },
   iconBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: 'rgba(255,255,255,0.92)', borderWidth: 1, borderColor: COLORS.border, alignItems: 'center', justifyContent: 'center' },
-  preview: { position: 'absolute', left: 14, right: 14, bottom: 150 },
   barWrap: { position: 'absolute', left: 14, right: 14, bottom: 18 },
   bar: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: 'rgba(255,255,255,0.9)', borderWidth: 1, borderColor: COLORS.border, borderRadius: RADIUS.full, paddingHorizontal: 16, minHeight: 52, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 12, elevation: 4 },
   barText: { color: COLORS.secondaryText, fontSize: 15 },
@@ -263,5 +254,6 @@ const s = StyleSheet.create({
   cardImg: { width: 92, height: 92 },
   cardBody: { flex: 1, padding: 10 },
   cardName: { fontWeight: '700', fontSize: 15, color: COLORS.text },
+  kind: { fontSize: 11, fontWeight: '800', letterSpacing: 0.5, color: COLORS.primaryDark, marginTop: 2 },
   muted: { color: COLORS.secondaryText, fontSize: 12, marginTop: 2 },
 });

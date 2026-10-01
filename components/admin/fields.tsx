@@ -80,8 +80,7 @@ export function ImageField({ label, bucket, value, onChange }: {
       const uri = await pickImage();
       if (!uri) return;
       setBusy(true);
-      const ext = ((uri.split('.').pop() ?? 'jpg').toLowerCase().split('?')[0] || 'jpg').slice(0, 4);
-      const url = await uploadImage(bucket, uri, `${Date.now()}.${ext}`);
+      const url = await uploadImage(bucket, uri, `img-${Date.now()}`);
       onChange(url);
     } catch (e: any) { setErr(e.message); } finally { setBusy(false); }
   };

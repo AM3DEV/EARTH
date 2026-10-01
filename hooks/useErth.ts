@@ -8,6 +8,9 @@ export function useErth(conversationId?: string | null) {
   const [messages, setMessages] = useState<Msg[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Persist the server conversation across sends so every message continues
+  // the SAME conversation (new one only via clear(), i.e. the New Chat button).
+  const [cid, setCid] = useState<string | null>(conversationId ?? null);
 
   const send = useCallback(async (text: string) => {
     const q = text.trim();
@@ -26,11 +29,12 @@ export function useErth(conversationId?: string | null) {
           apikey: process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? '',
           ...(session ? { Authorization: `Bearer ${session.access_token}` } : {}),
         },
-        body: JSON.stringify({ message: q, conversation_id: conversationId ?? null }),
+        body: JSON.stringify({ message: q, conversation_id: cid }),
       });
       let json: any = null;
       try { json = await res.json(); } catch { /* non-JSON body */ }
       if (!res.ok) throw new Error(json?.error ? String(json.error) : `AI error ${res.status}`);
+      if (json.conversation_id) setCid(json.conversation_id);
       const am: Msg = { id: `a-${Date.now()}`, role: 'assistant', content: json.reply ?? '' };
       setMessages((m) => [...m, am]);
     } catch (e: any) {
@@ -38,9 +42,9 @@ export function useErth(conversationId?: string | null) {
     } finally {
       setLoading(false);
     }
-  }, [conversationId]);
+  }, [cid]);
 
-  const clear = useCallback(() => setMessages([]), []);
+  const clear = useCallback(() => { setMessages([]); setCid(null); }, []);
 
   return { messages, loading, error, send, clear };
 }

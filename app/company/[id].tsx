@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ScrollView, View, Text, StyleSheet, Pressable, Linking, Share } from 'react-native';
+import { ScrollView, View, Text, StyleSheet, Pressable, Linking, Share, useWindowDimensions } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Image } from 'expo-image';
@@ -19,6 +19,9 @@ export default function CompanyDetail() {
   const [services, setServices] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const { toggle } = useFavorites();
+  // Responsive cover: ~28% of screen height, clamped for small and large screens.
+  const { height: WH } = useWindowDimensions();
+  const coverH = Math.min(300, Math.max(170, Math.round(WH * 0.28)));
 
   useEffect(() => {
     (async () => {
@@ -41,7 +44,7 @@ export default function CompanyDetail() {
 
   return (
     <ScrollView style={s.wrap} contentContainerStyle={{ paddingBottom: 40 }}>
-      {row.cover_url ? <Image source={{ uri: row.cover_url }} style={s.cover} contentFit="cover" /> : null}
+      {row.cover_url ? <Image source={{ uri: row.cover_url }} style={[s.cover, { height: coverH }]} contentFit="cover" /> : null}
       <View style={s.body}>
         <View style={s.head}>
           {row.logo_url ? <Image source={{ uri: row.logo_url }} style={s.logo} contentFit="cover" /> : null}
@@ -72,12 +75,16 @@ export default function CompanyDetail() {
         {services.map((sv) => {
           const sn = lang === 'ar' ? sv.name_ar : sv.name_en;
           return (
-            <Pressable key={sv.id} style={s.sv} onPress={() => router.push(`/service/${sv.id}` as any)}>
-              <Text style={s.svName}>{sn}</Text>
+            <Pressable key={sv.id} style={s.sv} onPress={() => router.push(`/service/${sv.id}` as any)} accessibilityRole="button" accessibilityLabel={sn}>
+              <View style={s.svTop}>
+                <Text style={s.svName}>{sn}</Text>
+                <Text style={s.book}>{t('detail.book')} ›</Text>
+              </View>
               <Text style={s.muted}>{sv.current_price} {sv.currency} · {sv.current_booking}/{sv.max_booking}</Text>
             </Pressable>
           );
         })}
+        {services.length === 0 ? <Text style={s.muted}>No services yet.</Text> : null}
       </View>
     </ScrollView>
   );
@@ -98,5 +105,7 @@ const s = StyleSheet.create({
   map: { height: 180, borderRadius: RADIUS.lg, marginTop: 14 },
   sec: { fontSize: 18, fontWeight: '800', color: COLORS.text, marginTop: 18, marginBottom: 8 },
   sv: { borderWidth: 1, borderColor: COLORS.border, borderRadius: RADIUS.md, padding: 12, marginBottom: 8 },
-  svName: { fontWeight: '700', color: COLORS.text, fontSize: 15 },
+  svTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
+  svName: { flex: 1, fontWeight: '700', color: COLORS.text, fontSize: 15 },
+  book: { color: COLORS.primaryDark, fontWeight: '800', fontSize: 14 },
 });

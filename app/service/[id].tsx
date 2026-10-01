@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, View, Text, StyleSheet, Pressable, TextInput } from 'react-native';
+import { ScrollView, View, Text, StyleSheet, Pressable, TextInput, useWindowDimensions } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Image } from 'expo-image';
@@ -24,6 +24,9 @@ export default function ServiceDetail() {
   const [qty, setQty] = useState('1');
   const [msg, setMsg] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  // Responsive hero: ~30% of screen height, clamped for small and large screens.
+  const { height: WH } = useWindowDimensions();
+  const heroH = Math.min(320, Math.max(180, Math.round(WH * 0.3)));
 
   const load = async () => {
     setLoading(true);
@@ -53,7 +56,7 @@ export default function ServiceDetail() {
   const name = lang === 'ar' ? row.name_ar : row.name_en;
   return (
     <ScrollView style={s.wrap} contentContainerStyle={{ paddingBottom: 40 }}>
-      {row.image_url ? <Image source={{ uri: row.image_url }} style={s.hero} contentFit="cover" /> : null}
+      {row.image_url ? <Image source={{ uri: row.image_url }} style={[s.hero, { height: heroH }]} contentFit="cover" /> : null}
       <View style={s.body}>
         <Text style={s.name}>{name}</Text>
         <Text style={s.muted}>{(row.companies as any)?.name_en} · {row.current_booking}/{row.max_booking}</Text>

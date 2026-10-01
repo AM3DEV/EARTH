@@ -7,10 +7,10 @@ import { supabase } from '../../lib/supabase';
 import { COLORS } from '../../constants/colors';
 import { LoadingState, EmptyState } from '../ui/States';
 
-/** Generic admin list shell: table, titleKey, name picker, create/edit routes. */
-export function AdminList({ table, titleKey, createHref, editBase, nameOf }: {
+/** Generic admin list shell: table, titleKey, name picker, create/edit routes. `bare` skips the wrapper + header (for embedding in tab screens). */
+export function AdminList({ table, titleKey, createHref, editBase, nameOf, bare }: {
   table: string; titleKey: string; createHref: string; editBase: string;
-  nameOf: (r: any, lang: string) => string;
+  nameOf: (r: any, lang: string) => string; bare?: boolean;
 }) {
   const { t, i18n } = useTranslation();
   const router = useRouter();
@@ -40,17 +40,8 @@ export function AdminList({ table, titleKey, createHref, editBase, nameOf }: {
     load();
   };
 
-  if (loading) return <LoadingState />;
-  return (
-    <View style={s.wrap}>
-      <View style={s.head}>
-        <Pressable onPress={() => router.back()} style={s.backBtn} accessibilityRole="button" accessibilityLabel="Back">
-          <ArrowLeft color={COLORS.text} size={20} />
-        </Pressable>
-        <Text style={s.title}>{t(titleKey)}</Text>
-        <Pressable style={s.create} onPress={() => router.push(createHref as any)}><Text style={s.createT}>+ {t('common.create')}</Text></Pressable>
-      </View>
-      {rows.length === 0 ? <EmptyState /> : (
+  if (loading && !bare) return <LoadingState />;
+  const body = loading ? <LoadingState /> : rows.length === 0 ? <EmptyState /> : (
         <FlatList data={rows} keyExtractor={(r) => r.id} contentContainerStyle={{ padding: 16 }}
           renderItem={({ item }) => (
             <View style={s.card}>
@@ -62,13 +53,25 @@ export function AdminList({ table, titleKey, createHref, editBase, nameOf }: {
               </View>
             </View>
           )} />
-      )}
+      );
+  if (bare) return <View style={s.bare}>{body}</View>;
+  return (
+    <View style={s.wrap}>
+      <View style={s.head}>
+        <Pressable onPress={() => router.back()} style={s.backBtn} accessibilityRole="button" accessibilityLabel="Back">
+          <ArrowLeft color={COLORS.text} size={20} />
+        </Pressable>
+        <Text style={s.title}>{t(titleKey)}</Text>
+        <Pressable style={s.create} onPress={() => router.push(createHref as any)}><Text style={s.createT}>+ {t('common.create')}</Text></Pressable>
+      </View>
+      {body}
     </View>
   );
 }
 
 const s = StyleSheet.create({
   wrap: { flex: 1, backgroundColor: '#fff', paddingTop: 60 },
+  bare: { flex: 1, backgroundColor: '#fff' },
   head: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, gap: 8 },
   backBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#fff', borderWidth: 1, borderColor: COLORS.border, alignItems: 'center', justifyContent: 'center' },
   title: { flex: 1, fontSize: 22, fontWeight: '800', color: COLORS.text },

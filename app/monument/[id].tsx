@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, View, Text, StyleSheet, Pressable, Linking, Share } from 'react-native';
+import { ScrollView, View, Text, StyleSheet, Pressable, Linking, Share, useWindowDimensions } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
+import { ArrowLeft, ArrowRight } from 'lucide-react-native';
 import { Image } from 'expo-image';
 import MapView, { Marker } from '../../components/maps/NativeMap';
 import { supabase } from '../../lib/supabase';
@@ -40,6 +41,10 @@ export function DetailShell({ table, targetType, backTo }: { table: string; targ
   const { rows: reviews, add } = useReviews(targetType, id);
   const [comment, setComment] = useState('');
   const [rating, setRating] = useState(5);
+  const rtl = lang === 'ar';
+  // Responsive hero: ~32% of screen height, clamped so it fits small and large screens.
+  const { height: WH } = useWindowDimensions();
+  const heroH = Math.min(340, Math.max(200, Math.round(WH * 0.32)));
 
   if (loading) return <LoadingState />;
   if (error || !row) return <ErrorState message={error ?? t('common.error')} onRetry={() => router.back()} />;
@@ -53,11 +58,20 @@ export function DetailShell({ table, targetType, backTo }: { table: string; targ
   };
 
   return (
-    <ScrollView style={s.wrap} contentContainerStyle={{ paddingBottom: 40 }}>
-      {img ? (
-        <Image source={{ uri: img }} style={s.hero} contentFit="cover" cachePolicy="memory-disk" />
-      ) : (
-        <View style={[s.hero, s.heroFallback]}>
+    <View style={s.wrap}>
+      <Pressable
+        onPress={() => (backTo ? router.push(backTo as any) : router.back())}
+        style={[s.backFab, rtl ? { right: 16 } : { left: 16 }]}
+        accessibilityRole="button"
+        accessibilityLabel="Back"
+      >
+        {rtl ? <ArrowRight color={COLORS.text} size={20} /> : <ArrowLeft color={COLORS.text} size={20} />}
+      </Pressable>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 40 }}>
+        {img ? (
+          <Image source={{ uri: img }} style={[s.hero, { height: heroH }]} contentFit="cover" cachePolicy="memory-disk" />
+        ) : (
+          <View style={[s.hero, { height: heroH }, s.heroFallback]}>
           <Text style={s.heroEmoji}>🇯🇴</Text>
           <Text style={s.heroTxt}>{name}</Text>
         </View>
@@ -102,6 +116,7 @@ export function DetailShell({ table, targetType, backTo }: { table: string; targ
         </View>
       </View>
     </ScrollView>
+    </View>
   );
 }
 
@@ -113,6 +128,12 @@ function Info({ k, v }: { k: string; v: string }) {
 
 const s = StyleSheet.create({
   wrap: { flex: 1, backgroundColor: '#fff' },
+  // Floating back button: always above the hero image (zIndex + elevation).
+  backFab: {
+    position: 'absolute', top: 54, width: 44, height: 44, borderRadius: 22,
+    backgroundColor: 'rgba(255,255,255,0.94)', borderWidth: 1, borderColor: COLORS.border,
+    alignItems: 'center', justifyContent: 'center', zIndex: 10, elevation: 4,
+  },
   hero: { width: '100%', height: 260, backgroundColor: '#eee' },
   heroFallback: { backgroundColor: '#F3D9CC', alignItems: 'center', justifyContent: 'center' },
   heroEmoji: { fontSize: 56 },

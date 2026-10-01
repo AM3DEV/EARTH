@@ -19,17 +19,19 @@ export default function MonumentTab() {
 
   return (
     <View style={s.wrap}>
-      <Text style={s.title}>{t('monument.title')}</Text>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={s.chips} contentContainerStyle={{ gap: 8, paddingHorizontal: 16 }}>
-        <Pressable onPress={() => setCat(undefined)} style={[s.chip, !cat && s.chipActive]}>
-          <Text style={[s.chipTxt, !cat && s.chipTxtActive]}>{t('monument.all')}</Text>
-        </Pressable>
-        {cats.map((c) => (
-          <Pressable key={c.id} onPress={() => setCat(c.id)} style={[s.chip, cat === c.id && s.chipActive]}>
-            <Text style={[s.chipTxt, cat === c.id && s.chipTxtActive]}>{lang === 'ar' ? c.name_ar : c.name_en}</Text>
+      <View style={s.topBar}>
+        <Text style={s.title}>{t('monument.title')}</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={s.chips} contentContainerStyle={{ gap: 8, paddingHorizontal: 16, alignItems: 'center' }}>
+          <Pressable onPress={() => setCat(undefined)} style={[s.chip, !cat && s.chipActive]}>
+            <Text style={[s.chipTxt, !cat && s.chipTxtActive]}>{t('monument.all')}</Text>
           </Pressable>
-        ))}
-      </ScrollView>
+          {cats.map((c) => (
+            <Pressable key={c.id} onPress={() => setCat(c.id)} style={[s.chip, cat === c.id && s.chipActive]}>
+              <Text style={[s.chipTxt, cat === c.id && s.chipTxtActive]}>{lang === 'ar' ? c.name_ar : c.name_en}</Text>
+            </Pressable>
+          ))}
+        </ScrollView>
+      </View>
       {loading ? <LoadingState /> : error ? <ErrorState message={error} onRetry={reload} /> : rows.length === 0 && events.length === 0 ? <EmptyState /> : (
         <FlatList
           data={[...rows.map((r: any) => ({ kind: 'm', r })), ...events.map((r: any) => ({ kind: 'e', r }))]}
@@ -49,9 +51,15 @@ export default function MonumentTab() {
   );
 }
 const s = StyleSheet.create({
-  wrap: { flex: 1, backgroundColor: '#fff', paddingTop: 56 },
+  wrap: { flex: 1, backgroundColor: '#fff' },
+  // Solid upper bar: opaque background + elevation so card images can never
+  // paint over the title and filter buttons.
+  topBar: {
+    paddingTop: 56, paddingBottom: 10, backgroundColor: '#fff',
+    borderBottomWidth: 1, borderColor: COLORS.border, zIndex: 10, elevation: 4,
+  },
   title: { fontSize: 24, fontWeight: '800', color: COLORS.text, paddingHorizontal: 16 },
-  chips: { maxHeight: 48, marginTop: 10 },
+  chips: { height: 48, marginTop: 10 },
   chip: { borderWidth: 1, borderColor: COLORS.border, borderRadius: RADIUS.full, paddingHorizontal: 14, height: 36, justifyContent: 'center', backgroundColor: '#fff' },
   chipActive: { backgroundColor: COLORS.text, borderColor: COLORS.text },
   chipTxt: { color: COLORS.text, fontWeight: '600' },

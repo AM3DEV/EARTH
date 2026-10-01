@@ -1,21 +1,58 @@
-import React from 'react';
+import React, { useEffect, useImperativeHandle, useRef, useState, forwardRef } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
 type AnyProps = { style?: any; children?: React.ReactNode; [key: string]: any };
 
-// Web stub — react-native-maps has no web implementation.
-// This placeholder keeps `expo export --platform all` (static route rendering)
-// working; the full interactive map stays native-only.
-export default function WebMapPlaceholder({ style }: AnyProps) {
-  return (
-    <View style={[style, s.ph]}>
-      <Text style={s.t}>Map view is available in the mobile app</Text>
-    </View>
-  );
-}
+// Web map entry. SSR-safe: Leaflet touches `window`, so LeafletWeb is imported
+// lazily after mount. Server/static render gets a placeholder; the real
+// interactive map (OpenStreetMap + markers) hydrates in the browser.
+const WebMapInner = forwardRef<any, AnyProps>(function WebMapInner({ style, ...rest }, ref) {
+  const [ClientMap, setClientMap] = useState<any>(null);
+  const innerRef = useRef<any>(null);
 
-export function Marker() {
-  return null;
+  useEffect(() => {
+    let on = true;
+    import('./LeafletWeb').then((m) => {
+      if (on) setClientMap(() => m.LeafletMap);
+    });
+    return () => {
+      on = false;
+    };
+  }, []);
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      animateToRegion: (...a: any[]) => innerRef.current?.animateToRegion(...a),
+    }),
+    []
+  );
+
+  if (!ClientMap) {
+    return (
+      <View style={[style, s.ph]}>
+        <Text style={s.t}>Loading map…</Text>
+      </View>
+    );
+  }
+  return <ClientMap {...rest} style={style} ref={innerRef} />;
+});
+
+export default WebMapInner;
+
+export function Marker(props: AnyProps) {
+  const [ClientMarker, setClientMarker] = useState<any>(null);
+  useEffect(() => {
+    let on = true;
+    import('./LeafletWeb').then((m) => {
+      if (on) setClientMarker(() => m.LeafletMarker);
+    });
+    return () => {
+      on = false;
+    };
+  }, []);
+  if (!ClientMarker) return null;
+  return <ClientMarker {...props} />;
 }
 
 export type Region = {

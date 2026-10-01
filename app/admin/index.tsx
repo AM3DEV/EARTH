@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import {
-  Building2, CalendarDays, Briefcase, Tags, ClipboardList, Calculator,
+  Building2, Briefcase, Tags, ClipboardList, Calculator,
   Percent, Zap, HeartHandshake, Star, History, ShieldCheck, Settings, User,
 } from 'lucide-react-native';
 import { supabase } from '../../lib/supabase';
@@ -15,8 +15,7 @@ import { useAdminStats } from '../../hooks/useAdmin';
 /** Admin home: stats overview + a button grid where each section opens its own page. */
 const SECTIONS = [
   { key: 'companies', href: '/admin/companies', icon: Building2 },
-  { key: 'events', href: '/admin/events', icon: CalendarDays },
-  { key: 'services', href: '/admin/services', icon: Briefcase },
+  { key: 'experiences', href: '/admin/experiences', icon: Briefcase },
   { key: 'categories', href: '/admin/categories', icon: Tags },
   { key: 'bookings', href: '/admin/bookings', icon: ClipboardList },
   { key: 'pricing', href: '/admin/pricing', icon: Calculator },

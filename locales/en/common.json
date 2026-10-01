@@ -56,7 +56,7 @@
     "edit": "Edit", "create": "Create", "search": "Search", "close": "Close", "active": "Active", "inactive": "Inactive"
   },
   "admin": {
-    "dashboard": "Dashboard", "companies": "Companies", "events": "Events",
+    "dashboard": "Dashboard", "companies": "Companies", "experiences": "Services & Events", "events": "Events",
     "services": "Services", "categories": "Categories", "bookings": "Bookings", "pricing": "Pricing",
     "discounts": "Discounts", "promotions": "Service Plus", "supportPricing": "Support Pricing",
     "reviews": "Reviews", "activity": "Activity Logs", "administrators": "Administrators",

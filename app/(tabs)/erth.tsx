@@ -57,6 +57,6 @@ const s = StyleSheet.create({
   typing: { color: COLORS.secondaryText, paddingHorizontal: 16, fontStyle: 'italic' },
   err: { color: COLORS.error, paddingHorizontal: 16 },
   row: { flexDirection: 'row', gap: 8, padding: 12, borderTopWidth: 1, borderColor: COLORS.border },
-  input: { flex: 1, borderWidth: 1, borderColor: COLORS.border, borderRadius: RADIUS.full, minHeight: 48, paddingHorizontal: 16, fontSize: 15, color: COLORS.text },
+  input: { flex: 1, borderWidth: 1, borderColor: COLORS.border, borderRadius: RADIUS.full, minHeight: 48, paddingHorizontal: 16, fontSize: 16, color: COLORS.text },
   send: { width: 48, height: 48, borderRadius: 24, backgroundColor: COLORS.primary, alignItems: 'center', justifyContent: 'center' },
 });

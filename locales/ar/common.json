@@ -56,7 +56,7 @@
     "edit": "تعديل", "create": "إنشاء", "search": "بحث", "close": "إغلاق", "active": "نشط", "inactive": "غير نشط"
   },
   "admin": {
-    "dashboard": "لوحة التحكم", "companies": "الشركات", "events": "الفعاليات",
+    "dashboard": "لوحة التحكم", "companies": "الشركات", "experiences": "الخدمات والفعاليات", "events": "الفعاليات",
     "services": "الخدمات", "categories": "الفئات", "bookings": "الحجوزات", "pricing": "التسعير",
     "discounts": "الخصومات", "promotions": "خدمة بلس", "supportPricing": "تسعير الدعم",
     "reviews": "التقييمات", "activity": "سجل النشاط", "administrators": "المسؤولون",
