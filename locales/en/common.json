@@ -1,0 +1,65 @@
+{
+  "app": { "name": "Jordan Tourism Guide", "tagline": "Discover Jordan" },
+  "onboarding": {
+    "s1t": "Discover Jordan", "s1d": "From Petra to Wadi Rum — explore the Kingdom's wonders.",
+    "s2t": "Historical Monuments", "s2d": "Jerash, Citadel, Ajloun Castle and more.",
+    "s3t": "Events & Experiences", "s3d": "Festivals, tours, diving, desert nights.",
+    "s4t": "Find nearby businesses", "s4d": "Restaurants, hotels and services on the map.",
+    "s5t": "Book tourism services", "s5d": "Real-time availability and server-priced booking.",
+    "getStarted": "Get Started", "login": "Login"
+  },
+  "auth": {
+    "login": "Login", "register": "Register", "emailOrUsername": "Email or username",
+    "email": "Email", "username": "Username", "password": "Password", "confirmPassword": "Confirm password",
+    "firstName": "First name", "lastName": "Last name",
+    "forgot": "Forgot password?", "forgotTitle": "Reset password",
+    "sendLink": "Send reset link", "backToLogin": "Back to login",
+    "noAccount": "No account? Register", "haveAccount": "Have an account? Login",
+    "welcomeAdmin": "Welcome, {{name}} — Administrator"
+  },
+  "tabs": { "map": "Map", "monument": "Monument", "erth": "Erth", "profile": "Profile" },
+  "map": {
+    "searchPlaceholder": "Search businesses...",
+    "searchLabel": "Search businesses", "closeLabel": "Close search", "clearLabel": "Clear search",
+    "noResults": "No businesses found", "viewDetails": "View Details",
+    "noReviews": "No reviews yet", "reviews": "{{count}} reviews"
+  },
+  "monument": { "title": "Explore", "categories": "Categories", "all": "All" },
+  "detail": {
+    "description": "Description", "history": "History", "hours": "Opening hours",
+    "price": "Price", "priceUnavailable": "Price unavailable",
+    "directions": "Directions", "favorite": "Favorite", "share": "Share", "reviews": "Reviews",
+    "call": "Call", "website": "Website", "book": "Book now"
+  },
+  "booking": {
+    "title": "Book service", "date": "Date", "quantity": "Quantity",
+    "confirm": "Confirm booking", "confirmed": "Booking Confirmed",
+    "reference": "Reference", "basePrice": "Base Price", "currentPrice": "Current Price",
+    "supportDiscount": "Support Discount", "finalPrice": "Final Price",
+    "myBookings": "My Bookings", "noBookings": "No bookings yet",
+    "capacity": "Capacity", "priceIncrease": "Price increase"
+  },
+  "support": { "badge": "Nearby Support {{pct}}% OFF", "supported": "Supported nearby experience" },
+  "plus": { "badge": "PLUS", "featured": "Featured Event" },
+  "erth": {
+    "title": "Erth", "placeholder": "Ask about Jordan...", "send": "Send",
+    "typing": "Erth is typing…", "newChat": "New conversation", "history": "History",
+    "error": "AI is unavailable. Please try again."
+  },
+  "favorites": { "title": "Favorites", "empty": "No favorites yet" },
+  "notifications": { "title": "Notifications", "empty": "No notifications", "markRead": "Mark read" },
+  "profile": { "edit": "Edit profile", "settings": "Settings", "logout": "Logout", "language": "Language" },
+  "settings": { "title": "Settings", "about": "About", "privacy": "Privacy", "terms": "Terms", "notifications": "Notifications" },
+  "common": {
+    "loading": "Loading…", "error": "Something went wrong", "retry": "Retry",
+    "empty": "Nothing here yet", "save": "Save", "cancel": "Cancel", "delete": "Delete",
+    "edit": "Edit", "create": "Create", "search": "Search", "close": "Close", "active": "Active", "inactive": "Inactive"
+  },
+  "admin": {
+    "dashboard": "Dashboard", "companies": "Companies", "events": "Events",
+    "services": "Services", "categories": "Categories", "bookings": "Bookings", "pricing": "Pricing",
+    "discounts": "Discounts", "promotions": "Service Plus", "supportPricing": "Support Pricing",
+    "reviews": "Reviews", "activity": "Activity Logs", "administrators": "Administrators",
+    "settings": "Settings", "profile": "My Profile"
+  }
+}

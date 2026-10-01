@@ -1,0 +1,67 @@
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, FlatList, Pressable } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { supabase } from '../../lib/supabase';
+import { getMyRole } from '../../lib/auth';
+import { COLORS } from '../../constants/colors';
+import { AdminHeader } from '../../components/admin/AdminHeader';
+import { LoadingState } from '../../components/ui/States';
+import { Field } from '../../components/ui/Field';
+
+/** Boss admin only: create/deactivate/reactivate admins, change roles. Deactivate preferred over delete. */
+export default function Administrators() {
+  const { t } = useTranslation();
+  const [rows, setRows] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [email, setEmail] = useState('');
+  const [msg, setMsg] = useState<string | null>(null);
+
+  const load = async () => {
+    setLoading(true);
+    const { data } = await supabase.rpc('boss_list_admins');
+    setRows((data as any[]) ?? []);
+    setLoading(false);
+  };
+  useEffect(() => {
+    (async () => {
+      const r = await getMyRole();
+      if (r !== 'boss_admin') { setMsg('Boss admin only'); setLoading(false); return; }
+      load();
+    })();
+  }, []);
+
+  const setRole = async (userId: string, role: string) => {
+    setMsg(null);
+    const { error } = await supabase.rpc('boss_set_role', { p_user_id: userId, p_role: role });
+    setMsg(error ? error.message : 'Updated');
+    load();
+  };
+
+  if (loading) return <LoadingState />;
+  return (
+    <View style={s.wrap}>
+      <AdminHeader title={t('admin.administrators')} />
+      {msg ? <Text style={s.msg}>{msg}</Text> : null}
+      <FlatList data={rows} keyExtractor={(r: any) => r.user_id} contentContainerStyle={{ padding: 16 }}
+        renderItem={({ item }: any) => (
+          <View style={s.card}>
+            <Text style={s.name}>{item.email ?? item.user_id.slice(0, 8)} · {item.role} {item.is_active === false ? '(deactivated)' : ''}</Text>
+            <View style={s.row}>
+              <Pressable onPress={() => setRole(item.user_id, 'admin')}><Text style={s.act}>make admin</Text></Pressable>
+              <Pressable onPress={() => setRole(item.user_id, 'boss_admin')}><Text style={s.act}>make boss</Text></Pressable>
+              <Pressable onPress={() => setRole(item.user_id, 'user')}><Text style={s.act}>deactivate→user</Text></Pressable>
+            </View>
+          </View>
+        )} />
+    </View>
+  );
+}
+const s = StyleSheet.create({
+  wrap: { flex: 1, backgroundColor: '#fff', paddingTop: 60 },
+  title: { fontSize: 22, fontWeight: '800', color: COLORS.text, paddingHorizontal: 16 },
+  msg: { color: COLORS.secondaryText, paddingHorizontal: 16 },
+  card: { borderWidth: 1, borderColor: COLORS.border, borderRadius: 12, padding: 12, marginBottom: 8 },
+  name: { fontWeight: '700', color: COLORS.text },
+  row: { flexDirection: 'row', gap: 14, marginTop: 8 },
+  act: { color: COLORS.primaryDark, fontWeight: '700' },
+});

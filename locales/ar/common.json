@@ -1,0 +1,65 @@
+{
+  "app": { "name": "دليل السياحة الأردنية", "tagline": "اكتشف الأردن" },
+  "onboarding": {
+    "s1t": "اكتشف الأردن", "s1d": "من البترا إلى وادي رم — استكشف عجائب المملكة.",
+    "s2t": "المواقع الأثرية", "s2d": "جرش والقلعة وقلعة عجلون والمزيد.",
+    "s3t": "الفعاليات والتجارب", "s3d": "مهرجانات وجولات وغوص وليالي الصحراء.",
+    "s4t": "اعثر على أعمال قريبة", "s4d": "مطاعم وفنادق وخدمات على الخريطة.",
+    "s5t": "احجز الخدمات السياحية", "s5d": "توافر فوري وأسعار محسوبة من الخادم.",
+    "getStarted": "ابدأ", "login": "تسجيل الدخول"
+  },
+  "auth": {
+    "login": "تسجيل الدخول", "register": "إنشاء حساب", "emailOrUsername": "البريد أو اسم المستخدم",
+    "email": "البريد الإلكتروني", "username": "اسم المستخدم", "password": "كلمة المرور", "confirmPassword": "تأكيد كلمة المرور",
+    "firstName": "الاسم الأول", "lastName": "اسم العائلة",
+    "forgot": "نسيت كلمة المرور؟", "forgotTitle": "استعادة كلمة المرور",
+    "sendLink": "إرسال رابط الاستعادة", "backToLogin": "عودة للدخول",
+    "noAccount": "ليس لديك حساب؟ سجّل", "haveAccount": "لديك حساب؟ ادخل",
+    "welcomeAdmin": "أهلاً {{name}} — مسؤول"
+  },
+  "tabs": { "map": "الخريطة", "monument": "الآثار", "erth": "إرث", "profile": "حسابي" },
+  "map": {
+    "searchPlaceholder": "ابحث عن الأعمال...",
+    "searchLabel": "البحث عن الأعمال", "closeLabel": "إغلاق البحث", "clearLabel": "مسح البحث",
+    "noResults": "لا توجد أعمال", "viewDetails": "عرض التفاصيل",
+    "noReviews": "لا تقييمات بعد", "reviews": "{{count}} تقييم"
+  },
+  "monument": { "title": "استكشف", "categories": "الفئات", "all": "الكل" },
+  "detail": {
+    "description": "الوصف", "history": "التاريخ", "hours": "ساعات العمل",
+    "price": "السعر", "priceUnavailable": "السعر غير متوفر",
+    "directions": "الاتجاهات", "favorite": "مفضلة", "share": "مشاركة", "reviews": "التقييمات",
+    "call": "اتصال", "website": "الموقع", "book": "احجز الآن"
+  },
+  "booking": {
+    "title": "حجز خدمة", "date": "التاريخ", "quantity": "العدد",
+    "confirm": "تأكيد الحجز", "confirmed": "تم تأكيد الحجز",
+    "reference": "المرجع", "basePrice": "السعر الأساسي", "currentPrice": "السعر الحالي",
+    "supportDiscount": "خصم الدعم", "finalPrice": "السعر النهائي",
+    "myBookings": "حجوزاتي", "noBookings": "لا حجوزات بعد",
+    "capacity": "السعة", "priceIncrease": "زيادة السعر"
+  },
+  "support": { "badge": "دعم قريب خصم {{pct}}٪", "supported": "تجربة قريبة مدعومة" },
+  "plus": { "badge": "PLUS", "featured": "فعالية مميزة" },
+  "erth": {
+    "title": "إرث", "placeholder": "اسأل عن الأردن...", "send": "إرسال",
+    "typing": "إرث يكتب…", "newChat": "محادثة جديدة", "history": "السجل",
+    "error": "المساعد غير متاح حالياً. حاول مجدداً."
+  },
+  "favorites": { "title": "المفضلة", "empty": "لا عناصر مفضلة بعد" },
+  "notifications": { "title": "الإشعارات", "empty": "لا إشعارات", "markRead": "تعليم كمقروء" },
+  "profile": { "edit": "تعديل الملف", "settings": "الإعدادات", "logout": "خروج", "language": "اللغة" },
+  "settings": { "title": "الإعدادات", "about": "حول", "privacy": "الخصوصية", "terms": "الشروط", "notifications": "الإشعارات" },
+  "common": {
+    "loading": "جارٍ التحميل…", "error": "حدث خطأ", "retry": "إعادة المحاولة",
+    "empty": "لا يوجد شيء بعد", "save": "حفظ", "cancel": "إلغاء", "delete": "حذف",
+    "edit": "تعديل", "create": "إنشاء", "search": "بحث", "close": "إغلاق", "active": "نشط", "inactive": "غير نشط"
+  },
+  "admin": {
+    "dashboard": "لوحة التحكم", "companies": "الشركات", "events": "الفعاليات",
+    "services": "الخدمات", "categories": "الفئات", "bookings": "الحجوزات", "pricing": "التسعير",
+    "discounts": "الخصومات", "promotions": "خدمة بلس", "supportPricing": "تسعير الدعم",
+    "reviews": "التقييمات", "activity": "سجل النشاط", "administrators": "المسؤولون",
+    "settings": "الإعدادات", "profile": "ملفي"
+  }
+}

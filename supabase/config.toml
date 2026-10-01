@@ -1,0 +1,2 @@
+[functions.erth-chat]
+verify_jwt = true
