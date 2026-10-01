@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, Pressable } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Marker } from '../../components/maps/NativeMap';
 import { supabase } from '../../lib/supabase';
 import { COLORS, RADIUS } from '../../constants/colors';
 import { AdminHeader } from '../../components/admin/AdminHeader';

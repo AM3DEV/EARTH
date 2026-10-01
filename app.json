@@ -30,6 +30,9 @@
       "permissions": [
         "android.permission.ACCESS_FINE_LOCATION",
         "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.RECORD_AUDIO"
       ],
       "config": {
@@ -76,6 +79,12 @@
         "projectId": "4447dd39-3d91-46c1-bbf3-6df6c94df635"
       }
     },
-    "owner": "am3.wav"
+    "owner": "am3.wav",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/4447dd39-3d91-46c1-bbf3-6df6c94df635"
+    }
   }
 }

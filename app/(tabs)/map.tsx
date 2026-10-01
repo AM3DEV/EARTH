@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { View, Text, StyleSheet, Pressable, TextInput, FlatList, Keyboard, KeyboardAvoidingView, Platform } from 'react-native';
-import MapView, { Marker, Region } from 'react-native-maps';
+import MapView, { Marker, type Region } from '../../components/maps/NativeMap';
 import * as Location from 'expo-location';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -21,7 +21,7 @@ export default function MapHome() {
   const { t, i18n } = useTranslation();
   const router = useRouter();
   const lang = i18n.language;
-  const mapRef = useRef<MapView>(null);
+  const mapRef = useRef<any>(null);
   const inputRef = useRef<TextInput>(null);
   const { profile } = useProfile();
 

@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ScrollView, View, Text, StyleSheet, Pressable, Linking, Share } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Image } from 'expo-image';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Marker } from '../../components/maps/NativeMap';
 import { supabase } from '../../lib/supabase';
 import { COLORS, RADIUS } from '../../constants/colors';
 import { LoadingState, ErrorState } from '../../components/ui/States';

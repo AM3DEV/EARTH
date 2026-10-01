@@ -35,7 +35,8 @@
   ],
   "exclude": [
     "supabase/functions/**/*",
-    "node_modules"
+    "node_modules",
+    "erth/**/*"
   ],
   "extends": "expo/tsconfig.base"
 }
