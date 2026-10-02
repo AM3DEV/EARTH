@@ -3,6 +3,7 @@ import { ScrollView, Text, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '../../lib/supabase';
+import { logAdminAction } from '../../lib/adminLog';
 import { Field } from '../ui/Field';
 import { PrimaryButton } from '../ui/Buttons';
 import { SectionTitle, ToggleRow, OptionsPicker, ImageField, AdminGate, friendlyDbError } from './fields';
@@ -31,13 +32,18 @@ export function CategoryForm({ initial, categoryId }: { initial: any; categoryId
     setErr(null); setBusy(true);
     try {
       if (!v.name_en?.trim() || !v.name_ar?.trim()) throw new Error('English and Arabic names are required');
+      // Prevent duplicate category names (case-insensitive) — dupes show as doubled filter chips.
+      const { data: dup } = await supabase.from('categories').select('id').ilike('name_en', v.name_en.trim()).limit(1);
+      if (dup?.length && dup[0].id !== categoryId) throw new Error('A category with this English name already exists.');
       const payload = { ...v, image_url: v.image_url ?? null, type: v.type ?? null };
       if (categoryId) {
         const { error } = await supabase.from('categories').update({ ...payload, updated_at: new Date().toISOString() }).eq('id', categoryId);
         if (error) throw error;
+        void logAdminAction('update', 'category', { entityId: categoryId, entityName: v.name_en });
       } else {
-        const { error } = await supabase.from('categories').insert(payload);
+        const { data, error } = await supabase.from('categories').insert(payload).select('id').single();
         if (error) throw error;
+        void logAdminAction('create', 'category', { entityId: data.id, entityName: v.name_en });
       }
       router.back();
     } catch (e: any) { setErr(friendlyDbError(e)); } finally { setBusy(false); }

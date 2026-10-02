@@ -54,11 +54,11 @@ export default function ProfileTab() {
   );
 }
 const s = StyleSheet.create({
-  wrap: { flex: 1, backgroundColor: '#fff' },
+  wrap: { flex: 1, backgroundColor: COLORS.background },
   head: { flexDirection: 'row', gap: 12, alignItems: 'center' },
-  av: { width: 56, height: 56, borderRadius: 28, backgroundColor: '#eee' },
-  avF: { backgroundColor: '#F3D9CC', alignItems: 'center', justifyContent: 'center' },
-  avT: { fontWeight: '800', color: '#C17654', fontSize: 20 },
+  av: { width: 60, height: 60, borderRadius: 30, backgroundColor: COLORS.softGreen, borderWidth: 2, borderColor: COLORS.gold },
+  avF: { backgroundColor: COLORS.softGreen, alignItems: 'center', justifyContent: 'center' },
+  avT: { fontWeight: '800', color: COLORS.primaryDark, fontSize: 22 },
   name: { fontWeight: '800', fontSize: 17, color: COLORS.text },
   muted: { color: COLORS.secondaryText, fontSize: 13, marginTop: 2 },
   row: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 13, borderBottomWidth: 1, borderColor: COLORS.border },

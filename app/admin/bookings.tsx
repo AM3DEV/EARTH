@@ -88,7 +88,7 @@ export default function AdminBookings() {
   );
 }
 const s = StyleSheet.create({
-  wrap: { flex: 1, backgroundColor: '#fff', paddingTop: 60 },
+  wrap: { flex: 1, backgroundColor: COLORS.background, paddingTop: 60 },
   card: { borderWidth: 1, borderColor: COLORS.border, borderRadius: 12, padding: 12, marginBottom: 8 },
   ref: { fontWeight: '800', color: COLORS.text },
   name: { fontWeight: '600', color: COLORS.text, fontSize: 13, marginTop: 2 },

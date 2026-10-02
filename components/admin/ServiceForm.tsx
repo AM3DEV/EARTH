@@ -3,9 +3,10 @@ import { ScrollView, Text, StyleSheet, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '../../lib/supabase';
+import { logAdminAction } from '../../lib/adminLog';
 import { Field } from '../ui/Field';
 import { PrimaryButton } from '../ui/Buttons';
-import { SectionTitle, ToggleRow, OptionsPicker, ImageField, Opt, useLocaleName, AdminGate, friendlyDbError } from './fields';
+import { SectionTitle, ToggleRow, OptionsPicker, ImageField, ImageGalleryField, Opt, useLocaleName, AdminGate, friendlyDbError } from './fields';
 import { COLORS } from '../../constants/colors';
 
 /**
@@ -19,7 +20,8 @@ export function ServiceForm({ initial, serviceId }: { initial: any; serviceId?: 
   const locName = useLocaleName();
   const [v, setV] = useState<any>({
     name_en: '', name_ar: '', description_en: '', description_ar: '',
-    company_id: null, category_id: null, image_url: null,
+    company_id: null, category_id: null, image_url: null, gallery_urls: [],
+    available_from: '', available_to: '',
     base_price: 0, currency: 'USD', max_booking: 100, current_booking: 0,
     duration: '', available: true, ...initial,
   });
@@ -48,11 +50,17 @@ export function ServiceForm({ initial, serviceId }: { initial: any; serviceId?: 
       if ((v.max_booking ?? 0) < 0) throw new Error('Max booking must be >= 0');
       if ((v.current_booking ?? 0) < 0) throw new Error('Current booking must be >= 0');
       if ((v.current_booking ?? 0) > (v.max_booking ?? 0)) throw new Error('Current booking cannot exceed max booking');
+      const from = String(v.available_from ?? '').trim() || null;
+      const to = String(v.available_to ?? '').trim() || null;
+      if (from && to && from > to) throw new Error('Available-from date must be before available-to date');
       const payload = {
         ...v,
         company_id: v.company_id ?? null,
         category_id: v.category_id ?? null,
         image_url: v.image_url ?? null,
+        gallery_urls: v.gallery_urls ?? [],
+        available_from: from,
+        available_to: to,
         base_price: Number(v.base_price) || 0,
         max_booking: Number(v.max_booking) || 0,
         current_booking: Number(v.current_booking) || 0,
@@ -60,9 +68,11 @@ export function ServiceForm({ initial, serviceId }: { initial: any; serviceId?: 
       if (serviceId) {
         const { error } = await supabase.from('services').update({ ...payload, updated_at: new Date().toISOString() }).eq('id', serviceId);
         if (error) throw error;
+        void logAdminAction('update', 'service', { entityId: serviceId, entityName: v.name_en });
       } else {
-        const { error } = await supabase.from('services').insert({ ...payload, current_price: payload.base_price });
+        const { data, error } = await supabase.from('services').insert({ ...payload, current_price: payload.base_price }).select('id').single();
         if (error) throw error;
+        void logAdminAction('create', 'service', { entityId: data.id, entityName: v.name_en });
       }
       router.back();
     } catch (e: any) { setErr(friendlyDbError(e)); } finally { setBusy(false); }
@@ -86,12 +96,15 @@ export function ServiceForm({ initial, serviceId }: { initial: any; serviceId?: 
 
       <SectionTitle>Media</SectionTitle>
       <ImageField label="Service image" bucket="service" value={v.image_url} onChange={(url) => set('image_url', url)} />
+      <ImageGalleryField label="More pictures" bucket="service" value={v.gallery_urls ?? []} onChange={(urls) => set('gallery_urls', urls)} />
 
       <SectionTitle>Pricing & Capacity</SectionTitle>
       <Field label="Base price" value={String(v.base_price ?? 0)} onChangeText={(x) => set('base_price', Number(x) || 0)} keyboardType="numeric" />
       <Field label="Currency" value={String(v.currency ?? 'USD')} onChangeText={(x) => set('currency', x)} />
       <Field label="Max booking" value={String(v.max_booking ?? 0)} onChangeText={(x) => set('max_booking', Number(x) || 0)} keyboardType="numeric" />
       <Field label="Current booking" value={String(v.current_booking ?? 0)} onChangeText={(x) => set('current_booking', Number(x) || 0)} keyboardType="numeric" />
+      <Field label="Available from (YYYY-MM-DD, optional)" value={String(v.available_from ?? '')} onChangeText={(x) => set('available_from', x)} placeholder="2026-11-01" />
+      <Field label="Available to (YYYY-MM-DD, optional)" value={String(v.available_to ?? '')} onChangeText={(x) => set('available_to', x)} placeholder="2026-12-31" />
       {serviceId ? (
         <View style={s.readonly}>
           <Text style={s.roLabel}>Current price (server-managed)</Text>

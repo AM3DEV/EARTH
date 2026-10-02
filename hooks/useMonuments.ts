@@ -1,20 +1,30 @@
 import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 
-export function useMonuments(categoryId?: string) {
+/** categoryId accepts one id or several (duplicate-named categories are merged by callers). */
+export function useMonuments(categoryId?: string | string[]) {
   const [rows, setRows] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const key = Array.isArray(categoryId) ? [...categoryId].sort().join(',') : (categoryId ?? '');
   const load = useCallback(async () => {
     setLoading(true); setError(null);
     try {
       let q = supabase.from('monuments').select('*, categories(name_en,name_ar)').order('name_en').limit(100);
-      if (categoryId) q = q.eq('category_id', categoryId);
+      const ids = Array.isArray(categoryId) ? categoryId : categoryId ? [categoryId] : [];
+      if (ids.length > 0) q = q.in('category_id', ids);
       const { data, error } = await q;
       if (error) throw error;
-      setRows(data ?? []);
+      // Defense in depth: never render two same-named places (first wins).
+      const seen = new Set<string>();
+      setRows((data ?? []).filter((m: any) => {
+        const n = String(m.name_en ?? '').trim().toLowerCase();
+        if (seen.has(n)) return false;
+        seen.add(n);
+        return true;
+      }));
     } catch (e: any) { setError(e.message); } finally { setLoading(false); }
-  }, [categoryId]);
+  }, [key]);
   useEffect(() => { load(); }, [load]);
   return { rows, loading, error, reload: load };
 }

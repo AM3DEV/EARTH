@@ -24,11 +24,12 @@
     "noResults": "لا توجد أعمال", "viewDetails": "عرض التفاصيل",
     "noReviews": "لا تقييمات بعد", "reviews": "{{count}} تقييم"
   },
-  "monument": { "title": "استكشف", "categories": "الفئات", "all": "الكل" },
+  "monument": { "title": "استكشف", "categories": "الفئات", "all": "الكل", "nearEvent": "قريب منك" },
   "detail": {
     "description": "الوصف", "history": "التاريخ", "hours": "ساعات العمل",
     "price": "السعر", "priceUnavailable": "السعر غير متوفر",
     "directions": "الاتجاهات", "favorite": "مفضلة", "share": "مشاركة", "reviews": "التقييمات",
+    "addReview": "اكتب تقييماً", "comment": "تعليق",
     "call": "اتصال", "website": "الموقع", "book": "احجز الآن"
   },
   "booking": {
@@ -37,7 +38,12 @@
     "reference": "المرجع", "basePrice": "السعر الأساسي", "currentPrice": "السعر الحالي",
     "supportDiscount": "خصم الدعم", "finalPrice": "السعر النهائي",
     "myBookings": "حجوزاتي", "noBookings": "لا حجوزات بعد",
-    "capacity": "السعة", "priceIncrease": "زيادة السعر"
+    "capacity": "السعة", "priceIncrease": "زيادة السعر",
+    "unavailable": "هذه التجربة غير متاحة حالياً.",
+    "invalidQty": "أدخل عدداً لا يقل عن 1.",
+    "onlyLeft": "تبقى {{count}} أماكن فقط لهذه التجربة.",
+    "fromDate": "متاح اعتباراً من {{date}}.",
+    "untilDate": "متاح حتى {{date}}."
   },
   "support": { "badge": "دعم قريب خصم {{pct}}٪", "supported": "تجربة قريبة مدعومة" },
   "plus": { "badge": "PLUS", "featured": "فعالية مميزة" },
@@ -53,10 +59,11 @@
   "common": {
     "loading": "جارٍ التحميل…", "error": "حدث خطأ", "retry": "إعادة المحاولة",
     "empty": "لا يوجد شيء بعد", "save": "حفظ", "cancel": "إلغاء", "delete": "حذف",
-    "edit": "تعديل", "create": "إنشاء", "search": "بحث", "close": "إغلاق", "active": "نشط", "inactive": "غير نشط"
+    "edit": "تعديل", "create": "إنشاء", "search": "بحث", "close": "إغلاق", "active": "نشط", "inactive": "غير نشط",
+    "verify": "توثيق", "unverify": "إلغاء التوثيق", "verified": "موثّق"
   },
   "admin": {
-    "dashboard": "لوحة التحكم", "companies": "الشركات", "experiences": "الخدمات والفعاليات", "events": "الفعاليات",
+    "dashboard": "لوحة التحكم", "places": "الأماكن", "companies": "الشركات", "monuments": "المعالم", "experiences": "الخدمات والفعاليات", "events": "الفعاليات",
     "services": "الخدمات", "categories": "الفئات", "bookings": "الحجوزات", "pricing": "التسعير",
     "discounts": "الخصومات", "promotions": "خدمة بلس", "supportPricing": "تسعير الدعم",
     "reviews": "التقييمات", "activity": "سجل النشاط", "administrators": "المسؤولون",

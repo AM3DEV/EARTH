@@ -1,10 +1,12 @@
 import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 
-export function useEvents(categoryId?: string) {
+/** categoryId accepts one id or several (duplicate-named categories are merged by callers). */
+export function useEvents(categoryId?: string | string[]) {
   const [rows, setRows] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const key = Array.isArray(categoryId) ? [...categoryId].sort().join(',') : (categoryId ?? '');
   const load = useCallback(async () => {
     setLoading(true); setError(null);
     try {
@@ -12,10 +14,11 @@ export function useEvents(categoryId?: string) {
       const { data, error } = await supabase.from('event_discovery').select('*').limit(100);
       if (error) throw error;
       let r = (data ?? []).filter((e: any) => e.active !== false);
-      if (categoryId) r = r.filter((e: any) => e.category_id === categoryId);
+      const ids = Array.isArray(categoryId) ? categoryId : categoryId ? [categoryId] : [];
+      if (ids.length > 0) r = r.filter((e: any) => ids.includes(e.category_id));
       setRows(r);
     } catch (e: any) { setError(e.message); } finally { setLoading(false); }
-  }, [categoryId]);
+  }, [key]);
   useEffect(() => { load(); }, [load]);
   return { rows, loading, error, reload: load };
 }

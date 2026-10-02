@@ -45,13 +45,13 @@ export default function ErthTab() {
   );
 }
 const s = StyleSheet.create({
-  wrap: { flex: 1, backgroundColor: '#fff', paddingTop: 56 },
+  wrap: { flex: 1, backgroundColor: COLORS.background, paddingTop: 56 },
   head: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, paddingBottom: 8 },
   title: { fontSize: 24, fontWeight: '800', color: COLORS.text },
   clear: { color: COLORS.primary, fontWeight: '600' },
   bubble: { maxWidth: '82%', borderRadius: RADIUS.lg, padding: 12, alignSelf: 'flex-end' },
   user: { backgroundColor: COLORS.primary, alignSelf: 'flex-end' },
-  ai: { backgroundColor: '#F5F5F5', alignSelf: 'flex-start', borderWidth: 1, borderColor: COLORS.border },
+  ai: { backgroundColor: '#fff', alignSelf: 'flex-start', borderWidth: 1, borderColor: COLORS.border },
   msg: { fontSize: 15, color: COLORS.text },
   hint: { color: COLORS.secondaryText, textAlign: 'center', marginTop: 40 },
   typing: { color: COLORS.secondaryText, paddingHorizontal: 16, fontStyle: 'italic' },

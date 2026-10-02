@@ -3,9 +3,10 @@ import { ScrollView, Text, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '../../lib/supabase';
+import { logAdminAction } from '../../lib/adminLog';
 import { Field } from '../ui/Field';
 import { PrimaryButton } from '../ui/Buttons';
-import { SectionTitle, ToggleRow, OptionsPicker, ImageField, Opt, useLocaleName, AdminGate, friendlyDbError } from './fields';
+import { SectionTitle, ToggleRow, OptionsPicker, ImageField, ImageGalleryField, Opt, useLocaleName, AdminGate, friendlyDbError } from './fields';
 import { COLORS } from '../../constants/colors';
 
 /** Parse "YYYY-MM-DD HH:mm" (or ISO) to ISO string, or null. */
@@ -32,7 +33,7 @@ function fromISO(s?: string | null): string {
 export function EventForm({ initial, eventId }: { initial: any; eventId?: string }) {
   const { t } = useTranslation();
   const router = useRouter();
-  const [v, setV] = useState<any>({ title_en: '', title_ar: '', location: '', price: 0, currency: 'USD', capacity: 100, active: true, category_id: null, image_url: null, ...initial });
+  const [v, setV] = useState<any>({ title_en: '', title_ar: '', location: '', price: 0, currency: 'USD', capacity: 100, active: true, category_id: null, image_url: null, gallery_urls: [], ...initial });
   const [plus, setPlus] = useState({ enabled: false, plan: 'PLUS', durationDays: 7, priority: 100, status: 'scheduled' });
   const [support, setSupport] = useState({ enabled: true, radiusKm: 25, maxDiscount: 30, minCap: 0, maxCap: 70, stacking: false, durationH: 48 });
   const [cats, setCats] = useState<Opt[]>([]);
@@ -67,10 +68,12 @@ export function EventForm({ initial, eventId }: { initial: any; eventId?: string
       if (eid) {
         const { error } = await supabase.from('events').update({ ...payload, updated_at: new Date().toISOString() }).eq('id', eid);
         if (error) throw error;
+        void logAdminAction('update', 'event', { entityId: eid, entityName: v.title_en });
       } else {
         const { data, error } = await supabase.from('events').insert(payload).select('id').single();
         if (error) throw error;
         eid = data.id;
+        void logAdminAction('create', 'event', { entityId: eid, entityName: v.title_en });
       }
       // Service Plus promotion
       if (plus.enabled && eid) {
@@ -108,6 +111,7 @@ export function EventForm({ initial, eventId }: { initial: any; eventId?: string
       <SectionTitle>Category & Media</SectionTitle>
       <OptionsPicker label="Category" value={v.category_id} options={cats} onChange={(id) => set('category_id', id)} placeholder="No category" />
       <ImageField label="Event image" bucket="event" value={v.image_url} onChange={(url) => set('image_url', url)} />
+      <ImageGalleryField label="More pictures" bucket="event" value={v.gallery_urls ?? []} onChange={(urls) => set('gallery_urls', urls)} />
 
       <SectionTitle>Schedule</SectionTitle>
       <Field label="Start (YYYY-MM-DD HH:mm)" value={startTxt} onChangeText={setStartTxt} placeholder="2026-10-15 18:00" />

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Pressable, Modal, FlatList, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Modal, FlatList, ActivityIndicator, ScrollView } from 'react-native';
 import { Switch } from 'react-native';
 import { Image } from 'expo-image';
+import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { COLORS, RADIUS } from '../../constants/colors';
@@ -108,6 +109,59 @@ export function ImageField({ label, bucket, value, onChange }: {
   );
 }
 
+/** Multi-picture gallery: add many at once, thumbnail strip, remove each. Uploads immediately. */
+export function ImageGalleryField({ label, bucket, value, onChange, max = 8 }: {
+  label: string; bucket: 'avatar' | 'monument' | 'event' | 'company' | 'service' | 'category';
+  value?: string[] | null; onChange: (urls: string[]) => void; max?: number;
+}) {
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+  const urls = value ?? [];
+
+  const add = async () => {
+    setErr(null);
+    try {
+      const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!perm.granted) throw new Error('Photo permission denied');
+      const res = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: 'images',
+        allowsMultipleSelection: true,
+        selectionLimit: Math.max(1, max - urls.length),
+        quality: 0.7,
+      });
+      if (res.canceled || !res.assets?.length) return;
+      setBusy(true);
+      const uploaded: string[] = [];
+      for (const a of res.assets) {
+        uploaded.push(await uploadImage(bucket, a.uri, `img-${Date.now()}`));
+      }
+      onChange([...urls, ...uploaded].slice(0, max));
+    } catch (e: any) { setErr(e.message); } finally { setBusy(false); }
+  };
+
+  return (
+    <View style={s.field}>
+      <Text style={s.label}>{label} ({urls.length}/{max})</Text>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.galRow}>
+        {urls.map((u, i) => (
+          <View key={`${u}-${i}`} style={s.galWrap}>
+            <Image source={{ uri: u }} style={s.thumb} contentFit="cover" cachePolicy="memory-disk" />
+            <Pressable onPress={() => onChange(urls.filter((_, x) => x !== i))} style={s.galX} accessibilityRole="button" accessibilityLabel="Remove image">
+              <Text style={s.galXTxt}>✕</Text>
+            </Pressable>
+          </View>
+        ))}
+        {urls.length < max ? (
+          <Pressable onPress={add} disabled={busy} style={[s.thumb, s.thumbEmpty]} accessibilityRole="button" accessibilityLabel={`Add ${label}`}>
+            {busy ? <ActivityIndicator size="small" color={COLORS.primary} /> : <Text style={s.galPlus}>＋</Text>}
+          </Pressable>
+        ) : null}
+      </ScrollView>
+      {err ? <Text style={s.err}>{err}</Text> : null}
+    </View>
+  );
+}
+
 export function useLocaleName() {
   const { i18n } = useTranslation();
   return (ar?: string | null, en?: string | null) => (i18n.language === 'ar' ? (ar ?? en ?? '') : (en ?? ar ?? ''));
@@ -116,6 +170,8 @@ export function useLocaleName() {
 /** Translate cryptic PostgREST errors into actionable admin messages. */
 export function friendlyDbError(e: any): string {
   const m = String(e?.message ?? e ?? '');
+  if (m.includes('schema cache') || (m.includes('Could not find') && m.includes('column')))
+    return 'Database is behind the app: run the newest file in supabase/migrations/ in Supabase SQL Editor, then retry.';
   if (m.includes('row-level security') || m.includes('42501'))
     return 'Not saved: your account is not an administrator (or the session expired). Log in with an admin account and try again.';
   if (m.includes('duplicate key') || m.includes('23505'))
@@ -173,7 +229,7 @@ const s = StyleSheet.create({
   closeBtn: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
   closeTxt: { fontSize: 18, color: COLORS.secondaryText },
   opt: { paddingHorizontal: 16, paddingVertical: 13, borderBottomWidth: 1, borderColor: COLORS.border },
-  optActive: { backgroundColor: '#FFF6F1' },
+  optActive: { backgroundColor: COLORS.softGreen },
   optTxt: { fontSize: 15, color: COLORS.text, fontWeight: '600' },
   optTxtActive: { color: COLORS.primaryDark },
   optSub: { fontSize: 12, color: COLORS.secondaryText, marginTop: 2 },
@@ -186,6 +242,14 @@ const s = StyleSheet.create({
   imgBtnTxt: { color: COLORS.primaryDark, fontWeight: '700' },
   imgBtnGhost: { minHeight: 40, alignItems: 'center', justifyContent: 'center' },
   imgBtnGhostTxt: { color: COLORS.error, fontWeight: '600' },
+  galRow: { gap: 8, paddingVertical: 2, alignItems: 'center' },
+  galWrap: { position: 'relative' },
+  galX: {
+    position: 'absolute', top: -8, right: -8, width: 26, height: 26, borderRadius: 13,
+    backgroundColor: COLORS.error, alignItems: 'center', justifyContent: 'center',
+  },
+  galXTxt: { color: '#fff', fontSize: 12, fontWeight: '800' },
+  galPlus: { color: COLORS.primaryDark, fontSize: 26, fontWeight: '700' },
   err: { color: COLORS.error, marginTop: 6, fontSize: 13 },
   gate: { flex: 1, backgroundColor: '#fff', padding: 24, justifyContent: 'center' },
   gateTitle: { fontSize: 20, fontWeight: '800', color: COLORS.text, textAlign: 'center' },

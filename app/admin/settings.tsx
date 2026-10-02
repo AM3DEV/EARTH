@@ -38,7 +38,7 @@ export default function AdminSettings() {
   );
 }
 const s = StyleSheet.create({
-  wrap: { flex: 1, backgroundColor: '#fff' },
+  wrap: { flex: 1, backgroundColor: COLORS.background },
   title: { fontSize: 22, fontWeight: '800', color: COLORS.text, marginBottom: 12 },
   card: { borderWidth: 1, borderColor: COLORS.border, borderRadius: 12, padding: 12, marginBottom: 8 },
   k: { fontWeight: '700', color: COLORS.text },

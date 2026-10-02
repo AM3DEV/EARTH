@@ -24,11 +24,12 @@
     "noResults": "No businesses found", "viewDetails": "View Details",
     "noReviews": "No reviews yet", "reviews": "{{count}} reviews"
   },
-  "monument": { "title": "Explore", "categories": "Categories", "all": "All" },
+  "monument": { "title": "Explore", "categories": "Categories", "all": "All", "nearEvent": "Near Event" },
   "detail": {
     "description": "Description", "history": "History", "hours": "Opening hours",
     "price": "Price", "priceUnavailable": "Price unavailable",
     "directions": "Directions", "favorite": "Favorite", "share": "Share", "reviews": "Reviews",
+    "addReview": "Write a review", "comment": "Comment",
     "call": "Call", "website": "Website", "book": "Book now"
   },
   "booking": {
@@ -37,7 +38,12 @@
     "reference": "Reference", "basePrice": "Base Price", "currentPrice": "Current Price",
     "supportDiscount": "Support Discount", "finalPrice": "Final Price",
     "myBookings": "My Bookings", "noBookings": "No bookings yet",
-    "capacity": "Capacity", "priceIncrease": "Price increase"
+    "capacity": "Capacity", "priceIncrease": "Price increase",
+    "unavailable": "This experience is currently unavailable.",
+    "invalidQty": "Enter a quantity of at least 1.",
+    "onlyLeft": "Only {{count}} spots left for this experience.",
+    "fromDate": "Available from {{date}}.",
+    "untilDate": "Available until {{date}}."
   },
   "support": { "badge": "Nearby Support {{pct}}% OFF", "supported": "Supported nearby experience" },
   "plus": { "badge": "PLUS", "featured": "Featured Event" },
@@ -53,10 +59,11 @@
   "common": {
     "loading": "Loading…", "error": "Something went wrong", "retry": "Retry",
     "empty": "Nothing here yet", "save": "Save", "cancel": "Cancel", "delete": "Delete",
-    "edit": "Edit", "create": "Create", "search": "Search", "close": "Close", "active": "Active", "inactive": "Inactive"
+    "edit": "Edit", "create": "Create", "search": "Search", "close": "Close", "active": "Active", "inactive": "Inactive",
+    "verify": "Verify", "unverify": "Unverify", "verified": "Verified"
   },
   "admin": {
-    "dashboard": "Dashboard", "companies": "Companies", "experiences": "Services & Events", "events": "Events",
+    "dashboard": "Dashboard", "places": "Places", "companies": "Companies", "monuments": "Monuments", "experiences": "Services & Events", "events": "Events",
     "services": "Services", "categories": "Categories", "bookings": "Bookings", "pricing": "Pricing",
     "discounts": "Discounts", "promotions": "Service Plus", "supportPricing": "Support Pricing",
     "reviews": "Reviews", "activity": "Activity Logs", "administrators": "Administrators",

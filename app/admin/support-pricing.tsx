@@ -86,7 +86,7 @@ const s = StyleSheet.create({
   statV: { fontSize: 20, fontWeight: '800', color: COLORS.text },
   statK: { color: COLORS.secondaryText, fontSize: 12 },
   map: { height: 220, borderRadius: RADIUS.lg, marginBottom: 12 },
-  card: { borderWidth: 1, borderColor: COLORS.border, borderRadius: 12, padding: 12, marginBottom: 8, backgroundColor: '#fff' },
+  card: { borderWidth: 1, borderColor: COLORS.border, borderRadius: 12, padding: 12, marginBottom: 8, backgroundColor: COLORS.card },
   name: { fontWeight: '700', color: COLORS.text },
   muted: { color: COLORS.secondaryText, fontSize: 12, marginTop: 2 },
   row: { flexDirection: 'row', gap: 14, marginTop: 8 },

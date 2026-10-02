@@ -8,6 +8,8 @@ import Animated, { useSharedValue, useAnimatedStyle, withTiming, Easing } from '
 import { Search, X, ArrowLeft, Settings, MapPin } from 'lucide-react-native';
 import { Image } from 'expo-image';
 import { supabase } from '../../lib/supabase';
+import { searchPlaces } from '../../lib/search';
+import { fallbackPhoto } from '../../constants/photos';
 import { JORDAN_REGION } from '../../constants/jordan';
 import { COLORS, RADIUS } from '../../constants/colors';
 import { useProfile } from '../../hooks/useAuth';
@@ -94,10 +96,9 @@ export default function MapHome() {
     setSearching(true);
     const h = setTimeout(async () => {
       try {
-        const { data, error } = await supabase.rpc('search_places', { p_q: query.trim(), p_limit: 25, p_offset: 0 });
+        const rows = await searchPlaces(query.trim(), 25);
         if (my !== reqId.current) return; // outdated — drop
-        if (error) throw error;
-        setResults(data ?? []);
+        setResults(rows);
       } catch { if (my === reqId.current) setResults([]); }
       finally { if (my === reqId.current) setSearching(false); }
     }, 250);
@@ -110,7 +111,7 @@ export default function MapHome() {
     else router.push(`/event/${mk.raw.id}` as any);
   };
 
-  const pinColor = (k: string) => (k === 'monument' ? '#8A5A44' : k === 'event' ? COLORS.primary : '#2E8B57');
+  const pinColor = (k: string) => (k === 'monument' ? COLORS.sandstone : k === 'event' ? COLORS.primary : COLORS.success);
 
   return (
     <View style={s.wrap}>
@@ -194,6 +195,7 @@ export default function MapHome() {
                   : item.kind === 'monument'
                     ? (lang === 'ar' ? 'معلم' : 'Monument')
                     : (lang === 'ar' ? 'فعالية' : 'Event');
+                const cardImg = item.image_url ?? fallbackPhoto(item.id ?? name);
                 return (
                   <Pressable
                     accessibilityRole="button"
@@ -207,7 +209,7 @@ export default function MapHome() {
                       router.push(href as any);
                     }}
                   >
-                    <Image source={{ uri: item.image_url ?? undefined }} style={s.cardImg} contentFit="cover" cachePolicy="memory-disk" />
+                    <Image source={typeof cardImg === 'string' ? { uri: cardImg } : cardImg} style={s.cardImg} contentFit="cover" cachePolicy="memory-disk" />
                     <View style={s.cardBody}>
                       <Text style={s.cardName} numberOfLines={1}>{name}</Text>
                       <Text style={s.kind}>{kindTxt}{item.location ? ` · ${item.location}` : ''}</Text>
@@ -233,7 +235,7 @@ export default function MapHome() {
 }
 
 const s = StyleSheet.create({
-  wrap: { flex: 1, backgroundColor: '#fff' },
+  wrap: { flex: 1, backgroundColor: COLORS.background },
   header: { position: 'absolute', top: 54, left: 14, right: 14, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   profileChip: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.92)', borderWidth: 1, borderColor: COLORS.border, borderRadius: RADIUS.full, paddingHorizontal: 10, paddingVertical: 6, maxWidth: 220, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.08, shadowRadius: 6, elevation: 3 },
   avatar: { width: 30, height: 30, borderRadius: 15, backgroundColor: '#eee' },

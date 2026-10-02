@@ -36,7 +36,20 @@ export function useReviews(targetType: string, targetId?: string) {
     if (!targetId) return;
     setLoading(true);
     const { data } = await supabase.from('reviews').select('*').eq('target_type', targetType).eq('target_id', targetId).order('created_at', { ascending: false });
-    setRows(data ?? []);
+    let enriched = data ?? [];
+    // Attach public author (photo + name). View may not exist yet → keep plain rows.
+    try {
+      const ids = [...new Set(enriched.map((r: any) => r.user_id).filter(Boolean))];
+      if (ids.length > 0) {
+        const { data: profs } = await supabase.from('public_profiles').select('*').in('id', ids);
+        const byId: Record<string, any> = {};
+        for (const p of profs ?? []) byId[(p as any).id] = p;
+        enriched = enriched.map((r: any) => ({ ...r, author: byId[r.user_id] ?? null }));
+      }
+    } catch {
+      // reviews still show without author
+    }
+    setRows(enriched);
     setLoading(false);
   }, [targetType, targetId]);
   useEffect(() => { load(); }, [load]);

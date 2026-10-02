@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, FlatList, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { supabase } from '../lib/supabase';
+import { searchPlaces } from '../lib/search';
 import { COLORS, RADIUS } from '../constants/colors';
 import { EmptyState } from '../components/ui/States';
 import { GenericCard } from '../components/cards/Cards';
@@ -17,8 +17,11 @@ export default function SearchScreen() {
   useEffect(() => {
     if (!q.trim()) { setRows([]); return; }
     const h = setTimeout(async () => {
-      const { data } = await supabase.rpc('search_companies', { p_q: q.trim(), p_limit: 25, p_offset: 0 });
-      setRows(data ?? []);
+      try {
+        setRows(await searchPlaces(q.trim(), 25));
+      } catch {
+        setRows([]);
+      }
     }, 250);
     return () => clearTimeout(h);
   }, [q]);
@@ -30,15 +33,25 @@ export default function SearchScreen() {
         data={rows}
         keyExtractor={(r) => r.id}
         contentContainerStyle={{ padding: 16 }}
-        renderItem={({ item }) => (
-          <GenericCard image={item.cover_url ?? item.logo_url} title={lang === 'ar' ? item.name_ar : item.name_en} subtitle={item.location} onPress={() => router.push(`/company/${item.id}` as any)} />
-        )}
+        renderItem={({ item }) => {
+          const href = item.kind === 'company' ? `/company/${item.id}`
+            : item.kind === 'monument' ? `/monument/${item.id}`
+            : `/event/${item.id}`;
+          return (
+            <GenericCard
+              image={item.image_url}
+              title={lang === 'ar' ? item.name_ar : item.name_en}
+              subtitle={item.location}
+              onPress={() => router.push(href as any)}
+            />
+          );
+        }}
         ListEmptyComponent={q ? <EmptyState message={t('map.noResults')} /> : null}
       />
     </View>
   );
 }
 const s = StyleSheet.create({
-  wrap: { flex: 1, backgroundColor: '#fff', paddingTop: 60 },
-  input: { marginHorizontal: 16, borderWidth: 1, borderColor: COLORS.border, borderRadius: RADIUS.full, minHeight: 48, paddingHorizontal: 16, fontSize: 16, color: COLORS.text },
+  wrap: { flex: 1, backgroundColor: COLORS.background, paddingTop: 60 },
+  input: { marginHorizontal: 16, backgroundColor: '#fff', borderWidth: 1, borderColor: COLORS.border, borderRadius: RADIUS.full, minHeight: 50, paddingHorizontal: 18, fontSize: 16, color: COLORS.text },
 });

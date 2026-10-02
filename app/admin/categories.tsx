@@ -69,9 +69,9 @@ export default function AdminCategories() {
 }
 
 const s = StyleSheet.create({
-  wrap: { flex: 1, backgroundColor: '#fff', paddingTop: 60 },
+  wrap: { flex: 1, backgroundColor: COLORS.background, paddingTop: 60 },
   head: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, gap: 8 },
-  backBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#fff', borderWidth: 1, borderColor: COLORS.border, alignItems: 'center', justifyContent: 'center' },
+  backBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: COLORS.card, borderWidth: 1, borderColor: COLORS.border, alignItems: 'center', justifyContent: 'center' },
   title: { flex: 1, fontSize: 22, fontWeight: '800', color: COLORS.text },
   create: { backgroundColor: COLORS.primary, borderRadius: 10, paddingHorizontal: 12, minHeight: 40, justifyContent: 'center' },
   createT: { color: '#fff', fontWeight: '700' },

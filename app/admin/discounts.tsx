@@ -37,7 +37,7 @@ export default function DiscountsScreen() {
   );
 }
 const s = StyleSheet.create({
-  wrap: { flex: 1, backgroundColor: '#fff', paddingTop: 60 },
+  wrap: { flex: 1, backgroundColor: COLORS.background, paddingTop: 60 },
   title: { fontSize: 22, fontWeight: '800', color: COLORS.text, paddingHorizontal: 16 },
   sub: { color: COLORS.secondaryText, paddingHorizontal: 16, marginBottom: 8 },
   card: { borderWidth: 1, borderColor: COLORS.border, borderRadius: 12, padding: 12, marginBottom: 8 },

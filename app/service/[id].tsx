@@ -1,30 +1,28 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, View, Text, StyleSheet, Pressable, TextInput, useWindowDimensions } from 'react-native';
+import { ScrollView, View, Text, StyleSheet, Pressable, useWindowDimensions } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { Image } from 'expo-image';
+import { ArrowLeft, ArrowRight } from 'lucide-react-native';
 import { supabase } from '../../lib/supabase';
 import { COLORS, RADIUS } from '../../constants/colors';
+import { fallbackPhoto } from '../../constants/photos';
 import { LoadingState, ErrorState } from '../../components/ui/States';
 import { PriceBreakdown } from '../../components/booking/PriceBreakdown';
-import { createBookingServer } from '../../hooks/useBookings';
 import { Badge } from '../../components/ui/Card';
-import { Field } from '../../components/ui/Field';
+import { PhotoSlider } from '../../components/cards/Cards';
+import { ReviewsSection } from '../../components/reviews/ReviewsSection';
 import { PrimaryButton } from '../../components/ui/Buttons';
 
 export default function ServiceDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
+  const rtl = lang === 'ar';
   const router = useRouter();
   const [row, setRow] = useState<any>(null);
   const [quote, setQuote] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
-  const [qty, setQty] = useState('1');
-  const [msg, setMsg] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
-  // Responsive hero: ~30% of screen height, clamped for small and large screens.
+  // Responsive slider: ~30% of screen height, clamped for small and large screens.
   const { height: WH } = useWindowDimensions();
   const heroH = Math.min(320, Math.max(180, Math.round(WH * 0.3)));
 
@@ -41,42 +39,47 @@ export default function ServiceDetail() {
   };
   useEffect(() => { load(); }, [id]);
 
-  const book = async () => {
-    setMsg(null); setBusy(true);
-    try {
-      const res: any = await createBookingServer({ service_id: id!, booking_date: new Date(date).toISOString(), quantity: Number(qty) || 1 });
-      const bookingId = res?.booking_id ?? res?.id ?? res;
-      router.push(`/booking/${bookingId}` as any);
-    } catch (e: any) { setMsg(e.message); } finally { setBusy(false); }
-  };
-
   if (loading) return <LoadingState />;
   if (!row) return <ErrorState message={t('common.error')} onRetry={() => router.back()} />;
 
   const name = lang === 'ar' ? row.name_ar : row.name_en;
+  const heroPics = [row.image_url, ...(row.gallery_urls ?? [])].filter(Boolean);
   return (
-    <ScrollView style={s.wrap} contentContainerStyle={{ paddingBottom: 40 }}>
-      {row.image_url ? <Image source={{ uri: row.image_url }} style={[s.hero, { height: heroH }]} contentFit="cover" /> : null}
-      <View style={s.body}>
-        <Text style={s.name}>{name}</Text>
-        <Text style={s.muted}>{(row.companies as any)?.name_en} · {row.current_booking}/{row.max_booking}</Text>
-        {(quote?.support_discount_percentage ?? 0) > 0 ? <Badge label={t('support.badge', { pct: quote.support_discount_percentage })} tone="success" /> : null}
-        <View style={{ height: 10 }} />
-        <PriceBreakdown quote={quote ?? { base_price: row.base_price, dynamic_price: row.current_price, final_price: row.current_price, currency: row.currency }} />
-        <View style={{ height: 14 }} />
-        <Field label={t('booking.date')} value={date} onChangeText={setDate} placeholder="YYYY-MM-DD" />
-        <Field label={t('booking.quantity')} value={qty} onChangeText={setQty} keyboardType="numeric" />
-        {msg ? <Text style={s.err}>{msg}</Text> : null}
-        <PrimaryButton title={busy ? '…' : t('booking.confirm')} onPress={book} disabled={busy} />
-      </View>
-    </ScrollView>
+    <View style={s.wrap}>
+      <Pressable
+        onPress={() => router.back()}
+        style={[s.backFab, rtl ? { right: 16 } : { left: 16 }]}
+        accessibilityRole="button"
+        accessibilityLabel="Back"
+      >
+        {rtl ? <ArrowRight color={COLORS.text} size={20} /> : <ArrowLeft color={COLORS.text} size={20} />}
+      </Pressable>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingTop: 110, paddingBottom: 40 }}>
+        <View style={{ paddingHorizontal: 16 }}>
+          <PhotoSlider urls={heroPics.length > 0 ? heroPics : [fallbackPhoto(row.id)]} height={heroH} />
+        </View>
+        <View style={s.body}>
+          <Text style={s.name}>{name}</Text>
+          <Text style={s.muted}>{(row.companies as any)?.name_en} · {row.current_booking}/{row.max_booking}</Text>
+          {(quote?.support_discount_percentage ?? 0) > 0 ? <Badge label={t('support.badge', { pct: quote.support_discount_percentage })} tone="success" /> : null}
+          <View style={{ height: 10 }} />
+          <PriceBreakdown quote={quote ?? { base_price: row.base_price, dynamic_price: row.current_price, final_price: row.current_price, currency: row.currency }} />
+          <View style={{ height: 14 }} />
+          <PrimaryButton title={t('detail.book')} onPress={() => router.push(`/booking/new?service_id=${row.id}` as any)} />
+          <ReviewsSection targetType="service" targetId={row.id} />
+        </View>
+      </ScrollView>
+    </View>
   );
 }
 const s = StyleSheet.create({
-  wrap: { flex: 1, backgroundColor: '#fff' },
-  hero: { width: '100%', height: 230, backgroundColor: '#eee' },
+  wrap: { flex: 1, backgroundColor: COLORS.background },
+  backFab: {
+    position: 'absolute', top: 54, width: 44, height: 44, borderRadius: 22,
+    backgroundColor: 'rgba(255,255,255,0.94)', borderWidth: 1, borderColor: COLORS.border,
+    alignItems: 'center', justifyContent: 'center', zIndex: 10, elevation: 4,
+  },
   body: { padding: 16 },
   name: { fontSize: 22, fontWeight: '800', color: COLORS.text },
   muted: { color: COLORS.secondaryText, marginTop: 4 },
-  err: { color: COLORS.error, marginBottom: 8 },
 });

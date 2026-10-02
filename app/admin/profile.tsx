@@ -33,7 +33,7 @@ export default function AdminProfile() {
   );
 }
 const s = StyleSheet.create({
-  wrap: { flex: 1, backgroundColor: '#fff' },
+  wrap: { flex: 1, backgroundColor: COLORS.background },
   title: { fontSize: 22, fontWeight: '800', color: COLORS.text, marginBottom: 12 },
   name: { fontWeight: '800', fontSize: 18, color: COLORS.text },
   muted: { color: COLORS.secondaryText, marginTop: 2 },

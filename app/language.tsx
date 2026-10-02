@@ -36,7 +36,7 @@ const s = StyleSheet.create({
   wrap: { flex: 1, backgroundColor: '#fff', padding: 16, paddingTop: 60 },
   title: { fontSize: 24, fontWeight: '800', color: COLORS.text, marginBottom: 12 },
   opt: { borderWidth: 1, borderColor: COLORS.border, borderRadius: RADIUS.md, minHeight: 52, alignItems: 'center', justifyContent: 'center', marginBottom: 10 },
-  active: { borderColor: COLORS.primary, backgroundColor: '#FFF6F1' },
+  active: { borderColor: COLORS.primary, backgroundColor: COLORS.softGreen },
   txt: { fontSize: 16, color: COLORS.text, fontWeight: '600' },
   txtActive: { color: COLORS.primaryDark },
   hint: { color: COLORS.secondaryText, marginTop: 8 },

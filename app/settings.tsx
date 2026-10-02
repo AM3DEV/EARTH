@@ -27,7 +27,7 @@ export default function SettingsScreen() {
   );
 }
 const s = StyleSheet.create({
-  wrap: { flex: 1, backgroundColor: '#fff' },
+  wrap: { flex: 1, backgroundColor: COLORS.background },
   title: { fontSize: 24, fontWeight: '800', color: COLORS.text, marginBottom: 12 },
   row: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 13, borderBottomWidth: 1, borderColor: COLORS.border },
   txt: { fontWeight: '600', color: COLORS.text, fontSize: 15 },
