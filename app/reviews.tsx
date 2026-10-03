@@ -9,7 +9,7 @@ export default function ReviewsScreen() {
   return (
     <ScrollView style={s.wrap} contentContainerStyle={{ padding: 16, paddingTop: 60 }}>
       <Text style={s.title}>{t('admin.reviews')}</Text>
-      <Card><Text style={s.muted}>Reviews are managed per entity on detail pages. Admins moderate from Admin → Reviews.</Text></Card>
+      <Card><Text style={s.muted}>{t('admin.reviewsHint')}</Text></Card>
     </ScrollView>
   );
 }

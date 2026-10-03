@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { COLORS, RADIUS } from '../../constants/colors';
 import { pickImage, uploadImage } from '../../lib/storage';
 import { getMyRole } from '../../lib/auth';
+import i18n from '../../lib/i18n';
 import { PrimaryButton } from '../ui/Buttons';
 
 export function SectionTitle({ children }: { children: React.ReactNode }) {
@@ -29,6 +30,7 @@ export interface Opt { id: string; label: string; sub?: string }
 export function OptionsPicker({ label, value, options, onChange, placeholder }: {
   label: string; value?: string | null; options: Opt[]; onChange: (id: string | null) => void; placeholder?: string;
 }) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const selected = options.find((o) => o.id === value);
   return (
@@ -48,7 +50,7 @@ export function OptionsPicker({ label, value, options, onChange, placeholder }: 
               <Pressable onPress={() => setOpen(false)} style={s.closeBtn}><Text style={s.closeTxt}>✕</Text></Pressable>
             </View>
             <FlatList
-              data={[{ id: '', label: placeholder ?? 'None', sub: '' }, ...options]}
+              data={[{ id: '', label: placeholder ?? t('form.none'), sub: '' }, ...options]}
               keyExtractor={(o) => o.id || '__none'}
               renderItem={({ item }) => (
                 <Pressable
@@ -67,6 +69,23 @@ export function OptionsPicker({ label, value, options, onChange, placeholder }: 
   );
 }
 
+/** Map known storage error messages to translated strings; pass through the rest. */
+export function mapUploadError(e: any): string {
+  const m = String(e?.message ?? e ?? '');
+  const t = (k: string) => {
+    try {
+      const s = i18n.t(k);
+      return typeof s === 'string' && s.length > 0 ? s : k;
+    } catch {
+      return k;
+    }
+  };
+  if (m.includes('Photo permission denied')) return t('form.photoDenied');
+  if (m.includes('Image too large')) return t('form.tooBig');
+  if (m.includes('Could not read the picked image')) return t('form.unreadable');
+  return m;
+}
+
 /** Admin image field: preview + pick from library + immediate upload to the given bucket. */
 export function ImageField({ label, bucket, value, onChange }: {
   label: string; bucket: 'avatar' | 'monument' | 'event' | 'company' | 'service' | 'category';
@@ -83,7 +102,7 @@ export function ImageField({ label, bucket, value, onChange }: {
       setBusy(true);
       const url = await uploadImage(bucket, uri, `img-${Date.now()}`);
       onChange(url);
-    } catch (e: any) { setErr(e.message); } finally { setBusy(false); }
+    } catch (e: any) { setErr(mapUploadError(e)); } finally { setBusy(false); }
   };
 
   return (
@@ -93,14 +112,14 @@ export function ImageField({ label, bucket, value, onChange }: {
         {value ? (
           <Image source={{ uri: value }} style={s.thumb} contentFit="cover" cachePolicy="memory-disk" />
         ) : (
-          <View style={[s.thumb, s.thumbEmpty]}><Text style={s.thumbTxt}>No image</Text></View>
+          <View style={[s.thumb, s.thumbEmpty]}><Text style={s.thumbTxt}>{i18n.t('form.noImage')}</Text></View>
         )}
         <View style={s.imgBtns}>
-          <Pressable onPress={pick} disabled={busy} style={s.imgBtn} accessibilityRole="button" accessibilityLabel={`Pick ${label}`}>
-            {busy ? <ActivityIndicator size="small" color={COLORS.primary} /> : <Text style={s.imgBtnTxt}>{value ? 'Change…' : 'Upload…'}</Text>}
+          <Pressable onPress={pick} disabled={busy} style={s.imgBtn} accessibilityRole="button" accessibilityLabel={`${i18n.t('form.pick')} ${label}`}>
+            {busy ? <ActivityIndicator size="small" color={COLORS.primary} /> : <Text style={s.imgBtnTxt}>{value ? i18n.t('form.change') : i18n.t('form.upload')}</Text>}
           </Pressable>
           {value ? (
-            <Pressable onPress={() => onChange(null)} style={s.imgBtnGhost}><Text style={s.imgBtnGhostTxt}>Remove</Text></Pressable>
+            <Pressable onPress={() => onChange(null)} style={s.imgBtnGhost}><Text style={s.imgBtnGhostTxt}>{i18n.t('form.remove')}</Text></Pressable>
           ) : null}
         </View>
       </View>
@@ -136,7 +155,7 @@ export function ImageGalleryField({ label, bucket, value, onChange, max = 8 }: {
         uploaded.push(await uploadImage(bucket, a.uri, `img-${Date.now()}`));
       }
       onChange([...urls, ...uploaded].slice(0, max));
-    } catch (e: any) { setErr(e.message); } finally { setBusy(false); }
+    } catch (e: any) { setErr(mapUploadError(e)); } finally { setBusy(false); }
   };
 
   return (
@@ -146,13 +165,13 @@ export function ImageGalleryField({ label, bucket, value, onChange, max = 8 }: {
         {urls.map((u, i) => (
           <View key={`${u}-${i}`} style={s.galWrap}>
             <Image source={{ uri: u }} style={s.thumb} contentFit="cover" cachePolicy="memory-disk" />
-            <Pressable onPress={() => onChange(urls.filter((_, x) => x !== i))} style={s.galX} accessibilityRole="button" accessibilityLabel="Remove image">
+            <Pressable onPress={() => onChange(urls.filter((_, x) => x !== i))} style={s.galX} accessibilityRole="button" accessibilityLabel={i18n.t('form.remove')}>
               <Text style={s.galXTxt}>✕</Text>
             </Pressable>
           </View>
         ))}
         {urls.length < max ? (
-          <Pressable onPress={add} disabled={busy} style={[s.thumb, s.thumbEmpty]} accessibilityRole="button" accessibilityLabel={`Add ${label}`}>
+          <Pressable onPress={add} disabled={busy} style={[s.thumb, s.thumbEmpty]} accessibilityRole="button" accessibilityLabel={i18n.t('form.upload')}>
             {busy ? <ActivityIndicator size="small" color={COLORS.primary} /> : <Text style={s.galPlus}>＋</Text>}
           </Pressable>
         ) : null}
@@ -170,23 +189,32 @@ export function useLocaleName() {
 /** Translate cryptic PostgREST errors into actionable admin messages. */
 export function friendlyDbError(e: any): string {
   const m = String(e?.message ?? e ?? '');
+  const t = (k: string) => {
+    try {
+      const s = i18n.t(k);
+      return typeof s === 'string' && s.length > 0 ? s : k;
+    } catch {
+      return k;
+    }
+  };
   if (m.includes('schema cache') || (m.includes('Could not find') && m.includes('column')))
-    return 'Database is behind the app: run the newest file in supabase/migrations/ in Supabase SQL Editor, then retry.';
+    return t('admin.errSchema');
   if (m.includes('row-level security') || m.includes('42501'))
-    return 'Not saved: your account is not an administrator (or the session expired). Log in with an admin account and try again.';
+    return t('admin.errAdmin');
   if (m.includes('duplicate key') || m.includes('23505'))
-    return 'Not saved: this already exists (duplicate value).';
+    return t('admin.errDupe');
   if (m.includes('foreign key') || m.includes('23503'))
-    return 'Not saved: the selected category/company no longer exists. Pick another one.';
+    return t('admin.errFk');
   if (m.includes('not-null') || m.includes('23502'))
-    return 'Not saved: please fill all required fields.';
+    return t('admin.errNotNull');
   if (m.includes('Failed to fetch') || m.includes('Network'))
-    return 'Not saved: network error. Check your connection and Supabase URL/key in .env, then retry.';
-  return m || 'Not saved: unknown error.';
+    return t('admin.errNet');
+  return m || t('common.error');
 }
 
 /** Blocks non-admins from create/edit forms with a clear message instead of an RLS failure. */
 export function AdminGate({ children }: { children: React.ReactNode }) {
+  const { t } = useTranslation();
   const router = useRouter();
   const [role, setRole] = useState<string | null>(null);
   useEffect(() => {
@@ -202,10 +230,10 @@ export function AdminGate({ children }: { children: React.ReactNode }) {
   if (role !== 'admin' && role !== 'boss_admin') {
     return (
       <View style={s.gate}>
-        <Text style={s.gateTitle}>Administrator access required</Text>
-        <Text style={s.gateTxt}>You are logged in as "{role}". Log in with an admin account to add or edit content.</Text>
+        <Text style={s.gateTitle}>{t('admin.gateTitle')}</Text>
+        <Text style={s.gateTxt}>{t('admin.gateTxt', { role })}</Text>
         <View style={{ height: 12 }} />
-        <PrimaryButton title="Go back" onPress={() => router.back()} />
+        <PrimaryButton title={t('admin.goBack')} onPress={() => router.back()} />
       </View>
     );
   }

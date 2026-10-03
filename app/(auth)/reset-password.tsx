@@ -9,7 +9,7 @@ export default function ResetPassword() {
   return (
     <View style={s.wrap}>
       <Text style={s.title}>{t('auth.forgotTitle')}</Text>
-      <Text style={s.sub}>Open the email link on this device to finish resetting your password. Then login with the new password.</Text>
+      <Text style={s.sub}>{t('auth.resetHint')}</Text>
     </View>
   );
 }

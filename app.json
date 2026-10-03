@@ -65,7 +65,14 @@
           "photosPermission": "Allow Jordan Guide to access photos for profile and uploads."
         }
       ],
-      "expo-system-ui"
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow Jordan Guide to use the camera to scan company QR codes and earn loyalty points."
+        }
+      ],
+      "expo-system-ui",
+      "expo-sharing"
     ],
     "experiments": {
       "typedRoutes": true

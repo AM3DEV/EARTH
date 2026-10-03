@@ -22,14 +22,14 @@ export default function DiscountsScreen() {
   return (
     <View style={s.wrap}>
       <AdminHeader title={t('admin.discounts')} />
-      <Text style={s.sub}>Smart capacity pricing + nearby support rules per service. Edit thresholds in Supabase or extend this screen.</Text>
+      <Text style={s.sub}>{t('admin.discSub')}</Text>
       {rules.length === 0 ? <EmptyState /> : (
         <FlatList data={rules} keyExtractor={(r) => r.id} contentContainerStyle={{ padding: 16 }}
           renderItem={({ item }) => (
             <View style={s.card}>
               <Text style={s.name}>{(item.services as any)?.name_en ?? item.service_id.slice(0, 8)}</Text>
-              <Text style={s.muted}>Max +{item.max_increase_percentage}% · Support {item.support_discount_enabled ? `${item.maximum_support_discount_percentage}% / ${item.maximum_support_radius_km}km` : 'off'}</Text>
-              <Text style={s.muted}>Target {item.minimum_target_capacity_percentage}-{item.maximum_target_capacity_percentage}% · Stack {item.allow_discount_stacking ? 'yes' : 'no'}</Text>
+              <Text style={s.muted}>{t('admin.wMax')} +{item.max_increase_percentage}% · {t('admin.wSupport')} {item.support_discount_enabled ? `${item.maximum_support_discount_percentage}% / ${item.maximum_support_radius_km}km` : t('common.no')}</Text>
+              <Text style={s.muted}>{t('admin.wTarget')} {item.minimum_target_capacity_percentage}-{item.maximum_target_capacity_percentage}% · {t('admin.wStack')} {item.allow_discount_stacking ? t('common.yes') : t('common.no')}</Text>
             </View>
           )} />
       )}

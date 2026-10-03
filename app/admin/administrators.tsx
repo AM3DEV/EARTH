@@ -25,7 +25,7 @@ export default function Administrators() {
   useEffect(() => {
     (async () => {
       const r = await getMyRole();
-      if (r !== 'boss_admin') { setMsg('Boss admin only'); setLoading(false); return; }
+      if (r !== 'boss_admin') { setMsg(t('admin.bossOnly')); setLoading(false); return; }
       load();
     })();
   }, []);
@@ -33,7 +33,7 @@ export default function Administrators() {
   const setRole = async (userId: string, role: string) => {
     setMsg(null);
     const { error } = await supabase.rpc('boss_set_role', { p_user_id: userId, p_role: role });
-    setMsg(error ? error.message : 'Updated');
+    setMsg(error ? error.message : t('admin.updated'));
     load();
   };
 
@@ -45,11 +45,11 @@ export default function Administrators() {
       <FlatList data={rows} keyExtractor={(r: any) => r.user_id} contentContainerStyle={{ padding: 16 }}
         renderItem={({ item }: any) => (
           <View style={s.card}>
-            <Text style={s.name}>{item.email ?? item.user_id.slice(0, 8)} · {item.role} {item.is_active === false ? '(deactivated)' : ''}</Text>
+            <Text style={s.name}>{item.email ?? item.user_id.slice(0, 8)} · {item.role} {item.is_active === false ? t('admin.deactivated') : ''}</Text>
             <View style={s.row}>
-              <Pressable onPress={() => setRole(item.user_id, 'admin')}><Text style={s.act}>make admin</Text></Pressable>
-              <Pressable onPress={() => setRole(item.user_id, 'boss_admin')}><Text style={s.act}>make boss</Text></Pressable>
-              <Pressable onPress={() => setRole(item.user_id, 'user')}><Text style={s.act}>deactivate→user</Text></Pressable>
+              <Pressable onPress={() => setRole(item.user_id, 'admin')}><Text style={s.act}>{t('admin.makeAdmin')}</Text></Pressable>
+              <Pressable onPress={() => setRole(item.user_id, 'boss_admin')}><Text style={s.act}>{t('admin.makeBoss')}</Text></Pressable>
+              <Pressable onPress={() => setRole(item.user_id, 'user')}><Text style={s.act}>{t('admin.deactivateUser')}</Text></Pressable>
             </View>
           </View>
         )} />

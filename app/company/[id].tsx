@@ -11,6 +11,7 @@ import { LoadingState, ErrorState } from '../../components/ui/States';
 import { Stars } from '../../components/ui/Card';
 import { PhotoSlider } from '../../components/cards/Cards';
 import { VerifiedBadge } from '../../components/VerifiedBadge';
+import { usePrice } from '../../lib/currency';
 import { ReviewsSection } from '../../components/reviews/ReviewsSection';
 import { useFavorites } from '../../hooks/useFavorites';
 
@@ -27,6 +28,7 @@ export default function CompanyDetail() {
   // Responsive slider: ~28% of screen height, clamped for small and large screens.
   const { height: WH } = useWindowDimensions();
   const coverH = Math.min(300, Math.max(170, Math.round(WH * 0.28)));
+  const { fmt } = usePrice();
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -58,7 +60,7 @@ export default function CompanyDetail() {
         onPress={() => router.back()}
         style={[s.backFab, rtl ? { right: 16 } : { left: 16 }]}
         accessibilityRole="button"
-        accessibilityLabel="Back"
+        accessibilityLabel={t('common.back')}
       >
         {rtl ? <ArrowRight color={COLORS.text} size={20} /> : <ArrowLeft color={COLORS.text} size={20} />}
       </Pressable>
@@ -101,7 +103,7 @@ export default function CompanyDetail() {
               </Pressable>
             </>
           ) : null}
-          <Text style={s.sec}>Services</Text>
+          <Text style={s.sec}>{t('detail.services')}</Text>
           {services.map((sv) => {
             const sn = lang === 'ar' ? sv.name_ar : sv.name_en;
             const off = !sv.available;
@@ -115,7 +117,7 @@ export default function CompanyDetail() {
                     <Text style={s.book}>{t('detail.book')} ›</Text>
                   )}
                 </View>
-                <Text style={s.muted}>{sv.current_price} {sv.currency} · {sv.current_booking}/{sv.max_booking}</Text>
+                <Text style={s.muted}>{fmt(sv.current_price, sv.currency)} · {sv.current_booking}/{sv.max_booking}</Text>
               </>
             );
             return off ? (
@@ -126,7 +128,7 @@ export default function CompanyDetail() {
               </Pressable>
             );
           })}
-          {services.length === 0 ? <Text style={s.muted}>No services yet.</Text> : null}
+          {services.length === 0 ? <Text style={s.muted}>{t('detail.noServices')}</Text> : null}
           <ReviewsSection targetType="company" targetId={row.id} />
         </View>
       </ScrollView>

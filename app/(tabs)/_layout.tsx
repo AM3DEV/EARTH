@@ -20,7 +20,7 @@ export default function TabsLayout() {
       <Tabs.Screen name="map" options={{ title: t('tabs.map'), tabBarIcon: ({ color, size }) => <MapIcon color={color} size={size} /> }} />
       <Tabs.Screen name="monument" options={{ title: t('tabs.monument'), tabBarIcon: ({ color, size }) => <Landmark color={color} size={size} /> }} />
       <Tabs.Screen name="erth" options={{ title: t('tabs.erth'), tabBarIcon: ({ color, size }) => <Sparkles color={color} size={size} /> }} />
-      <Tabs.Screen name="profile" options={{ title: t('tabs.profile'), tabBarIcon: ({ color, size }) => <User color={color} size={size} /> }} />
+      <Tabs.Screen name="profile" options={{ title: t('settings.title'), tabBarIcon: ({ color, size }) => <User color={color} size={size} /> }} />
     </Tabs>
   );
 }

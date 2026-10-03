@@ -31,8 +31,8 @@ export default function AdminSettings() {
       {rows.map((r) => (
         <View key={r.key} style={s.card}><Text style={s.k}>{r.key}</Text><Text style={s.muted}>{JSON.stringify(r.value)}</Text></View>
       ))}
-      <Field label="Key" value={key} onChangeText={setKey} />
-      <Field label="Value (JSON string)" value={value} onChangeText={setValue} />
+      <Field label={t('admin.key')} value={key} onChangeText={setKey} />
+      <Field label={t('admin.value')} value={value} onChangeText={setValue} />
       <PrimaryButton title={t('common.save')} onPress={save} />
     </ScrollView>
   );

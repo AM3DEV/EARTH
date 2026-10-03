@@ -8,7 +8,7 @@ import { COLORS } from '../../constants/colors';
 /** Consistent top bar for every admin section page: back button + title. */
 export function AdminHeader({ title }: { title: string }) {
   const router = useRouter();
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const rtl = i18n.language === 'ar';
   return (
     <View style={s.wrap}>
@@ -16,7 +16,7 @@ export function AdminHeader({ title }: { title: string }) {
         onPress={() => router.back()}
         style={s.back}
         accessibilityRole="button"
-        accessibilityLabel="Back"
+        accessibilityLabel={t('common.back')}
       >
         <ArrowLeft color={COLORS.text} size={20} style={rtl ? { transform: [{ scaleX: -1 }] } : undefined} />
       </Pressable>

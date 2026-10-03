@@ -34,7 +34,7 @@ export default function EditProfile() {
     try {
       const uri = await pickImage();
       if (uri) setLocalUri(uri);
-    } catch (e: any) { setMsg(e.message); }
+    } catch (e: any) { setMsg(e.message === 'Photo permission denied' ? t('form.photoDenied') : e.message); }
   };
 
   const save = async () => {
@@ -56,7 +56,15 @@ export default function EditProfile() {
       }).eq('id', user.id);
       if (error) throw error;
       router.back();
-    } catch (e: any) { setMsg(e.message); } finally { setBusy(false); }
+    } catch (e: any) {
+      const m = String(e?.message ?? '');
+      setMsg(
+        m.includes('Not authenticated') ? t('common.notAuth')
+        : m.includes('Image too large') ? t('form.tooBig')
+        : m.includes('Could not read the picked image') ? t('form.unreadable')
+        : m
+      );
+    } finally { setBusy(false); }
   };
 
   return (
@@ -70,8 +78,8 @@ export default function EditProfile() {
             <Text style={s.avatarTxt}>{(f.first_name?.[0] ?? '?').toUpperCase()}</Text>
           </View>
         )}
-        <Pressable onPress={changePhoto} disabled={busy} style={s.photoBtn} accessibilityRole="button" accessibilityLabel="Change photo">
-          {busy ? <ActivityIndicator size="small" color={COLORS.primary} /> : <Text style={s.photoTxt}>Change photo</Text>}
+        <Pressable onPress={changePhoto} disabled={busy} style={s.photoBtn} accessibilityRole="button" accessibilityLabel={t('auth.changePhoto')}>
+          {busy ? <ActivityIndicator size="small" color={COLORS.primary} /> : <Text style={s.photoTxt}>{t('auth.changePhoto')}</Text>}
         </Pressable>
       </View>
       <Field label={t('auth.firstName')} value={f.first_name} onChangeText={(v) => setF({ ...f, first_name: v })} />

@@ -39,9 +39,9 @@ export function MonumentForm({ initial, monumentId }: { initial: any; monumentId
   const save = async () => {
     setErr(null); setBusy(true);
     try {
-      if (!v.name_en?.trim() || !v.name_ar?.trim()) throw new Error('English and Arabic names are required');
-      if (v.lat != null && !isLat(Number(v.lat))) throw new Error('Invalid latitude (-90..90)');
-      if (v.lng != null && !isLng(Number(v.lng))) throw new Error('Invalid longitude (-180..180)');
+      if (!v.name_en?.trim() || !v.name_ar?.trim()) throw new Error(t('form.reqNames'));
+      if (v.lat != null && !isLat(Number(v.lat))) throw new Error(t('form.badLat'));
+      if (v.lng != null && !isLng(Number(v.lng))) throw new Error(t('form.badLng'));
       const payload = {
         ...v,
         lat: v.lat ?? null,
@@ -67,30 +67,30 @@ export function MonumentForm({ initial, monumentId }: { initial: any; monumentId
   return (
     <AdminGate>
     <ScrollView style={s.wrap} contentContainerStyle={{ padding: 16, paddingTop: 60, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
-      <Text style={s.title}>{monumentId ? 'Edit Monument' : 'Add Monument'}</Text>
+      <Text style={s.title}>{monumentId ? t('form.editItem', { name: t('admin.monuments') }) : t('form.addItem', { name: t('admin.monuments') })}</Text>
 
-      <SectionTitle>Basic Information</SectionTitle>
-      <Field label="Name (EN)" value={String(v.name_en ?? '')} onChangeText={(x) => set('name_en', x)} />
-      <Field label="Name (AR)" value={String(v.name_ar ?? '')} onChangeText={(x) => set('name_ar', x)} />
-      <Field label="Description (EN)" value={String(v.description_en ?? '')} onChangeText={(x) => set('description_en', x)} multiline />
-      <Field label="Description (AR)" value={String(v.description_ar ?? '')} onChangeText={(x) => set('description_ar', x)} multiline />
+      <SectionTitle>{t('form.basic')}</SectionTitle>
+      <Field label={t('form.nameEn')} value={String(v.name_en ?? '')} onChangeText={(x) => set('name_en', x)} />
+      <Field label={t('form.nameAr')} value={String(v.name_ar ?? '')} onChangeText={(x) => set('name_ar', x)} />
+      <Field label={t('form.descEn')} value={String(v.description_en ?? '')} onChangeText={(x) => set('description_en', x)} multiline />
+      <Field label={t('form.descAr')} value={String(v.description_ar ?? '')} onChangeText={(x) => set('description_ar', x)} multiline />
 
-      <SectionTitle>Category & Media</SectionTitle>
-      <OptionsPicker label="Category" value={v.category_id} options={cats} onChange={(id) => set('category_id', id)} placeholder="No category" />
-      <ImageField label="Cover" bucket="monument" value={v.image_url} onChange={(url) => set('image_url', url)} />
-      <ImageGalleryField label="More pictures" bucket="monument" value={v.gallery_urls ?? []} onChange={(urls) => set('gallery_urls', urls)} />
+      <SectionTitle>{t('form.catMedia')}</SectionTitle>
+      <OptionsPicker label={t('form.category')} value={v.category_id} options={cats} onChange={(id) => set('category_id', id)} placeholder={t('form.noCategory')} />
+      <ImageField label={t('form.cover')} bucket="monument" value={v.image_url} onChange={(url) => set('image_url', url)} />
+      <ImageGalleryField label={t('form.gallery')} bucket="monument" value={v.gallery_urls ?? []} onChange={(urls) => set('gallery_urls', urls)} />
 
-      <SectionTitle>Location & Visit</SectionTitle>
-      <Field label="Location" value={String(v.location ?? '')} onChangeText={(x) => set('location', x)} placeholder="Petra" />
-      <Field label="Latitude" value={v.lat == null ? '' : String(v.lat)} onChangeText={(x) => set('lat', x.trim() === '' ? null : Number(x))} keyboardType="numeric" />
-      <Field label="Longitude" value={v.lng == null ? '' : String(v.lng)} onChangeText={(x) => set('lng', x.trim() === '' ? null : Number(x))} keyboardType="numeric" />
-      <Field label="Price (empty = unavailable)" value={v.price == null ? '' : String(v.price)} onChangeText={(x) => set('price', x.trim() === '' ? null : Number(x))} keyboardType="numeric" />
-      <Field label="Currency" value={String(v.currency ?? 'USD')} onChangeText={(x) => set('currency', x)} />
-      <Field label="Opening hours" value={String(v.opening_hours ?? '')} onChangeText={(x) => set('opening_hours', x)} placeholder="06:00-18:00" />
+      <SectionTitle>{t('form.locVisit')}</SectionTitle>
+      <Field label={t('form.location')} value={String(v.location ?? '')} onChangeText={(x) => set('location', x)} />
+      <Field label={t('form.lat')} value={v.lat == null ? '' : String(v.lat)} onChangeText={(x) => set('lat', x.trim() === '' ? null : Number(x))} keyboardType="numeric" />
+      <Field label={t('form.lng')} value={v.lng == null ? '' : String(v.lng)} onChangeText={(x) => set('lng', x.trim() === '' ? null : Number(x))} keyboardType="numeric" />
+      <Field label={t('form.priceEmpty')} value={v.price == null ? '' : String(v.price)} onChangeText={(x) => set('price', x.trim() === '' ? null : Number(x))} keyboardType="numeric" />
+      <Field label={t('form.currency')} value={String(v.currency ?? 'USD')} onChangeText={(x) => set('currency', x)} />
+      <Field label={t('form.hours')} value={String(v.opening_hours ?? '')} onChangeText={(x) => set('opening_hours', x)} />
 
-      <SectionTitle>Contact</SectionTitle>
-      <Field label="Phone" value={String(v.phone ?? '')} onChangeText={(x) => set('phone', x)} keyboardType="phone-pad" />
-      <Field label="Website" value={String(v.website ?? '')} onChangeText={(x) => set('website', x)} autoCapitalize="none" />
+      <SectionTitle>{t('form.contact')}</SectionTitle>
+      <Field label={t('form.phone')} value={String(v.phone ?? '')} onChangeText={(x) => set('phone', x)} keyboardType="phone-pad" />
+      <Field label={t('form.website')} value={String(v.website ?? '')} onChangeText={(x) => set('website', x)} autoCapitalize="none" />
 
       {err ? <Text style={s.err}>{err}</Text> : null}
       <PrimaryButton title={busy ? '…' : t('common.save')} onPress={save} disabled={busy} />

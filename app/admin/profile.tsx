@@ -26,8 +26,8 @@ export default function AdminProfile() {
       <Card>
         <Text style={s.name}>{row ? `${row.first_name} ${row.last_name}` : '…'}</Text>
         <Text style={s.muted}>@{row?.username} · {row?.email}</Text>
-        <Text style={s.muted}>Role: {role}</Text>
-        <Text style={s.muted}>Created: {row?.created_at?.slice(0, 10)}</Text>
+        <Text style={s.muted}>{t('admin.role')}: {role}</Text>
+        <Text style={s.muted}>{t('admin.created')}: {row?.created_at?.slice(0, 10)}</Text>
       </Card>
     </ScrollView>
   );

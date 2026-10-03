@@ -1,21 +1,26 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { COLORS } from '../../constants/colors';
-import { formatMoney } from '../../lib/pricing';
 import { Badge } from '../ui/Card';
+import { usePrice } from '../../lib/currency';
 
 export function PriceBreakdown({ quote, supportPct }: { quote: any; supportPct?: number }) {
   const { t } = useTranslation();
+  const { fmt } = usePrice();
   if (!quote) return null;
+  const cur = quote.currency;
   return (
     <View style={s.wrap}>
-      <Row k={t('booking.basePrice')} v={formatMoney(quote.base_price ?? quote.basePrice, quote.currency)} />
-      <Row k={t('booking.currentPrice')} v={formatMoney(quote.dynamic_price ?? quote.dynamicPrice, quote.currency)} />
+      <Row k={t('booking.basePrice')} v={fmt(quote.base_price ?? quote.basePrice, cur)} />
+      <Row k={t('booking.currentPrice')} v={fmt(quote.dynamic_price ?? quote.dynamicPrice, cur)} />
       {(supportPct ?? quote.support_discount_percentage ?? 0) > 0 ? (
-        <Row k={t('booking.supportDiscount')} v={`-${formatMoney(quote.support_discount_amount ?? 0, quote.currency)}`} />
+        <Row k={t('booking.supportDiscount')} v={`-${fmt(quote.support_discount_amount ?? 0, cur)}`} />
       ) : null}
-      <Row k={t('booking.finalPrice')} v={formatMoney(quote.final_price ?? quote.finalPrice, quote.currency)} bold />
+      {(quote.coupon_discount_amount ?? 0) > 0 ? (
+        <Row k={t('booking.couponDiscount')} v={`-${fmt(quote.coupon_discount_amount ?? 0, cur)}`} />
+      ) : null}
+      <Row k={t('booking.finalPrice')} v={fmt(quote.final_price ?? quote.finalPrice, cur)} bold />
       {(supportPct ?? 0) > 0 || (quote.support_discount_percentage ?? 0) > 0 ? (
         <Badge label={t('support.badge', { pct: supportPct ?? quote.support_discount_percentage })} tone="success" />
       ) : null}

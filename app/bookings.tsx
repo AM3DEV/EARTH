@@ -5,13 +5,15 @@ import { useTranslation } from 'react-i18next';
 import { useBookings } from '../hooks/useBookings';
 import { LoadingState, ErrorState, EmptyState } from '../components/ui/States';
 import { COLORS, RADIUS, SHADOW } from '../constants/colors';
-import { formatMoney } from '../lib/pricing';
+import { usePrice } from '../lib/currency';
+import { bookingStatusKey } from '../lib/status';
 
 export default function BookingsScreen() {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
   const router = useRouter();
   const { rows, loading, error, reload } = useBookings();
+  const { fmt } = usePrice();
   if (loading) return <LoadingState />;
   if (error) return <ErrorState message={error} onRetry={reload} />;
   return (
@@ -21,6 +23,7 @@ export default function BookingsScreen() {
         <FlatList data={rows} keyExtractor={(r) => r.id} contentContainerStyle={{ padding: 16 }}
           renderItem={({ item }) => {
             const st = String(item.status ?? '');
+            const stKey = bookingStatusKey(st);
             const ok = st === 'confirmed' || st === 'completed';
             const wait = st === 'pending';
             return (
@@ -28,11 +31,11 @@ export default function BookingsScreen() {
                 <View style={s.top}>
                   <Text style={s.ref}>{item.booking_reference}</Text>
                   <Text style={[s.pill, { backgroundColor: ok ? '#E3F3E9' : wait ? '#FAF0D7' : '#FDE7E9', color: ok ? COLORS.success : wait ? '#A5760A' : COLORS.error }]}>
-                    {st}
+                    {stKey ? t(stKey) : st}
                   </Text>
                 </View>
                 <Text style={s.name}>{lang === 'ar' ? item.services?.name_ar : item.services?.name_en}</Text>
-                <Text style={s.muted}>{item.booking_date.slice(0, 10)} · {formatMoney(item.final_price, item.currency)}</Text>
+                <Text style={s.muted}>{item.booking_date.slice(0, 10)} · {fmt(item.final_price, item.currency)}</Text>
               </Pressable>
             );
           }} />

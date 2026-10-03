@@ -8,6 +8,7 @@ import { COLORS, RADIUS, SHADOW } from '../../constants/colors';
 import { AdminHeader } from '../../components/admin/AdminHeader';
 import { LoadingState, EmptyState, ErrorState } from '../../components/ui/States';
 import { friendlyDbError } from '../../components/admin/fields';
+import { logActionLabel, targetKindLabel } from '../../lib/status';
 
 /** Activity timeline: every admin create/update/delete/activate + server booking & promotion events. Normal admin sees own logs; boss sees all (RLS). */
 export default function ActivityLogs() {
@@ -45,7 +46,7 @@ export default function ActivityLogs() {
       {error ? (
         <ErrorState message={error} onRetry={load} />
       ) : rows.length === 0 ? (
-        <EmptyState message="No activity yet — create, edit or deactivate something and it will appear here." />
+        <EmptyState message={t('admin.noActivity')} />
       ) : (
         <FlatList
           data={rows}
@@ -75,8 +76,9 @@ function fmtDate(iso: string): string {
 }
 
 function LogRow({ item }: { item: any }) {
+  const { t } = useTranslation();
   const when = fmtDate(item.created_at);
-  const entity = [item.entity_type, item.entity_name].filter(Boolean).join(' · ');
+  const entity = [targetKindLabel(item.entity_type, t), item.entity_name].filter(Boolean).join(' · ');
   return (
     <View style={s.row}>
       <View style={s.rail}>
@@ -84,10 +86,10 @@ function LogRow({ item }: { item: any }) {
         <View style={s.line} />
       </View>
       <View style={s.card}>
-        <Text style={s.action}>{item.action}</Text>
+        <Text style={s.action}>{logActionLabel(item.action, t)}</Text>
         {entity ? <Text style={s.entity}>{entity}</Text> : null}
         {item.description ? <Text style={s.desc} numberOfLines={2}>{item.description}</Text> : null}
-        <Text style={s.meta}>{item.admin_name_snapshot ?? 'Admin'} · {when}</Text>
+        <Text style={s.meta}>{item.admin_name_snapshot ?? t('admin.badgeAdmin')} · {when}</Text>
       </View>
     </View>
   );

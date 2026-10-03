@@ -50,7 +50,7 @@ export default function ServiceDetail() {
         onPress={() => router.back()}
         style={[s.backFab, rtl ? { right: 16 } : { left: 16 }]}
         accessibilityRole="button"
-        accessibilityLabel="Back"
+        accessibilityLabel={t('common.back')}
       >
         {rtl ? <ArrowRight color={COLORS.text} size={20} /> : <ArrowLeft color={COLORS.text} size={20} />}
       </Pressable>

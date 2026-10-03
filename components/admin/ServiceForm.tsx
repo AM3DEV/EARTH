@@ -7,13 +7,43 @@ import { logAdminAction } from '../../lib/adminLog';
 import { Field } from '../ui/Field';
 import { PrimaryButton } from '../ui/Buttons';
 import { SectionTitle, ToggleRow, OptionsPicker, ImageField, ImageGalleryField, Opt, useLocaleName, AdminGate, friendlyDbError } from './fields';
+import { CURRENCIES } from '../../lib/currency';
 import { COLORS } from '../../constants/colors';
 
-/**
- * Service Create/Edit with sections:
- * Basic Info | Company & Category | Media | Pricing & Capacity | Publishing
- * Note: current_price is server-managed (recalculated on booking) — shown read-only on edit.
- */
+const PRICE_OPTS = ['5', '10', '15', '20', '25', '30', '40', '50', '75', '100', '150', '200', '250', '300', '500'];
+const isCustomPrice = (val: any) => val !== '' && val != null && !PRICE_OPTS.includes(String(val));
+
+/** Price picker: preset amounts + Custom (reveals a numeric box). */
+function PricePicker({ label, value, allowEmpty, onChange }: {
+  label: string; value: any; allowEmpty?: boolean; onChange: (v: number | null) => void;
+}) {
+  const { t } = useTranslation();
+  const str = value == null || value === '' ? '' : String(value);
+  const showCustom = str !== '' && !PRICE_OPTS.includes(str);
+  const opts: Opt[] = [
+    ...(allowEmpty ? [{ id: '__same', label: t('form.sameAsTourist') }] : []),
+    ...PRICE_OPTS.map((p) => ({ id: p, label: p })),
+    { id: '__custom', label: t('form.custom') },
+  ];
+  return (
+    <>
+      <OptionsPicker
+        label={label}
+        value={allowEmpty && str === '' ? '__same' : showCustom ? '__custom' : str}
+        options={opts}
+        onChange={(id) => {
+          if (id === '__same') onChange(null);
+          else if (id === '__custom' || id === null) onChange(0);
+          else onChange(Number(id) || 0);
+        }}
+        placeholder={t('form.pickPrice')}
+      />
+      {showCustom ? (
+        <Field label={`${label} (${t('form.custom')})`} value={str} onChangeText={(x) => onChange(x.trim() === '' ? (allowEmpty ? null : 0) : Number(x))} keyboardType="numeric" />
+      ) : null}
+    </>
+  );
+}
 export function ServiceForm({ initial, serviceId }: { initial: any; serviceId?: string }) {
   const { t } = useTranslation();
   const router = useRouter();
@@ -22,7 +52,7 @@ export function ServiceForm({ initial, serviceId }: { initial: any; serviceId?: 
     name_en: '', name_ar: '', description_en: '', description_ar: '',
     company_id: null, category_id: null, image_url: null, gallery_urls: [],
     available_from: '', available_to: '',
-    base_price: 0, currency: 'USD', max_booking: 100, current_booking: 0,
+    base_price: 0, citizen_price: null, currency: 'JOD', max_booking: 100, current_booking: 0,
     duration: '', available: true, ...initial,
   });
   const [cats, setCats] = useState<Opt[]>([]);
@@ -45,14 +75,16 @@ export function ServiceForm({ initial, serviceId }: { initial: any; serviceId?: 
   const save = async () => {
     setErr(null); setBusy(true);
     try {
-      if (!v.name_en?.trim() || !v.name_ar?.trim()) throw new Error('English and Arabic names are required');
-      if ((v.base_price ?? 0) < 0) throw new Error('Base price must be >= 0');
-      if ((v.max_booking ?? 0) < 0) throw new Error('Max booking must be >= 0');
-      if ((v.current_booking ?? 0) < 0) throw new Error('Current booking must be >= 0');
-      if ((v.current_booking ?? 0) > (v.max_booking ?? 0)) throw new Error('Current booking cannot exceed max booking');
+      if (!v.name_en?.trim() || !v.name_ar?.trim()) throw new Error(t('form.reqNames'));
+      if ((v.base_price ?? 0) < 0) throw new Error(t('form.negBase'));
+      const cz = v.citizen_price === '' || v.citizen_price == null ? null : Number(v.citizen_price);
+      if (cz != null && (isNaN(cz) || cz < 0)) throw new Error(t('form.negBase'));
+      if ((v.max_booking ?? 0) < 0) throw new Error(t('form.negMax'));
+      if ((v.current_booking ?? 0) < 0) throw new Error(t('form.negCur'));
+      if ((v.current_booking ?? 0) > (v.max_booking ?? 0)) throw new Error(t('form.curExceeds'));
       const from = String(v.available_from ?? '').trim() || null;
       const to = String(v.available_to ?? '').trim() || null;
-      if (from && to && from > to) throw new Error('Available-from date must be before available-to date');
+      if (from && to && from > to) throw new Error(t('form.badDates'));
       const payload = {
         ...v,
         company_id: v.company_id ?? null,
@@ -62,6 +94,7 @@ export function ServiceForm({ initial, serviceId }: { initial: any; serviceId?: 
         available_from: from,
         available_to: to,
         base_price: Number(v.base_price) || 0,
+        citizen_price: cz,
         max_booking: Number(v.max_booking) || 0,
         current_booking: Number(v.current_booking) || 0,
       };
@@ -81,39 +114,48 @@ export function ServiceForm({ initial, serviceId }: { initial: any; serviceId?: 
   return (
     <AdminGate>
     <ScrollView style={s.wrap} contentContainerStyle={{ padding: 16, paddingTop: 60, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
-      <Text style={s.title}>{serviceId ? 'Edit Service' : 'Add Service'}</Text>
+      <Text style={s.title}>{serviceId ? t('form.editItem', { name: t('admin.services') }) : t('form.addItem', { name: t('admin.services') })}</Text>
 
-      <SectionTitle>Basic Information</SectionTitle>
-      <Field label="Name (EN)" value={String(v.name_en ?? '')} onChangeText={(x) => set('name_en', x)} />
-      <Field label="Name (AR)" value={String(v.name_ar ?? '')} onChangeText={(x) => set('name_ar', x)} />
-      <Field label="Description (EN)" value={String(v.description_en ?? '')} onChangeText={(x) => set('description_en', x)} multiline />
-      <Field label="Description (AR)" value={String(v.description_ar ?? '')} onChangeText={(x) => set('description_ar', x)} multiline />
-      <Field label="Duration" value={String(v.duration ?? '')} onChangeText={(x) => set('duration', x)} placeholder="2 hours" />
+      <SectionTitle>{t('form.basic')}</SectionTitle>
+      <Field label={t('form.nameEn')} value={String(v.name_en ?? '')} onChangeText={(x) => set('name_en', x)} />
+      <Field label={t('form.nameAr')} value={String(v.name_ar ?? '')} onChangeText={(x) => set('name_ar', x)} />
+      <Field label={t('form.descEn')} value={String(v.description_en ?? '')} onChangeText={(x) => set('description_en', x)} multiline />
+      <Field label={t('form.descAr')} value={String(v.description_ar ?? '')} onChangeText={(x) => set('description_ar', x)} multiline />
+      <Field label={t('form.duration')} value={String(v.duration ?? '')} onChangeText={(x) => set('duration', x)} placeholder={t('form.durPh')} />
 
-      <SectionTitle>Company & Category</SectionTitle>
-      <OptionsPicker label="Company" value={v.company_id} options={comps} onChange={(id) => set('company_id', id)} placeholder="No company" />
-      <OptionsPicker label="Category" value={v.category_id} options={cats} onChange={(id) => set('category_id', id)} placeholder="No category" />
+      <SectionTitle>{t('form.company')} & {t('form.category')}</SectionTitle>
+      <OptionsPicker label={t('form.company')} value={v.company_id} options={comps} onChange={(id) => set('company_id', id)} placeholder={t('form.noCompany')} />
+      <OptionsPicker label={t('form.category')} value={v.category_id} options={cats} onChange={(id) => set('category_id', id)} placeholder={t('form.noCategory')} />
 
-      <SectionTitle>Media</SectionTitle>
-      <ImageField label="Service image" bucket="service" value={v.image_url} onChange={(url) => set('image_url', url)} />
-      <ImageGalleryField label="More pictures" bucket="service" value={v.gallery_urls ?? []} onChange={(urls) => set('gallery_urls', urls)} />
+      <SectionTitle>{t('form.media')}</SectionTitle>
+      <ImageField label={t('form.serviceImage')} bucket="service" value={v.image_url} onChange={(url) => set('image_url', url)} />
+      <ImageGalleryField label={t('form.gallery')} bucket="service" value={v.gallery_urls ?? []} onChange={(urls) => set('gallery_urls', urls)} />
 
-      <SectionTitle>Pricing & Capacity</SectionTitle>
-      <Field label="Base price" value={String(v.base_price ?? 0)} onChangeText={(x) => set('base_price', Number(x) || 0)} keyboardType="numeric" />
-      <Field label="Currency" value={String(v.currency ?? 'USD')} onChangeText={(x) => set('currency', x)} />
-      <Field label="Max booking" value={String(v.max_booking ?? 0)} onChangeText={(x) => set('max_booking', Number(x) || 0)} keyboardType="numeric" />
-      <Field label="Current booking" value={String(v.current_booking ?? 0)} onChangeText={(x) => set('current_booking', Number(x) || 0)} keyboardType="numeric" />
-      <Field label="Available from (YYYY-MM-DD, optional)" value={String(v.available_from ?? '')} onChangeText={(x) => set('available_from', x)} placeholder="2026-11-01" />
-      <Field label="Available to (YYYY-MM-DD, optional)" value={String(v.available_to ?? '')} onChangeText={(x) => set('available_to', x)} placeholder="2026-12-31" />
+      <SectionTitle>{t('form.prices')}</SectionTitle>
+      <PricePicker label={t('form.baseTourist')} value={v.base_price} onChange={(n) => set('base_price', n ?? 0)} />
+      <PricePicker label={t('form.citizenPrice')} value={v.citizen_price} allowEmpty onChange={(n) => set('citizen_price', n)} />
+      <OptionsPicker
+        label={t('form.currency')}
+        value={v.currency ?? 'JOD'}
+        options={[...CURRENCIES].map((c) => ({ id: c.code, label: `${c.symbol} ${c.code}` }))}
+        onChange={(id) => set('currency', id ?? 'JOD')}
+        placeholder={t('form.pickCurrency')}
+      />
+
+      <SectionTitle>{t('form.capAvail')}</SectionTitle>
+      <Field label={t('form.maxBooking')} value={String(v.max_booking ?? 0)} onChangeText={(x) => set('max_booking', Number(x) || 0)} keyboardType="numeric" />
+      <Field label={t('form.currentBooking')} value={String(v.current_booking ?? 0)} onChangeText={(x) => set('current_booking', Number(x) || 0)} keyboardType="numeric" />
+      <Field label={t('form.fromDate')} value={String(v.available_from ?? '')} onChangeText={(x) => set('available_from', x)} placeholder={t('form.fromPh')} />
+      <Field label={t('form.toDate')} value={String(v.available_to ?? '')} onChangeText={(x) => set('available_to', x)} placeholder={t('form.toPh')} />
       {serviceId ? (
         <View style={s.readonly}>
-          <Text style={s.roLabel}>Current price (server-managed)</Text>
+          <Text style={s.roLabel}>{t('form.curManaged')}</Text>
           <Text style={s.roVal}>{v.current_price ?? '—'} {v.currency ?? ''}</Text>
         </View>
       ) : null}
 
-      <SectionTitle>Publishing</SectionTitle>
-      <ToggleRow label="Available for booking" value={!!v.available} onChange={(x) => set('available', x)} />
+      <SectionTitle>{t('form.publishing')}</SectionTitle>
+      <ToggleRow label={t('form.available')} value={!!v.available} onChange={(x) => set('available', x)} />
 
       {err ? <Text style={s.err}>{err}</Text> : null}
       <PrimaryButton title={busy ? '…' : t('common.save')} onPress={save} disabled={busy} />

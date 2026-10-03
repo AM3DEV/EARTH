@@ -13,7 +13,7 @@ export default function ForgotPassword() {
   const [msg, setMsg] = useState<string | null>(null);
   const go = async () => {
     const { error } = await supabase.auth.resetPasswordForEmail(email.trim().toLowerCase());
-    setMsg(error ? error.message : 'Check your email for the reset link.');
+    setMsg(error ? error.message : t('auth.checkEmail'));
   };
   return (
     <View style={s.wrap}>

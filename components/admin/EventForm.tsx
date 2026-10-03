@@ -54,9 +54,9 @@ export function EventForm({ initial, eventId }: { initial: any; eventId?: string
   const save = async () => {
     setErr(null); setBusy(true);
     try {
-      if (!v.title_en?.trim() || !v.title_ar?.trim()) throw new Error('English and Arabic titles are required');
-      if ((v.price ?? 0) < 0) throw new Error('Price must be >= 0');
-      if ((v.capacity ?? 0) < 0) throw new Error('Capacity must be >= 0');
+      if (!v.title_en?.trim() || !v.title_ar?.trim()) throw new Error(t('form.reqTitles'));
+      if ((v.price ?? 0) < 0) throw new Error(t('form.negPrice'));
+      if ((v.capacity ?? 0) < 0) throw new Error(t('form.negCap'));
       const payload = {
         ...v,
         category_id: v.category_id ?? null,
@@ -96,49 +96,49 @@ export function EventForm({ initial, eventId }: { initial: any; eventId?: string
   return (
     <AdminGate>
     <ScrollView style={s.wrap} contentContainerStyle={{ padding: 16, paddingTop: 60 }} keyboardShouldPersistTaps="handled">
-      <Text style={s.h}>Basic Event Information</Text>
-      <Field label="Title (EN)" value={String(v.title_en ?? '')} onChangeText={(x) => set('title_en', x)} />
-      <Field label="Title (AR)" value={String(v.title_ar ?? '')} onChangeText={(x) => set('title_ar', x)} />
-      <Field label="Description (EN)" value={String(v.description_en ?? '')} onChangeText={(x) => set('description_en', x)} multiline />
-      <Field label="Description (AR)" value={String(v.description_ar ?? '')} onChangeText={(x) => set('description_ar', x)} multiline />
-      <Field label="Location" value={String(v.location ?? '')} onChangeText={(x) => set('location', x)} />
-      <Field label="Latitude" value={String(v.lat ?? '')} onChangeText={(x) => set('lat', Number(x) || null)} keyboardType="numeric" />
-      <Field label="Longitude" value={String(v.lng ?? '')} onChangeText={(x) => set('lng', Number(x) || null)} keyboardType="numeric" />
-      <Field label="Price" value={String(v.price ?? 0)} onChangeText={(x) => set('price', Number(x) || 0)} keyboardType="numeric" />
-      <Field label="Currency" value={String(v.currency ?? 'USD')} onChangeText={(x) => set('currency', x)} />
-      <Field label="Capacity" value={String(v.capacity ?? 100)} onChangeText={(x) => set('capacity', Number(x) || 0)} keyboardType="numeric" />
+      <Text style={s.h}>{t('form.eventInfo')}</Text>
+      <Field label={t('form.titleEn')} value={String(v.title_en ?? '')} onChangeText={(x) => set('title_en', x)} />
+      <Field label={t('form.titleAr')} value={String(v.title_ar ?? '')} onChangeText={(x) => set('title_ar', x)} />
+      <Field label={t('form.descEn')} value={String(v.description_en ?? '')} onChangeText={(x) => set('description_en', x)} multiline />
+      <Field label={t('form.descAr')} value={String(v.description_ar ?? '')} onChangeText={(x) => set('description_ar', x)} multiline />
+      <Field label={t('form.location')} value={String(v.location ?? '')} onChangeText={(x) => set('location', x)} />
+      <Field label={t('form.lat')} value={String(v.lat ?? '')} onChangeText={(x) => set('lat', Number(x) || null)} keyboardType="numeric" />
+      <Field label={t('form.lng')} value={String(v.lng ?? '')} onChangeText={(x) => set('lng', Number(x) || null)} keyboardType="numeric" />
+      <Field label={t('form.price')} value={String(v.price ?? 0)} onChangeText={(x) => set('price', Number(x) || 0)} keyboardType="numeric" />
+      <Field label={t('form.currency')} value={String(v.currency ?? 'USD')} onChangeText={(x) => set('currency', x)} />
+      <Field label={t('form.capacity')} value={String(v.capacity ?? 100)} onChangeText={(x) => set('capacity', Number(x) || 0)} keyboardType="numeric" />
 
-      <SectionTitle>Category & Media</SectionTitle>
-      <OptionsPicker label="Category" value={v.category_id} options={cats} onChange={(id) => set('category_id', id)} placeholder="No category" />
-      <ImageField label="Event image" bucket="event" value={v.image_url} onChange={(url) => set('image_url', url)} />
-      <ImageGalleryField label="More pictures" bucket="event" value={v.gallery_urls ?? []} onChange={(urls) => set('gallery_urls', urls)} />
+      <SectionTitle>{t('form.catMedia')}</SectionTitle>
+      <OptionsPicker label={t('form.category')} value={v.category_id} options={cats} onChange={(id) => set('category_id', id)} placeholder={t('form.noCategory')} />
+      <ImageField label={t('form.eventImage')} bucket="event" value={v.image_url} onChange={(url) => set('image_url', url)} />
+      <ImageGalleryField label={t('form.gallery')} bucket="event" value={v.gallery_urls ?? []} onChange={(urls) => set('gallery_urls', urls)} />
 
-      <SectionTitle>Schedule</SectionTitle>
-      <Field label="Start (YYYY-MM-DD HH:mm)" value={startTxt} onChangeText={setStartTxt} placeholder="2026-10-15 18:00" />
-      <Field label="End (YYYY-MM-DD HH:mm)" value={endTxt} onChangeText={setEndTxt} placeholder="2026-10-15 22:00" />
-      <Field label="Opening time" value={String(v.opening_time ?? '')} onChangeText={(x) => set('opening_time', x)} placeholder="18:00" />
-      <Field label="Closing time" value={String(v.closing_time ?? '')} onChangeText={(x) => set('closing_time', x)} placeholder="22:00" />
-      <Field label="Organizer" value={String(v.organizer ?? '')} onChangeText={(x) => set('organizer', x)} />
-      <Field label="Phone" value={String(v.phone ?? '')} onChangeText={(x) => set('phone', x)} keyboardType="phone-pad" />
-      <Field label="Website" value={String(v.website ?? '')} onChangeText={(x) => set('website', x)} autoCapitalize="none" />
+      <SectionTitle>{t('form.schedule')}</SectionTitle>
+      <Field label={t('form.start')} value={startTxt} onChangeText={setStartTxt} placeholder={t('form.startPh')} />
+      <Field label={t('form.end')} value={endTxt} onChangeText={setEndTxt} placeholder={t('form.endPh')} />
+      <Field label={t('form.openTime')} value={String(v.opening_time ?? '')} onChangeText={(x) => set('opening_time', x)} placeholder="18:00" />
+      <Field label={t('form.closeTime')} value={String(v.closing_time ?? '')} onChangeText={(x) => set('closing_time', x)} placeholder="22:00" />
+      <Field label={t('form.organizer')} value={String(v.organizer ?? '')} onChangeText={(x) => set('organizer', x)} />
+      <Field label={t('form.phone')} value={String(v.phone ?? '')} onChangeText={(x) => set('phone', x)} keyboardType="phone-pad" />
+      <Field label={t('form.website')} value={String(v.website ?? '')} onChangeText={(x) => set('website', x)} autoCapitalize="none" />
 
-      <SectionTitle>Publishing</SectionTitle>
-      <ToggleRow label="Active (visible to tourists)" value={!!v.active} onChange={(x) => set('active', x)} />
+      <SectionTitle>{t('form.publishing')}</SectionTitle>
+      <ToggleRow label={t('form.active')} value={!!v.active} onChange={(x) => set('active', x)} />
 
-      <Text style={s.h}>SERVICE PLUS</Text>
-      <ToggleRow label="Enable Service Plus" value={plus.enabled} onChange={(x) => setPlus({ ...plus, enabled: x })} />
-      <Field label="Plan (PLUS)" value={plus.plan} onChangeText={(x) => setPlus({ ...plus, plan: x })} />
-      <Field label="Duration days (7/14/30)" value={String(plus.durationDays)} onChangeText={(x) => setPlus({ ...plus, durationDays: Number(x) || 7 })} keyboardType="numeric" />
-      <Field label="Priority" value={String(plus.priority)} onChangeText={(x) => setPlus({ ...plus, priority: Number(x) || 0 })} keyboardType="numeric" />
+      <Text style={s.h}>{t('form.plus')}</Text>
+      <ToggleRow label={t('form.enablePlus')} value={plus.enabled} onChange={(x) => setPlus({ ...plus, enabled: x })} />
+      <Field label={t('form.plan')} value={plus.plan} onChangeText={(x) => setPlus({ ...plus, plan: x })} />
+      <Field label={t('form.durDays')} value={String(plus.durationDays)} onChangeText={(x) => setPlus({ ...plus, durationDays: Number(x) || 7 })} keyboardType="numeric" />
+      <Field label={t('form.priority')} value={String(plus.priority)} onChangeText={(x) => setPlus({ ...plus, priority: Number(x) || 0 })} keyboardType="numeric" />
 
-      <Text style={s.h}>Support Pricing</Text>
-      <ToggleRow label="Enable Support Pricing" value={support.enabled} onChange={(x) => setSupport({ ...support, enabled: x })} />
-      <Field label="Max radius km" value={String(support.radiusKm)} onChangeText={(x) => setSupport({ ...support, radiusKm: Number(x) || 25 })} keyboardType="numeric" />
-      <Field label="Max support discount %" value={String(support.maxDiscount)} onChangeText={(x) => setSupport({ ...support, maxDiscount: Number(x) || 0 })} keyboardType="numeric" />
-      <Field label="Target min capacity %" value={String(support.minCap)} onChangeText={(x) => setSupport({ ...support, minCap: Number(x) || 0 })} keyboardType="numeric" />
-      <Field label="Target max capacity %" value={String(support.maxCap)} onChangeText={(x) => setSupport({ ...support, maxCap: Number(x) || 0 })} keyboardType="numeric" />
-      <ToggleRow label="Allow stacking" value={support.stacking} onChange={(x) => setSupport({ ...support, stacking: x })} />
-      <Field label="Discount duration hours" value={String(support.durationH)} onChangeText={(x) => setSupport({ ...support, durationH: Number(x) || 48 })} keyboardType="numeric" />
+      <Text style={s.h}>{t('form.support')}</Text>
+      <ToggleRow label={t('form.enableSupport')} value={support.enabled} onChange={(x) => setSupport({ ...support, enabled: x })} />
+      <Field label={t('form.radius')} value={String(support.radiusKm)} onChangeText={(x) => setSupport({ ...support, radiusKm: Number(x) || 25 })} keyboardType="numeric" />
+      <Field label={t('form.maxDisc')} value={String(support.maxDiscount)} onChangeText={(x) => setSupport({ ...support, maxDiscount: Number(x) || 0 })} keyboardType="numeric" />
+      <Field label={t('form.minCap')} value={String(support.minCap)} onChangeText={(x) => setSupport({ ...support, minCap: Number(x) || 0 })} keyboardType="numeric" />
+      <Field label={t('form.maxCap')} value={String(support.maxCap)} onChangeText={(x) => setSupport({ ...support, maxCap: Number(x) || 0 })} keyboardType="numeric" />
+      <ToggleRow label={t('form.stacking')} value={support.stacking} onChange={(x) => setSupport({ ...support, stacking: x })} />
+      <Field label={t('form.discHours')} value={String(support.durationH)} onChangeText={(x) => setSupport({ ...support, durationH: Number(x) || 48 })} keyboardType="numeric" />
 
       {err ? <Text style={s.err}>{err}</Text> : null}
       <PrimaryButton title={busy ? '…' : t('common.save')} onPress={save} disabled={busy} />

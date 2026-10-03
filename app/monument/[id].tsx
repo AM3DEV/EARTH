@@ -61,7 +61,7 @@ export function DetailShell({ table, targetType, backTo }: { table: string; targ
         onPress={() => (backTo ? router.push(backTo as any) : router.back())}
         style={[s.backFab, rtl ? { right: 16 } : { left: 16 }]}
         accessibilityRole="button"
-        accessibilityLabel="Back"
+        accessibilityLabel={t('common.back')}
       >
         {rtl ? <ArrowRight color={COLORS.text} size={20} /> : <ArrowLeft color={COLORS.text} size={20} />}
       </Pressable>

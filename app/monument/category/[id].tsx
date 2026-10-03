@@ -20,7 +20,7 @@ export default function CategoryList() {
   return (
     <View style={s.wrap}>
       <View style={s.head}>
-        <Pressable onPress={() => router.back()} style={s.backBtn} accessibilityRole="button" accessibilityLabel="Back">
+        <Pressable onPress={() => router.back()} style={s.backBtn} accessibilityRole="button" accessibilityLabel={t('common.back')}>
           {rtl ? <ArrowRight color={COLORS.text} size={20} /> : <ArrowLeft color={COLORS.text} size={20} />}
         </Pressable>
         <Text style={s.title}>{t('monument.title')}</Text>

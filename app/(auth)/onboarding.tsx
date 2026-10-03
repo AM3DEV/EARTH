@@ -8,6 +8,7 @@ import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS, RADIUS } from '../../constants/colors';
 import { ONBOARDING_PHOTOS } from '../../constants/photos';
+import { LanguageButton, LanguageSheet } from '../../components/LanguagePicker';
 import { PrimaryButton } from '../../components/ui/Buttons';
 
 const SLIDES = ['s1t', 's2t', 's3t', 's4t', 's5t'] as const;
@@ -18,6 +19,7 @@ export default function Onboarding() {
   const rtl = i18n.language === 'ar';
   const router = useRouter();
   const [i, setI] = useState(0);
+  const [showLang, setShowLang] = useState(false);
   const { height: H } = useWindowDimensions();
 
   const done = async () => {
@@ -37,8 +39,11 @@ export default function Onboarding() {
         locations={[0.55, 1]}
         style={[StyleSheet.absoluteFill, { height: H * 0.72 }]}
       />
-      <Pressable onPress={done} style={s.skip} accessibilityRole="button" accessibilityLabel={t('common.close')}>
-        <Text style={s.skipTxt}>{t('common.close')}</Text>
+      <View style={s.langWrap}>
+        <LanguageButton onPress={() => setShowLang(true)} />
+      </View>
+      <Pressable onPress={done} style={s.skip} accessibilityRole="button" accessibilityLabel={t('common.skip')}>
+        <Text style={s.skipTxt}>{t('common.skip')}</Text>
       </Pressable>
       <Animated.View key={i} entering={FadeInUp.duration(350)} style={s.panel}>
         <Text style={[s.title, { textAlign: rtl ? 'right' : 'left' }]}>{t(`onboarding.${SLIDES[i]}`)}</Text>
@@ -49,7 +54,7 @@ export default function Onboarding() {
           ))}
         </View>
         {i < SLIDES.length - 1 ? (
-          <PrimaryButton title={t('common.save') === 'Save' ? 'Next' : 'التالي'} onPress={() => setI(i + 1)} />
+          <PrimaryButton title={t('common.next')} onPress={() => setI(i + 1)} />
         ) : (
           <PrimaryButton title={t('onboarding.getStarted')} onPress={done} />
         )}
@@ -58,12 +63,14 @@ export default function Onboarding() {
           <Text style={s.loginLink}>{t('onboarding.login')}</Text>
         </Pressable>
       </Animated.View>
+      <LanguageSheet visible={showLang} onClose={() => setShowLang(false)} />
     </View>
   );
 }
 
 const s = StyleSheet.create({
   wrap: { flex: 1, backgroundColor: '#fff', justifyContent: 'flex-end' },
+  langWrap: { position: 'absolute', top: 60, left: 20, zIndex: 5 },
   skip: {
     position: 'absolute', top: 60, right: 20, zIndex: 5,
     backgroundColor: 'rgba(43,26,18,0.45)', borderRadius: RADIUS.full, paddingHorizontal: 16, paddingVertical: 8,

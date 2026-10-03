@@ -10,6 +10,7 @@ import { PrimaryButton } from '../../components/ui/Buttons';
 import { ErrorState } from '../../components/ui/States';
 import { COLORS } from '../../constants/colors';
 import { LOGIN_BG } from '../../constants/photos';
+import { LanguageButton, LanguageSheet } from '../../components/LanguagePicker';
 
 export default function Login() {
   const { t, i18n } = useTranslation();
@@ -19,6 +20,7 @@ export default function Login() {
   const [pw, setPw] = useState('');
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [showLang, setShowLang] = useState(false);
 
   const go = async () => {
     setErr(null); setBusy(true);
@@ -38,6 +40,9 @@ export default function Login() {
         colors={['rgba(38,22,15,0.35)', 'rgba(38,22,15,0.72)']}
         style={StyleSheet.absoluteFill}
       />
+      <View style={s.langWrap}>
+        <LanguageButton onPress={() => setShowLang(true)} />
+      </View>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={s.avoid}>
         <ScrollView contentContainerStyle={s.scroll} keyboardShouldPersistTaps="handled">
           <View style={s.brand}>
@@ -59,6 +64,7 @@ export default function Login() {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
+      <LanguageSheet visible={showLang} onClose={() => setShowLang(false)} />
     </View>
   );
 }
@@ -66,6 +72,7 @@ export default function Login() {
 const s = StyleSheet.create({
   root: { flex: 1, backgroundColor: COLORS.darkestGreen },
   avoid: { flex: 1 },
+  langWrap: { position: 'absolute', top: 60, left: 20, zIndex: 5 },
   scroll: { flexGrow: 1, justifyContent: 'flex-end', padding: 20, paddingBottom: 28 },
   brand: { alignItems: 'center', marginBottom: 22 },
   flag: { fontSize: 56 },

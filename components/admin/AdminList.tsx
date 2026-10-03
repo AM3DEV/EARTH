@@ -115,7 +115,7 @@ export function AdminList({ table, titleKey, createHref, editBase, nameOf, bare,
   return (
     <View style={s.wrap}>
       <View style={s.head}>
-        <Pressable onPress={() => router.back()} style={s.backBtn} accessibilityRole="button" accessibilityLabel="Back">
+        <Pressable onPress={() => router.back()} style={s.backBtn} accessibilityRole="button" accessibilityLabel={t('common.back')}>
           <ArrowLeft color={COLORS.text} size={20} />
         </Pressable>
         <Text style={s.title}>{t(titleKey)}</Text>

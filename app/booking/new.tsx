@@ -10,15 +10,14 @@ import { COLORS, RADIUS } from '../../constants/colors';
 import { fallbackPhoto } from '../../constants/photos';
 import { LoadingState, ErrorState } from '../../components/ui/States';
 import { PriceBreakdown } from '../../components/booking/PriceBreakdown';
-import { createBookingServer } from '../../hooks/useBookings';
 import { Field } from '../../components/ui/Field';
 import { PrimaryButton } from '../../components/ui/Buttons';
-import { formatMoney } from '../../lib/pricing';
+import { usePrice } from '../../lib/currency';
 
 /**
  * Booking page: opened from a service's Book button with ?service_id=.
- * Date + quantity + live availability. Confirm is disabled with a clear
- * reason whenever the booking cannot be placed (full, closed, out of dates).
+ * Date + quantity + coupon, live availability. Confirm goes to the
+ * payment page (CARD / PAYPAL) — booking completes there.
  */
 export default function NewBooking() {
   const { service_id } = useLocalSearchParams<{ service_id: string }>();
@@ -32,7 +31,10 @@ export default function NewBooking() {
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
   const [qty, setQty] = useState('1');
   const [msg, setMsg] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
+  const [coupon, setCoupon] = useState('');
+  const [picked, setPicked] = useState<string | null>(null);
+  const [myCoupons, setMyCoupons] = useState<any[]>([]);
+  const { fmt } = usePrice();
   const { height: WH } = useWindowDimensions();
   const heroH = Math.min(260, Math.max(170, Math.round(WH * 0.27)));
 
@@ -44,6 +46,21 @@ export default function NewBooking() {
       if (data) {
         const { data: q } = await supabase.rpc('calculate_price_quote', { p_service_id: data.id });
         setQuote(q);
+      }
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const { data: cp } = await supabase
+            .from('coupons')
+            .select('code,kind,value')
+            .eq('user_id', user.id)
+            .eq('status', 'active')
+            .order('created_at', { ascending: false })
+            .limit(20);
+          setMyCoupons(cp ?? []);
+        }
+      } catch {
+        // coupons optional — manual code still works
       }
       setLoading(false);
     })();
@@ -73,14 +90,23 @@ export default function NewBooking() {
     reason = t('booking.untilDate', { date: String(row.available_to).slice(0, 10) });
   }
 
-  const book = async () => {
+  const effectiveCoupon = (picked ?? coupon.trim()).toUpperCase();
+
+  // Live estimate for the picked coupon (server applies it authoritatively).
+  const pickedCpn = myCoupons.find((c) => c.code === picked);
+  const pickBase = Number(quote?.final_price ?? row.current_price ?? 0);
+  const pickOff = pickedCpn
+    ? pickedCpn.kind === 'percent'
+      ? Math.round(pickBase * Math.min(Number(pickedCpn.value), 100)) / 100
+      : Math.min(Number(pickedCpn.value), pickBase)
+    : 0;
+
+  const goPay = () => {
     if (reason) { setMsg(reason); return; }
-    setMsg(null); setBusy(true);
-    try {
-      const res: any = await createBookingServer({ service_id: service_id!, booking_date: new Date(day).toISOString(), quantity: qn });
-      const bookingId = res?.booking_id ?? res?.id ?? res;
-      router.push(`/booking/${bookingId}` as any);
-    } catch (e: any) { setMsg(e.message); } finally { setBusy(false); }
+    setMsg(null);
+    router.push(
+      `/booking/pay?service_id=${service_id}&date=${encodeURIComponent(day)}&qty=${qn}&coupon=${encodeURIComponent(effectiveCoupon)}` as any
+    );
   };
 
   return (
@@ -89,7 +115,7 @@ export default function NewBooking() {
         onPress={() => router.back()}
         style={[s.backFab, rtl ? { right: 16 } : { left: 16 }]}
         accessibilityRole="button"
-        accessibilityLabel="Back"
+        accessibilityLabel={t('common.back')}
       >
         {rtl ? <ArrowRight color={COLORS.text} size={20} /> : <ArrowLeft color={COLORS.text} size={20} />}
       </Pressable>
@@ -105,20 +131,49 @@ export default function NewBooking() {
         <View style={s.body}>
           <Text style={s.name}>{name}</Text>
           <Text style={s.muted}>
-            {(row.companies as any)?.name_en} · {formatMoney(quote?.final_price ?? row.current_price, row.currency)} · {cur}/{max}
+            {(row.companies as any)?.name_en} · {fmt(quote?.final_price ?? row.current_price, row.currency)} · {cur}/{max}
           </Text>
           <View style={{ height: 10 }} />
           <PriceBreakdown quote={quote ?? { base_price: row.base_price, dynamic_price: row.current_price, final_price: row.current_price, currency: row.currency }} />
           <View style={{ height: 14 }} />
           <Field label={t('booking.date')} value={date} onChangeText={setDate} placeholder="YYYY-MM-DD" />
           <Field label={t('booking.quantity')} value={qty} onChangeText={setQty} keyboardType="numeric" />
+          {myCoupons.length > 0 ? (
+            <>
+              <Text style={s.secLabel}>{t('booking.chooseCoupon')}</Text>
+              <View style={s.couponRow}>
+                {myCoupons.map((c) => {
+                  const on = picked === c.code;
+                  return (
+                    <Pressable
+                      key={c.code}
+                      onPress={() => { setPicked(on ? null : c.code); setCoupon(''); setMsg(null); }}
+                      style={[s.coupon, on && s.couponOn]}
+                      accessibilityRole="button"
+                      accessibilityLabel={c.code}
+                    >
+                      <Text style={[s.couponCode, on && s.couponCodeOn]}>{c.code}</Text>
+                      <Text style={[s.couponVal, on && s.couponCodeOn]}>
+                        {c.kind === 'percent' ? `${c.value}%` : c.value}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
+              {pickOff > 0 ? (
+                <Text style={s.couponOff}>−{fmt(pickOff, row.currency)} → {fmt(Math.max(pickBase - pickOff, 0), row.currency)}</Text>
+              ) : null}
+            </>
+          ) : null}
+          <Field label={t('store.couponLabel')} value={coupon} onChangeText={(v) => { setCoupon(v.toUpperCase()); setPicked(null); }} placeholder="EARTH-XXXX-XXX-XXX" autoCapitalize="characters" />
+          <Text style={s.muted}>{t('store.couponHint')}</Text>
           {reason ? (
             <View style={s.why}>
               <Text style={s.whyTxt}>{reason}</Text>
             </View>
           ) : null}
           {msg && msg !== reason ? <Text style={s.err}>{msg}</Text> : null}
-          <PrimaryButton title={busy ? '…' : t('booking.confirm')} onPress={book} disabled={busy || !!reason} />
+          <PrimaryButton title={t('booking.confirm')} onPress={goPay} disabled={!!reason} />
         </View>
       </ScrollView>
     </View>
@@ -137,6 +192,14 @@ const s = StyleSheet.create({
   body: { padding: 16, marginTop: -24, borderTopLeftRadius: 24, borderTopRightRadius: 24, backgroundColor: '#fff' },
   name: { fontSize: 22, fontWeight: '800', color: COLORS.text },
   muted: { color: COLORS.secondaryText, marginTop: 4 },
+  secLabel: { fontSize: 13, color: COLORS.secondaryText, marginBottom: 6, fontWeight: '600' },
+  couponRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 12 },
+  coupon: { borderWidth: 1, borderColor: COLORS.border, borderRadius: RADIUS.md, paddingHorizontal: 12, paddingVertical: 8, backgroundColor: '#fff', alignItems: 'center' },
+  couponOn: { borderColor: COLORS.primary, backgroundColor: COLORS.softGreen },
+  couponCode: { fontWeight: '800', color: COLORS.text, fontSize: 13, letterSpacing: 0.5 },
+  couponCodeOn: { color: COLORS.primaryDark },
+  couponVal: { fontWeight: '700', color: COLORS.secondaryText, fontSize: 12 },
+  couponOff: { fontSize: 15, fontWeight: '800', color: COLORS.success, marginBottom: 12 },
   why: { backgroundColor: '#FAF0D7', borderWidth: 1, borderColor: COLORS.gold, borderRadius: RADIUS.md, padding: 12, marginBottom: 12 },
   whyTxt: { color: COLORS.text, fontWeight: '600', fontSize: 14 },
   err: { color: COLORS.error, marginBottom: 8 },

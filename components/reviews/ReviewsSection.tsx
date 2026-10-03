@@ -28,7 +28,7 @@ export function ReviewsSection({ targetType, targetId }: { targetType: string; t
       setComment('');
       setRating(5);
     } catch (e: any) {
-      setMsg(e.message);
+      setMsg(e.message === 'Not authenticated' ? t('common.notAuth') : e.message);
     } finally {
       setBusy(false);
     }
@@ -42,8 +42,8 @@ export function ReviewsSection({ targetType, targetId }: { targetType: string; t
       {reviews.map((r: any) => {
         const a = r.author ?? null;
         const aname = a
-          ? `${a.first_name ?? ''} ${a.last_name ?? ''}`.trim() || a.username || 'Tourist'
-          : 'Tourist';
+          ? `${a.first_name ?? ''} ${a.last_name ?? ''}`.trim() || a.username || t('common.guest')
+          : t('common.guest');
         return (
           <View key={r.id} style={s.rev}>
             <View style={s.revHead}>

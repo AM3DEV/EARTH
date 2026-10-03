@@ -10,10 +10,10 @@ import { SectionTitle, ToggleRow, OptionsPicker, ImageField, AdminGate, friendly
 import { COLORS } from '../../constants/colors';
 
 const TYPES = [
-  { id: 'monument', label: 'Monument' },
-  { id: 'event', label: 'Event' },
-  { id: 'company', label: 'Company' },
-  { id: 'service', label: 'Service' },
+  { id: 'monument', labelKey: 'admin.monuments' },
+  { id: 'event', labelKey: 'admin.events' },
+  { id: 'company', labelKey: 'admin.companies' },
+  { id: 'service', labelKey: 'admin.services' },
 ];
 
 /**
@@ -31,10 +31,10 @@ export function CategoryForm({ initial, categoryId }: { initial: any; categoryId
   const save = async () => {
     setErr(null); setBusy(true);
     try {
-      if (!v.name_en?.trim() || !v.name_ar?.trim()) throw new Error('English and Arabic names are required');
+      if (!v.name_en?.trim() || !v.name_ar?.trim()) throw new Error(t('form.reqNames'));
       // Prevent duplicate category names (case-insensitive) — dupes show as doubled filter chips.
       const { data: dup } = await supabase.from('categories').select('id').ilike('name_en', v.name_en.trim()).limit(1);
-      if (dup?.length && dup[0].id !== categoryId) throw new Error('A category with this English name already exists.');
+      if (dup?.length && dup[0].id !== categoryId) throw new Error(t('form.dupeCat'));
       const payload = { ...v, image_url: v.image_url ?? null, type: v.type ?? null };
       if (categoryId) {
         const { error } = await supabase.from('categories').update({ ...payload, updated_at: new Date().toISOString() }).eq('id', categoryId);
@@ -52,20 +52,20 @@ export function CategoryForm({ initial, categoryId }: { initial: any; categoryId
   return (
     <AdminGate>
     <ScrollView style={s.wrap} contentContainerStyle={{ padding: 16, paddingTop: 60, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
-      <Text style={s.title}>{categoryId ? 'Edit Category' : 'Add Category'}</Text>
+      <Text style={s.title}>{categoryId ? t('form.editItem', { name: t('admin.categories') }) : t('form.addItem', { name: t('admin.categories') })}</Text>
 
-      <SectionTitle>Names</SectionTitle>
-      <Field label="Name (EN)" value={String(v.name_en ?? '')} onChangeText={(x) => set('name_en', x)} placeholder="Restaurants" />
-      <Field label="Name (AR)" value={String(v.name_ar ?? '')} onChangeText={(x) => set('name_ar', x)} placeholder="مطاعم" />
-      <Field label="Description (EN)" value={String(v.description_en ?? '')} onChangeText={(x) => set('description_en', x)} multiline />
-      <Field label="Description (AR)" value={String(v.description_ar ?? '')} onChangeText={(x) => set('description_ar', x)} multiline />
+      <SectionTitle>{t('form.names')}</SectionTitle>
+      <Field label={t('form.nameEn')} value={String(v.name_en ?? '')} onChangeText={(x) => set('name_en', x)} />
+      <Field label={t('form.nameAr')} value={String(v.name_ar ?? '')} onChangeText={(x) => set('name_ar', x)} />
+      <Field label={t('form.descEn')} value={String(v.description_en ?? '')} onChangeText={(x) => set('description_en', x)} multiline />
+      <Field label={t('form.descAr')} value={String(v.description_ar ?? '')} onChangeText={(x) => set('description_ar', x)} multiline />
 
-      <SectionTitle>Usage</SectionTitle>
-      <OptionsPicker label="Used for" value={v.type} options={TYPES} onChange={(id) => set('type', id)} placeholder="General" />
-      <Text style={s.hint}>Companies, events, monuments and services pick from this list in their own forms.</Text>
+      <SectionTitle>{t('form.usage')}</SectionTitle>
+      <OptionsPicker label={t('form.usedFor')} value={v.type} options={TYPES.map((o) => ({ id: o.id, label: t(o.labelKey) }))} onChange={(id) => set('type', id)} placeholder={t('form.general')} />
+      <Text style={s.hint}>{t('form.usedForHint')}</Text>
 
-      <SectionTitle>Media</SectionTitle>
-      <ImageField label="Category image" bucket="category" value={v.image_url} onChange={(url) => set('image_url', url)} />
+      <SectionTitle>{t('form.media')}</SectionTitle>
+      <ImageField label={t('form.categoryImage')} bucket="category" value={v.image_url} onChange={(url) => set('image_url', url)} />
 
       {err ? <Text style={s.err}>{err}</Text> : null}
       <PrimaryButton title={busy ? '…' : t('common.save')} onPress={save} disabled={busy} />

@@ -6,11 +6,13 @@ import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { supabase } from '../lib/supabase';
 import { SPLASH_BG } from '../constants/photos';
+import { LanguageButton, LanguageSheet } from '../components/LanguagePicker';
 
 export default function Index() {
   const [ready, setReady] = useState(false);
   const [session, setSession] = useState<any>(null);
   const [seen, setSeen] = useState<boolean | null>(null);
+  const [showLang, setShowLang] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -32,6 +34,9 @@ export default function Index() {
           locations={[0.35, 1]}
           style={StyleSheet.absoluteFill}
         />
+        <View style={s.langWrap}>
+          <LanguageButton onPress={() => setShowLang(true)} />
+        </View>
         <View style={s.center}>
           <Text style={s.flag}>🇯🇴</Text>
           <Text style={s.logo}>Jordan</Text>
@@ -39,6 +44,7 @@ export default function Index() {
           <Text style={s.tag}>TOURISM GUIDE · دليل السياحة</Text>
           <ActivityIndicator size="large" color="#FFFFFF" style={s.spin} />
         </View>
+        <LanguageSheet visible={showLang} onClose={() => setShowLang(false)} />
       </View>
     );
   }
@@ -49,6 +55,7 @@ export default function Index() {
 
 const s = StyleSheet.create({
   splash: { flex: 1, backgroundColor: '#2B1A12', alignItems: 'center', justifyContent: 'flex-end' },
+  langWrap: { position: 'absolute', top: 60, right: 20, zIndex: 5 },
   center: { alignItems: 'center', justifyContent: 'center', paddingHorizontal: 32, paddingBottom: 110 },
   flag: { fontSize: 56 },
   logo: {

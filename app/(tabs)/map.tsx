@@ -13,6 +13,7 @@ import { fallbackPhoto } from '../../constants/photos';
 import { JORDAN_REGION } from '../../constants/jordan';
 import { COLORS, RADIUS } from '../../constants/colors';
 import { useProfile } from '../../hooks/useAuth';
+import { getWallet } from '../../hooks/useBookings';
 import { EmptyState } from '../../components/ui/States';
 import { Stars } from '../../components/ui/Card';
 
@@ -26,6 +27,11 @@ export default function MapHome() {
   const inputRef = useRef<TextInput>(null);
   const { profile } = useProfile();
   const { height: SH } = useWindowDimensions();
+  const [points, setPoints] = useState<number | null>(null);
+
+  useEffect(() => {
+    getWallet().then((w) => setPoints(w?.points ?? null)).catch(() => {});
+  }, []);
 
   const [region] = useState<Region>({ ...JORDAN_REGION });
   const [markers, setMarkers] = useState<MarkerItem[]>([]);
@@ -136,8 +142,9 @@ export default function MapHome() {
             <View style={[s.avatar, s.avatarFallback]}><Text style={s.avatarTxt}>{(profile?.first_name?.[0] ?? 'J').toUpperCase()}</Text></View>
           )}
           <Text style={s.profileName} numberOfLines={1}>{profile ? `${profile.first_name} ${profile.last_name}` : 'Jordan Guide'}</Text>
+          {points != null && points > 0 ? <Text style={s.pts}>★ {points}</Text> : null}
         </Pressable>
-        <Pressable accessibilityRole="button" accessibilityLabel="Settings" onPress={() => router.push('/settings' as any)} style={s.iconBtn}>
+        <Pressable accessibilityRole="button" accessibilityLabel={t('settings.title')} onPress={() => router.push('/settings' as any)} style={s.iconBtn}>
           <Settings color={COLORS.text} size={20} />
         </Pressable>
       </View>
@@ -190,11 +197,9 @@ export default function MapHome() {
                 const href = item.kind === 'company' ? `/company/${item.id}`
                   : item.kind === 'monument' ? `/monument/${item.id}`
                   : `/event/${item.id}`;
-                const kindTxt = item.kind === 'company'
-                  ? (lang === 'ar' ? 'شركة' : 'Company')
-                  : item.kind === 'monument'
-                    ? (lang === 'ar' ? 'معلم' : 'Monument')
-                    : (lang === 'ar' ? 'فعالية' : 'Event');
+                const kindTxt = item.kind === 'company' ? t('map.kindCompany')
+                  : item.kind === 'monument' ? t('map.kindMonument')
+                  : t('map.kindEvent');
                 const cardImg = item.image_url ?? fallbackPhoto(item.id ?? name);
                 return (
                   <Pressable
@@ -242,6 +247,7 @@ const s = StyleSheet.create({
   avatarFallback: { alignItems: 'center', justifyContent: 'center', backgroundColor: COLORS.primaryLight },
   avatarTxt: { fontWeight: '800', color: COLORS.primaryDark },
   profileName: { marginLeft: 8, fontWeight: '600', fontSize: 13, color: COLORS.text, flexShrink: 1 },
+  pts: { marginLeft: 6, fontWeight: '800', fontSize: 13, color: COLORS.gold },
   iconBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: 'rgba(255,255,255,0.92)', borderWidth: 1, borderColor: COLORS.border, alignItems: 'center', justifyContent: 'center' },
   barWrap: { position: 'absolute', left: 14, right: 14, bottom: 18 },
   bar: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: 'rgba(255,255,255,0.9)', borderWidth: 1, borderColor: COLORS.border, borderRadius: RADIUS.full, paddingHorizontal: 16, minHeight: 52, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 12, elevation: 4 },

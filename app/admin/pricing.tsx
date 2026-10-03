@@ -33,9 +33,9 @@ export default function PricingScreen() {
           renderItem={({ item }) => (
             <View style={s.card}>
               <Text style={s.name}>{item.name_en}</Text>
-              <Text style={s.muted}>Base {formatMoney(item.base_price, item.currency)} · {item.current_booking}/{item.max_booking} ({item.quote?.capacity_percentage ?? '—'}%)</Text>
-              <Text style={s.muted}>Increase +{item.quote?.price_increase_percentage ?? 0}% · Current {formatMoney(item.quote?.dynamic_price ?? item.current_price, item.currency)}</Text>
-              <Text style={s.muted}>Support {item.quote?.support_discount_percentage ?? 0}% · Final {formatMoney(item.quote?.final_price ?? item.current_price, item.currency)}</Text>
+              <Text style={s.muted}>{t('booking.rBase')} {formatMoney(item.base_price, item.currency)} · {item.current_booking}/{item.max_booking} ({item.quote?.capacity_percentage ?? '—'}%)</Text>
+              <Text style={s.muted}>{t('booking.rIncrease')} +{item.quote?.price_increase_percentage ?? 0}% · {t('booking.rCurrent')} {formatMoney(item.quote?.dynamic_price ?? item.current_price, item.currency)}</Text>
+              <Text style={s.muted}>{t('booking.rSupport')} {item.quote?.support_discount_percentage ?? 0}% · {t('booking.rFinal')} {formatMoney(item.quote?.final_price ?? item.current_price, item.currency)}</Text>
             </View>
           )} />
       )}

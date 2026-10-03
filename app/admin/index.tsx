@@ -10,7 +10,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useAdminStats } from '../../hooks/useAdmin';
 import {
   Building2, Briefcase, Tags, ClipboardList, Calculator,
-  Percent, Zap, HeartHandshake, Star, History, ShieldCheck, Settings, User,
+  Percent, Zap, HeartHandshake, Star, History, ShieldCheck, Settings, User, ShoppingBag,
 } from 'lucide-react-native';
 
 /** Admin home: stats overview + a button grid where each section opens its own page. */
@@ -21,6 +21,7 @@ const SECTIONS = [
   { key: 'bookings', href: '/admin/bookings', icon: ClipboardList },
   { key: 'pricing', href: '/admin/pricing', icon: Calculator },
   { key: 'discounts', href: '/admin/discounts', icon: Percent },
+  { key: 'store', href: '/admin/store-items', icon: ShoppingBag },
   { key: 'promotions', href: '/admin/event-promotions', icon: Zap },
   { key: 'supportPricing', href: '/admin/support-pricing', icon: HeartHandshake },
   { key: 'reviews', href: '/admin/reviews', icon: Star },
@@ -34,7 +35,7 @@ export default function AdminDashboard() {
   const { t } = useTranslation();
   const router = useRouter();
   const [role, setRole] = useState<string>('admin');
-  const [name, setName] = useState('Admin');
+  const [name, setName] = useState('');
   const [gate, setGate] = useState(true);
   const { stats, loading } = useAdminStats();
 
@@ -54,31 +55,48 @@ export default function AdminDashboard() {
 
   if (gate || loading) return <LoadingState />;
 
+  const statLabel = (k: string): string => {
+    switch (k) {
+      case 'companies': return t('admin.companies');
+      case 'services': return t('admin.services');
+      case 'events': return t('admin.events');
+      case 'bookings': return t('admin.bookings');
+      case 'pending_bookings': return t('admin.statPendingBookings');
+      case 'confirmed_bookings': return t('admin.statConfirmedBookings');
+      case 'revenue': return t('admin.statRevenue');
+      case 'active_services': return t('admin.statActiveServices');
+      case 'active_promotions': return t('admin.statActivePromos');
+      case 'active_support': return t('admin.statActiveSupport');
+      case 'pending_support': return t('admin.statPendingSupport');
+      default: return k.replaceAll('_', ' ');
+    }
+  };
+
   return (
     <ScrollView style={s.wrap} contentContainerStyle={{ paddingBottom: 40 }}>
       <LinearGradient colors={[COLORS.darkestGreen, COLORS.deepGreen]} style={s.hero}>
-        <Text style={s.eyebrow}>Jordan Guide · Admin</Text>
-        <Text style={s.hello}>{t('auth.welcomeAdmin', { name })}</Text>
+        <Text style={s.eyebrow}>Jordan Guide · {t('admin.badgeAdmin')}</Text>
+        <Text style={s.hello}>{t('auth.welcomeAdmin', { name: name || t('admin.defaultName') })}</Text>
         <View style={s.roleBadge}>
-          <Text style={s.roleTxt}>{role === 'boss_admin' ? 'BOSS ADMIN' : 'ADMIN'}</Text>
+          <Text style={s.roleTxt}>{role === 'boss_admin' ? t('admin.badgeBoss') : t('admin.badgeAdmin')}</Text>
         </View>
       </LinearGradient>
       <View style={s.body}>
         {stats ? (
           <>
-            <Text style={s.secTitle}>Overview</Text>
+            <Text style={s.secTitle}>{t('admin.overview')}</Text>
             <View style={s.grid}>
               {Object.entries(stats as Record<string, any>).slice(0, 8).map(([k, v]) => (
                 <View key={k} style={s.stat}>
                   <Text style={s.statV}>{String(v ?? 0)}</Text>
-                  <Text style={s.statK}>{k.replaceAll('_', ' ')}</Text>
+                  <Text style={s.statK}>{statLabel(k)}</Text>
                 </View>
               ))}
             </View>
           </>
         ) : null}
 
-        <Text style={s.secTitle}>Manage</Text>
+        <Text style={s.secTitle}>{t('admin.manage')}</Text>
         <View style={s.grid}>
           {SECTIONS.filter((sec) => !('bossOnly' in sec && sec.bossOnly) || role === 'boss_admin').map((sec) => {
             const Icon = sec.icon;

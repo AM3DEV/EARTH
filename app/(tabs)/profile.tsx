@@ -5,16 +5,22 @@ import { useTranslation } from 'react-i18next';
 import { Image } from 'expo-image';
 import { supabase } from '../../lib/supabase';
 import { useProfile } from '../../hooks/useAuth';
+import { getWallet } from '../../hooks/useBookings';
 import { COLORS, RADIUS } from '../../constants/colors';
 import { Card } from '../../components/ui/Card';
 
 export default function ProfileTab() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const ar = i18n.language === 'ar';
   const router = useRouter();
   const { profile, reload } = useProfile();
+  const [points, setPoints] = React.useState<number | null>(null);
 
   // Refresh when returning from Edit Profile so the new photo/name shows immediately.
-  useFocusEffect(React.useCallback(() => { reload(); }, [reload]));
+  useFocusEffect(React.useCallback(() => {
+    reload();
+    getWallet().then((w) => setPoints(w?.points ?? null)).catch(() => {});
+  }, [reload]));
 
   const logout = async () => {
     await supabase.auth.signOut();
@@ -36,12 +42,19 @@ export default function ProfileTab() {
           <View style={{ flex: 1 }}>
             <Text style={s.name}>{profile ? `${profile.first_name} ${profile.last_name}` : '…'}</Text>
             <Text style={s.muted}>@{profile?.username ?? '…'} · {profile?.email ?? ''}</Text>
+            {points != null && points > 0 ? (
+              <Text style={s.pts}>★ {points} {t('loyalty.points')}</Text>
+            ) : null}
           </View>
         </View>
       </Card>
       <View style={{ height: 12 }} />
       <Card>
         <Row label={t('profile.edit')} href="/edit-profile" />
+        <Row label={t('loyalty.scanTitle')} href="/scan" />
+        <Row label={t('loyalty.title')} href="/loyalty" />
+        <Row label={t('store.title')} href="/store" />
+        <Row label={t('store.transactions')} href="/transactions" />
         <Row label={t('booking.myBookings')} href="/bookings" />
         <Row label={t('favorites.title')} href="/favorites" />
         <Row label={t('notifications.title')} href="/notifications" />
@@ -60,6 +73,7 @@ const s = StyleSheet.create({
   avF: { backgroundColor: COLORS.softGreen, alignItems: 'center', justifyContent: 'center' },
   avT: { fontWeight: '800', color: COLORS.primaryDark, fontSize: 22 },
   name: { fontWeight: '800', fontSize: 17, color: COLORS.text },
+  pts: { color: COLORS.gold, fontWeight: '800', fontSize: 14, marginTop: 2 },
   muted: { color: COLORS.secondaryText, fontSize: 13, marginTop: 2 },
   row: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 13, borderBottomWidth: 1, borderColor: COLORS.border },
   rowTxt: { fontSize: 15, color: COLORS.text, fontWeight: '600' },

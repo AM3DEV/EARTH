@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, FlatList, Pressable, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { MapPin } from 'lucide-react-native';
+import { MapPin, ScanLine } from 'lucide-react-native';
 import * as Location from 'expo-location';
 import { useCategories, useMonuments } from '../../hooks/useMonuments';
 import { useEvents } from '../../hooks/useEvents';
@@ -54,7 +54,7 @@ export default function MonumentTab() {
     setLocBusy(true);
     try {
       const perm = await Location.requestForegroundPermissionsAsync();
-      if (perm.status !== 'granted') throw new Error(lang === 'ar' ? 'تم رفض إذن الموقع' : 'Location permission denied');
+      if (perm.status !== 'granted') throw new Error(t('map.locDenied'));
       const pos = await Location.getCurrentPositionAsync({});
       setUserLoc({ lat: pos.coords.latitude, lng: pos.coords.longitude });
       setCat(undefined);
@@ -106,7 +106,17 @@ export default function MonumentTab() {
   return (
     <View style={s.wrap}>
       <View style={s.topBar}>
-        <Text style={s.title}>{t('monument.title')}</Text>
+        <View style={s.titleRow}>
+          <Text style={s.title}>{t('monument.title')}</Text>
+          <Pressable
+            onPress={() => router.push('/scan' as any)}
+            style={s.scanBtn}
+            accessibilityRole="button"
+            accessibilityLabel={t('loyalty.scanTitle')}
+          >
+            <ScanLine color="#fff" size={20} />
+          </Pressable>
+        </View>
         <Pressable
           onPress={() => (nearby ? (setNearby(false), setCat(undefined)) : enableNearby())}
           disabled={locBusy}
@@ -164,7 +174,12 @@ const s = StyleSheet.create({
     paddingTop: 56, paddingBottom: 10, backgroundColor: COLORS.card,
     borderBottomWidth: 1, borderColor: COLORS.border, zIndex: 10, elevation: 4,
   },
-  title: { fontSize: 24, fontWeight: '800', color: COLORS.text, paddingHorizontal: 16 },
+  title: { flex: 1, fontSize: 24, fontWeight: '800', color: COLORS.text },
+  titleRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, gap: 10 },
+  scanBtn: {
+    width: 44, height: 44, borderRadius: 22, backgroundColor: COLORS.primary,
+    alignItems: 'center', justifyContent: 'center',
+  },
   nearBtn: {
     flexDirection: 'row', alignItems: 'center', gap: 8, marginHorizontal: 16, marginTop: 10,
     borderWidth: 1.5, borderColor: COLORS.primary, borderRadius: RADIUS.full,

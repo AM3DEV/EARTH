@@ -5,6 +5,7 @@ import { supabase } from '../../lib/supabase';
 import { COLORS } from '../../constants/colors';
 import { AdminHeader } from '../../components/admin/AdminHeader';
 import { LoadingState, EmptyState } from '../../components/ui/States';
+import { adminStatusKey } from '../../lib/status';
 
 export default function EventPromotions() {
   const { t } = useTranslation();
@@ -25,19 +26,25 @@ export default function EventPromotions() {
   return (
     <View style={s.wrap}>
       <AdminHeader title={t('admin.promotions')} />
-      {rows.length === 0 ? <EmptyState message="No active promotion" /> : (
+      {rows.length === 0 ? <EmptyState message={t('admin.noPromo')} /> : (
         <FlatList data={rows} keyExtractor={(r) => r.id} contentContainerStyle={{ padding: 16 }}
-          renderItem={({ item }) => (
+          renderItem={({ item }) => {
+            const stKey = adminStatusKey(item.status);
+            return (
             <View style={s.card}>
-              <Text style={s.name}>{(item.events as any)?.title_en ?? item.event_id.slice(0, 8)} · {item.plan} · {item.status} · P{item.priority}</Text>
+              <Text style={s.name}>{(item.events as any)?.title_en ?? item.event_id.slice(0, 8)} · {item.plan} · {stKey ? t(stKey) : item.status} · P{item.priority}</Text>
               <Text style={s.muted}>{item.start_at?.slice(0, 10)} → {item.end_at?.slice(0, 10)}</Text>
               <View style={s.row}>
-                {['active', 'scheduled', 'cancelled', 'expired'].map((st) => (
-                  <Pressable key={st} onPress={() => act(item.id, st)}><Text style={s.a}>{st}</Text></Pressable>
-                ))}
+                {(['active', 'scheduled', 'cancelled', 'expired'] as const).map((st) => {
+                  const ak = adminStatusKey(st);
+                  return (
+                  <Pressable key={st} onPress={() => act(item.id, st)}><Text style={s.a}>{ak ? t(ak) : st}</Text></Pressable>
+                  );
+                })}
               </View>
             </View>
-          )} />
+            );
+          }} />
       )}
     </View>
   );

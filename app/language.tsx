@@ -1,43 +1,80 @@
-import React from 'react';
-import { View, Text, StyleSheet, Pressable, I18nManager } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, Pressable, FlatList } from 'react-native';
+import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { persistLocale } from '../lib/i18n';
-import { supabase } from '../lib/supabase';
+import { ArrowLeft } from 'lucide-react-native';
+import { LANGS, applyLocale } from '../lib/i18n';
 import { COLORS, RADIUS } from '../constants/colors';
+import { PrimaryButton } from '../components/ui/Buttons';
 
 export default function LanguageScreen() {
   const { t, i18n } = useTranslation();
-  const set = async (lng: 'en' | 'ar') => {
-    await persistLocale(lng);
-    await i18n.changeLanguage(lng);
-    const rtl = lng === 'ar';
+  const rtl = i18n.language === 'ar';
+  const router = useRouter();
+  const [sel, setSel] = useState(i18n.language);
+  const [busy, setBusy] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  const save = async () => {
+    if (sel === i18n.language) return;
+    setBusy(true); setSaved(false);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) await supabase.from('profiles').update({ language: lng }).eq('id', user.id);
-    } catch {}
-    if (I18nManager.isRTL !== rtl) {
-      I18nManager.allowRTL(true);
-      I18nManager.forceRTL(rtl);
+      await applyLocale(sel);
+      setSaved(true);
+    } finally {
+      setBusy(false);
     }
   };
+
   return (
     <View style={s.wrap}>
-      <Text style={s.title}>{t('profile.language')}</Text>
-      {(['en', 'ar'] as const).map((l) => (
-        <Pressable key={l} onPress={() => set(l)} style={[s.opt, i18n.language === l && s.active]}>
-          <Text style={[s.txt, i18n.language === l && s.txtActive]}>{l === 'en' ? 'English' : 'العربية'}</Text>
+      <View style={s.head}>
+        <Pressable onPress={() => router.back()} style={s.backBtn} accessibilityRole="button" accessibilityLabel={t('common.back')}>
+          {rtl ? <ArrowLeft color={COLORS.text} size={20} style={{ transform: [{ scaleX: -1 }] }} /> : <ArrowLeft color={COLORS.text} size={20} />}
         </Pressable>
-      ))}
-      <Text style={s.hint}>RTL layout applies automatically for Arabic.</Text>
+        <Text style={s.title}>{t('profile.language')}</Text>
+      </View>
+      <FlatList
+        data={[...LANGS]}
+        keyExtractor={(l) => l.code}
+        renderItem={({ item: l }) => {
+          const active = sel === l.code;
+          return (
+            <Pressable
+              key={l.code}
+              onPress={() => { setSel(l.code); setSaved(false); }}
+              style={[s.opt, active && s.active]}
+              accessibilityRole="button"
+              accessibilityLabel={l.name}
+            >
+              <Text style={s.globe}>🌐</Text>
+              <Text style={[s.txt, active && s.txtActive]}>{l.name}</Text>
+              {active ? <Text style={s.check}>✓</Text> : null}
+            </Pressable>
+          );
+        }}
+      />
+      <PrimaryButton title={busy ? '…' : t('common.save')} onPress={save} disabled={busy || sel === i18n.language} />
+      {saved ? <Text style={s.saved}>{t('common.saved')}</Text> : null}
+      <Text style={s.hint}>{t('profile.rtlHint')}</Text>
     </View>
   );
 }
 const s = StyleSheet.create({
-  wrap: { flex: 1, backgroundColor: '#fff', padding: 16, paddingTop: 60 },
-  title: { fontSize: 24, fontWeight: '800', color: COLORS.text, marginBottom: 12 },
-  opt: { borderWidth: 1, borderColor: COLORS.border, borderRadius: RADIUS.md, minHeight: 52, alignItems: 'center', justifyContent: 'center', marginBottom: 10 },
+  wrap: { flex: 1, backgroundColor: COLORS.background, padding: 16, paddingTop: 60 },
+  head: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 },
+  backBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: COLORS.card, borderWidth: 1, borderColor: COLORS.border, alignItems: 'center', justifyContent: 'center' },
+  title: { flex: 1, fontSize: 24, fontWeight: '800', color: COLORS.text },
+  opt: {
+    flexDirection: 'row', alignItems: 'center', gap: 12,
+    borderWidth: 1, borderColor: COLORS.border, borderRadius: RADIUS.md,
+    minHeight: 54, paddingHorizontal: 16, backgroundColor: COLORS.card, marginBottom: 10,
+  },
   active: { borderColor: COLORS.primary, backgroundColor: COLORS.softGreen },
-  txt: { fontSize: 16, color: COLORS.text, fontWeight: '600' },
+  globe: { fontSize: 20 },
+  txt: { flex: 1, fontSize: 16, color: COLORS.text, fontWeight: '600' },
   txtActive: { color: COLORS.primaryDark },
+  check: { color: COLORS.primaryDark, fontWeight: '800', fontSize: 16 },
+  saved: { color: COLORS.success, fontWeight: '700', textAlign: 'center', marginTop: 10 },
   hint: { color: COLORS.secondaryText, marginTop: 8 },
 });

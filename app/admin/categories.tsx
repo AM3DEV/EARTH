@@ -30,7 +30,7 @@ export default function AdminCategories() {
   return (
     <View style={s.wrap}>
       <View style={s.head}>
-        <Pressable onPress={() => router.back()} style={s.backBtn} accessibilityRole="button" accessibilityLabel="Back">
+        <Pressable onPress={() => router.back()} style={s.backBtn} accessibilityRole="button" accessibilityLabel={t('common.back')}>
           <ArrowLeft color={COLORS.text} size={20} />
         </Pressable>
         <Text style={s.title}>{t('admin.categories')}</Text>
@@ -50,7 +50,7 @@ export default function AdminCategories() {
               ) : null}
               <View style={s.body}>
                 <Text style={s.name}>{lang === 'ar' ? item.name_ar : item.name_en}</Text>
-                <Text style={s.muted}>{lang === 'ar' ? item.name_en : item.name_ar} · {item.type ?? 'general'}</Text>
+                <Text style={s.muted}>{lang === 'ar' ? item.name_en : item.name_ar} · {item.type ?? t('form.general')}</Text>
                 <View style={s.row}>
                   <Pressable onPress={() => router.push(`/admin/category-edit/${item.id}` as any)}>
                     <Text style={s.act}>{t('common.edit')}</Text>

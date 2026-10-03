@@ -1,4 +1,6 @@
 import { StaticPage } from '../components/StaticPage';
+import { useTranslation } from 'react-i18next';
 export default function Terms() {
-  return <StaticPage title="Terms" body="Bookings require server confirmation. Prices are calculated server-side and may change with demand and support discounts. Promotions provide visibility boosts, never guaranteed positions." />;
+  const { t } = useTranslation();
+  return <StaticPage title={t('settings.terms')} body={t('settings.termsBody')} />;
 }

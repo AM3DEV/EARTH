@@ -5,6 +5,7 @@ import { supabase } from '../../lib/supabase';
 import { COLORS } from '../../constants/colors';
 import { AdminHeader } from '../../components/admin/AdminHeader';
 import { LoadingState, EmptyState } from '../../components/ui/States';
+import { targetKindLabel } from '../../lib/status';
 
 export default function AdminReviews() {
   const { t } = useTranslation();
@@ -21,11 +22,11 @@ export default function AdminReviews() {
   return (
     <View style={s.wrap}>
       <AdminHeader title={t('admin.reviews')} />
-      {rows.length === 0 ? <EmptyState message="No reviews yet" /> : (
+      {rows.length === 0 ? <EmptyState message={t('admin.noReviews')} /> : (
         <FlatList data={rows} keyExtractor={(r) => r.id} contentContainerStyle={{ padding: 16 }}
           renderItem={({ item }) => (
             <View style={s.card}>
-              <Text style={s.name}>★{item.rating} · {item.target_type} · {item.target_id.slice(0, 8)}</Text>
+              <Text style={s.name}>★{item.rating} · {targetKindLabel(item.target_type, t)} · {item.target_id.slice(0, 8)}</Text>
               {item.comment ? <Text style={s.muted}>{item.comment}</Text> : null}
               <Pressable onPress={async () => { await supabase.from('reviews').delete().eq('id', item.id); load(); }}>
                 <Text style={s.del}>{t('common.delete')}</Text>

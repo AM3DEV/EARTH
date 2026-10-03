@@ -6,6 +6,7 @@ import { supabase } from '../../lib/supabase';
 import { COLORS, RADIUS } from '../../constants/colors';
 import { AdminHeader } from '../../components/admin/AdminHeader';
 import { LoadingState, EmptyState } from '../../components/ui/States';
+import { adminStatusKey } from '../../lib/status';
 
 /** Support Pricing dashboard: cards + source->target list + optional map (red source, green target). */
 export default function SupportPricing() {
@@ -45,7 +46,7 @@ export default function SupportPricing() {
           <AdminHeader title={t('admin.supportPricing')} />
           <View style={s.cards}>
             {[
-              ['Active', active], ['Pending', pending], ['Expired', expired], ['Total', rows.length],
+              [t('admin.stActive'), active], [t('admin.statPending'), pending], [t('admin.stExpired'), expired], [t('common.total'), rows.length],
             ].map(([k, v]) => (
               <View key={k as string} style={s.stat}><Text style={s.statV}>{v}</Text><Text style={s.statK}>{k}</Text></View>
             ))}
@@ -64,18 +65,24 @@ export default function SupportPricing() {
           ) : null}
         </View>
       }
-      renderItem={({ item }) => (
+      renderItem={({ item }) => {
+        const stKey = adminStatusKey(item.status);
+        return (
         <View style={s.card}>
           <Text style={s.name}>{item.source_event_id.slice(0, 8)} → {item.target_event_id?.slice(0, 8) ?? 'pending'} · {item.distance_km ?? '—'} km</Text>
-          <Text style={s.muted}>Cap {item.source_capacity_percentage}% · +{item.source_price_increase_percentage}% → -{item.discount_percentage}% · {item.status}</Text>
+          <Text style={s.muted}>{t('booking.rCap')} {item.source_capacity_percentage}% · +{item.source_price_increase_percentage}% → -{item.discount_percentage}% · {stKey ? t(stKey) : item.status}</Text>
           <View style={s.row}>
-            {['active', 'cancelled', 'expired'].map((st) => (
-              <Pressable key={st} onPress={() => setStatus(item.id, st)}><Text style={s.act}>{st}</Text></Pressable>
-            ))}
+            {(['active', 'cancelled', 'expired'] as const).map((st) => {
+              const ak = adminStatusKey(st);
+              return (
+              <Pressable key={st} onPress={() => setStatus(item.id, st)}><Text style={s.act}>{ak ? t(ak) : st}</Text></Pressable>
+              );
+            })}
           </View>
         </View>
-      )}
-      ListEmptyComponent={<EmptyState message="No eligible nearby event for support discount" />}
+        );
+      }}
+      ListEmptyComponent={<EmptyState message={t('admin.noEligible')} />}
     />
   );
 }
