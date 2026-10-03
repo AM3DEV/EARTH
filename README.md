@@ -39,6 +39,7 @@
 - [🌍 Internationalization](#-internationalization)
 - [🛟 Troubleshooting](#-troubleshooting)
 - [🗺️ Roadmap](#️-roadmap)
+- [📝 Store Listing](#-store-listing)
 - [📄 License](#-license)
 
 ---
@@ -391,6 +392,36 @@ eas build -p android|ios                           # native binaries (projectId 
 - [ ] Tourist itinerary builder + shareable trip links
 - [ ] Offline map packs for Petra / Wadi Rum
 - [ ] Review photos moderation queue with AI assist
+
+---
+
+## 📝 Store Listing
+
+> Ready-to-paste text for Google Play / App Store listings (English + Arabic).
+
+**Tagline:**
+Discover Jordan like never before — explore monuments, events & local businesses on a live map, book experiences, and let Erth AI guide you. Available in 10 languages.
+
+**Full description:**
+
+Welcome to Jordan — Petra, Wadi Rum, Jerash, the Dead Sea, Aqaba and beyond, all in one app.
+
+🗺️ **MAP-FIRST DISCOVERY**
+Explore monuments, events and local companies on a live interactive map. Tap any pin to open its page, see photos, ratings, reviews and directions. Smart search finds places even with typos — try "aljoun"!
+
+🎫 **BOOKING WITH SMART PRICING**
+Book tours, diving, desert nights and more with live availability, transparent server-calculated prices, special rates for Jordanian citizens, multi-currency display, and support discounts that help quiet events thrive. Pay by card or PayPal.
+
+🤖 **ERTH — YOUR AI GUIDE (إرث)**
+Ask anything in your language: itineraries, transport (bus, taxi, car), nearby picks based on your live position, and real prices that are never hallucinated.
+
+🎁 **LOYALTY THAT PAYS**
+Scan store QR codes to earn points, exchange them for EARTH discount coupons in the Store, and pay less at booking. Track everything in Transactions.
+
+⭐ **COMMUNITY**
+Verified business badges, photo reviews with ratings, favorites, notifications, and full Arabic + 9 more languages with RTL support.
+
+📲 Download Jordan Tourism Guide — من البتراء إلى العقبة.
 
 ---
 
