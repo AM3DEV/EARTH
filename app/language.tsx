@@ -4,10 +4,12 @@ import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft } from 'lucide-react-native';
 import { LANGS, applyLocale } from '../lib/i18n';
-import { COLORS, RADIUS } from '../constants/colors';
+import { RADIUS } from '../constants/colors';
+import { useTheme, Palette } from '../lib/theme';
 import { PrimaryButton } from '../components/ui/Buttons';
 
 export default function LanguageScreen() {
+  const { colors: C } = useTheme();
   const { t, i18n } = useTranslation();
   const rtl = i18n.language === 'ar';
   const router = useRouter();
@@ -25,12 +27,13 @@ export default function LanguageScreen() {
       setBusy(false);
     }
   };
+  const s = React.useMemo(() => getStyles(C), [C]);
 
   return (
     <View style={s.wrap}>
       <View style={s.head}>
         <Pressable onPress={() => router.back()} style={s.backBtn} accessibilityRole="button" accessibilityLabel={t('common.back')}>
-          {rtl ? <ArrowLeft color={COLORS.text} size={20} style={{ transform: [{ scaleX: -1 }] }} /> : <ArrowLeft color={COLORS.text} size={20} />}
+          {rtl ? <ArrowLeft color={C.text} size={20} style={{ transform: [{ scaleX: -1 }] }} /> : <ArrowLeft color={C.text} size={20} />}
         </Pressable>
         <Text style={s.title}>{t('profile.language')}</Text>
       </View>
@@ -60,21 +63,21 @@ export default function LanguageScreen() {
     </View>
   );
 }
-const s = StyleSheet.create({
-  wrap: { flex: 1, backgroundColor: COLORS.background, padding: 16, paddingTop: 60 },
+const getStyles = (C: Palette) => StyleSheet.create({
+  wrap: { flex: 1, backgroundColor: C.background, padding: 16, paddingTop: 60 },
   head: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 },
-  backBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: COLORS.card, borderWidth: 1, borderColor: COLORS.border, alignItems: 'center', justifyContent: 'center' },
-  title: { flex: 1, fontSize: 24, fontWeight: '800', color: COLORS.text },
+  backBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: C.card, borderWidth: 1, borderColor: C.border, alignItems: 'center', justifyContent: 'center' },
+  title: { flex: 1, fontSize: 24, fontWeight: '800', color: C.text },
   opt: {
     flexDirection: 'row', alignItems: 'center', gap: 12,
-    borderWidth: 1, borderColor: COLORS.border, borderRadius: RADIUS.md,
-    minHeight: 54, paddingHorizontal: 16, backgroundColor: COLORS.card, marginBottom: 10,
+    borderWidth: 1, borderColor: C.border, borderRadius: RADIUS.md,
+    minHeight: 54, paddingHorizontal: 16, backgroundColor: C.card, marginBottom: 10,
   },
-  active: { borderColor: COLORS.primary, backgroundColor: COLORS.softGreen },
+  active: { borderColor: C.primary, backgroundColor: C.softGreen },
   globe: { fontSize: 20 },
-  txt: { flex: 1, fontSize: 16, color: COLORS.text, fontWeight: '600' },
-  txtActive: { color: COLORS.primaryDark },
-  check: { color: COLORS.primaryDark, fontWeight: '800', fontSize: 16 },
-  saved: { color: COLORS.success, fontWeight: '700', textAlign: 'center', marginTop: 10 },
-  hint: { color: COLORS.secondaryText, marginTop: 8 },
+  txt: { flex: 1, fontSize: 16, color: C.text, fontWeight: '600' },
+  txtActive: { color: C.primaryDark },
+  check: { color: C.primaryDark, fontWeight: '800', fontSize: 16 },
+  saved: { color: C.success, fontWeight: '700', textAlign: 'center', marginTop: 10 },
+  hint: { color: C.secondaryText, marginTop: 8 },
 });

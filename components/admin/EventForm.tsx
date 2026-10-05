@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
-import { ScrollView, Text, StyleSheet } from 'react-native';
+import { ScrollView, Text, StyleSheet, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '../../lib/supabase';
 import { logAdminAction } from '../../lib/adminLog';
 import { Field } from '../ui/Field';
+import { BackButton } from '../ui/BackButton';
 import { PrimaryButton } from '../ui/Buttons';
 import { SectionTitle, ToggleRow, OptionsPicker, ImageField, ImageGalleryField, Opt, useLocaleName, AdminGate, friendlyDbError } from './fields';
-import { COLORS } from '../../constants/colors';
+import { useTheme, Palette } from '../../lib/theme';
+import { GOVERNORATES } from '../../constants/governorates';
+import { sanitizeFor } from '../../lib/saveGuard';
 
 /** Parse "YYYY-MM-DD HH:mm" (or ISO) to ISO string, or null. */
 function toISO(s?: string | null): string | null {
@@ -31,9 +34,11 @@ function fromISO(s?: string | null): string {
  *  - Support Pricing (radius, max discount, target range, stacking, duration)
  */
 export function EventForm({ initial, eventId }: { initial: any; eventId?: string }) {
+  const { colors: C } = useTheme();
+  const s = React.useMemo(() => getStylesEventForm(C), [C]);
   const { t } = useTranslation();
   const router = useRouter();
-  const [v, setV] = useState<any>({ title_en: '', title_ar: '', location: '', price: 0, currency: 'USD', capacity: 100, active: true, category_id: null, image_url: null, gallery_urls: [], ...initial });
+  const [v, setV] = useState<any>({ title_en: '', title_ar: '', location: '', governorate: null, price: 0, currency: 'USD', capacity: 100, active: true, category_id: null, image_url: null, gallery_urls: [], ...initial });
   const [plus, setPlus] = useState({ enabled: false, plan: 'PLUS', durationDays: 7, priority: 100, status: 'scheduled' });
   const [support, setSupport] = useState({ enabled: true, radiusKm: 25, maxDiscount: 30, minCap: 0, maxCap: 70, stacking: false, durationH: 48 });
   const [cats, setCats] = useState<Opt[]>([]);
@@ -57,13 +62,13 @@ export function EventForm({ initial, eventId }: { initial: any; eventId?: string
       if (!v.title_en?.trim() || !v.title_ar?.trim()) throw new Error(t('form.reqTitles'));
       if ((v.price ?? 0) < 0) throw new Error(t('form.negPrice'));
       if ((v.capacity ?? 0) < 0) throw new Error(t('form.negCap'));
-      const payload = {
+      const payload = sanitizeFor('events', {
         ...v,
         category_id: v.category_id ?? null,
         image_url: v.image_url ?? null,
         start_at: toISO(startTxt),
         end_at: toISO(endTxt),
-      };
+      });
       let eid = eventId;
       if (eid) {
         const { error } = await supabase.from('events').update({ ...payload, updated_at: new Date().toISOString() }).eq('id', eid);
@@ -94,7 +99,9 @@ export function EventForm({ initial, eventId }: { initial: any; eventId?: string
   };
 
   return (
-    <AdminGate>
+    <View style={{ flex: 1, backgroundColor: C.background }}>
+      <BackButton />
+      <AdminGate>
     <ScrollView style={s.wrap} contentContainerStyle={{ padding: 16, paddingTop: 60 }} keyboardShouldPersistTaps="handled">
       <Text style={s.h}>{t('form.eventInfo')}</Text>
       <Field label={t('form.titleEn')} value={String(v.title_en ?? '')} onChangeText={(x) => set('title_en', x)} />
@@ -107,6 +114,15 @@ export function EventForm({ initial, eventId }: { initial: any; eventId?: string
       <Field label={t('form.price')} value={String(v.price ?? 0)} onChangeText={(x) => set('price', Number(x) || 0)} keyboardType="numeric" />
       <Field label={t('form.currency')} value={String(v.currency ?? 'USD')} onChangeText={(x) => set('currency', x)} />
       <Field label={t('form.capacity')} value={String(v.capacity ?? 100)} onChangeText={(x) => set('capacity', Number(x) || 0)} keyboardType="numeric" />
+
+      <SectionTitle>{t('form.governorate')}</SectionTitle>
+      <OptionsPicker
+        label={t('form.governorate')}
+        value={v.governorate ?? null}
+        options={GOVERNORATES.map((g) => ({ id: g, label: t(`gov.${g}`) }))}
+        onChange={(id) => set('governorate', id)}
+        placeholder={t('form.noCategory')}
+      />
 
       <SectionTitle>{t('form.catMedia')}</SectionTitle>
       <OptionsPicker label={t('form.category')} value={v.category_id} options={cats} onChange={(id) => set('category_id', id)} placeholder={t('form.noCategory')} />
@@ -143,14 +159,15 @@ export function EventForm({ initial, eventId }: { initial: any; eventId?: string
       {err ? <Text style={s.err}>{err}</Text> : null}
       <PrimaryButton title={busy ? '…' : t('common.save')} onPress={save} disabled={busy} />
     </ScrollView>
-    </AdminGate>
+      </AdminGate>
+    </View>
   );
 }
 
-const s = StyleSheet.create({
-  wrap: { flex: 1, backgroundColor: '#fff' },
-  h: { fontSize: 18, fontWeight: '800', color: COLORS.text, marginTop: 18, marginBottom: 8 },
-  row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 10, borderBottomWidth: 1, borderColor: COLORS.border },
-  rowT: { fontWeight: '600', color: COLORS.text },
-  err: { color: COLORS.error, marginVertical: 8 },
+const getStylesEventForm = (C: Palette) => StyleSheet.create({
+  wrap: { flex: 1, backgroundColor: C.background },
+  h: { fontSize: 18, fontWeight: '800', color: C.text, marginTop: 18, marginBottom: 8 },
+  row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 10, borderBottomWidth: 1, borderColor: C.border },
+  rowT: { fontWeight: '600', color: C.text },
+  err: { color: C.error, marginVertical: 8 },
 });

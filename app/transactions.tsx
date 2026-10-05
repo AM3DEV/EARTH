@@ -6,11 +6,13 @@ import { ArrowLeft } from 'lucide-react-native';
 import * as Clipboard from 'expo-clipboard';
 import { supabase } from '../lib/supabase';
 import { getWallet } from '../hooks/useBookings';
-import { COLORS, RADIUS, SHADOW } from '../constants/colors';
+import { RADIUS, SHADOW } from '../constants/colors';
+import { useTheme, Palette } from '../lib/theme';
 import { LoadingState, EmptyState } from '../components/ui/States';
 
 /** Transactions: active coupon codes (copyable) + full points history. */
 export default function TransactionsScreen() {
+  const { colors: C } = useTheme();
   const { t, i18n } = useTranslation();
   const rtl = i18n.language === 'ar';
   const router = useRouter();
@@ -48,6 +50,7 @@ export default function TransactionsScreen() {
   }, []);
 
   useFocusEffect(useCallback(() => { load(); }, [load]));
+  const s = React.useMemo(() => getStyles(C), [C]);
   if (loading) return <LoadingState />;
 
   const copy = async (code: string) => {
@@ -60,7 +63,7 @@ export default function TransactionsScreen() {
     <View style={s.wrap}>
       <View style={s.head}>
         <Pressable onPress={() => router.back()} style={s.backBtn} accessibilityRole="button" accessibilityLabel={t('common.back')}>
-          {rtl ? <ArrowLeft color={COLORS.text} size={20} style={{ transform: [{ scaleX: -1 }] }} /> : <ArrowLeft color={COLORS.text} size={20} />}
+          {rtl ? <ArrowLeft color={C.text} size={20} style={{ transform: [{ scaleX: -1 }] }} /> : <ArrowLeft color={C.text} size={20} />}
         </Pressable>
         <Text style={s.title}>{t('store.transactions')}</Text>
         <Text style={s.bal}>★ {points}</Text>
@@ -98,7 +101,7 @@ export default function TransactionsScreen() {
             const co = item.companies ? (i18n.language === 'ar' ? item.companies.name_ar : item.companies.name_en) : '';
             return (
               <View style={s.row}>
-                <Text style={[s.pts, { color: earn ? COLORS.success : COLORS.primaryDark }]}>
+                <Text style={[s.pts, { color: earn ? C.success : C.primaryDark }]}>
                   {earn ? `+${item.points}` : `${item.points}`}
                 </Text>
                 <View style={{ flex: 1 }}>
@@ -114,26 +117,26 @@ export default function TransactionsScreen() {
   );
 }
 
-const s = StyleSheet.create({
-  wrap: { flex: 1, backgroundColor: COLORS.background, paddingTop: 60 },
+const getStyles = (C: Palette) => StyleSheet.create({
+  wrap: { flex: 1, backgroundColor: C.background, paddingTop: 60 },
   head: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, paddingBottom: 10 },
-  backBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: COLORS.card, borderWidth: 1, borderColor: COLORS.border, alignItems: 'center', justifyContent: 'center' },
-  title: { flex: 1, fontSize: 22, fontWeight: '800', color: COLORS.text },
-  bal: { fontSize: 16, fontWeight: '800', color: COLORS.gold },
-  secTitle: { fontSize: 18, fontWeight: '800', color: COLORS.text, paddingHorizontal: 16, marginTop: 8, marginBottom: 8 },
+  backBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: C.card, borderWidth: 1, borderColor: C.border, alignItems: 'center', justifyContent: 'center' },
+  title: { flex: 1, fontSize: 22, fontWeight: '800', color: C.text },
+  bal: { fontSize: 16, fontWeight: '800', color: C.gold },
+  secTitle: { fontSize: 18, fontWeight: '800', color: C.text, paddingHorizontal: 16, marginTop: 8, marginBottom: 8 },
   coupon: {
     flexDirection: 'row', alignItems: 'center', gap: 10, marginHorizontal: 16, marginBottom: 8,
-    backgroundColor: COLORS.card, borderWidth: 1.5, borderColor: COLORS.gold,
+    backgroundColor: C.card, borderWidth: 1.5, borderColor: C.gold,
     borderRadius: RADIUS.md, padding: 12, ...SHADOW.card,
   },
-  code: { fontSize: 17, fontWeight: '800', letterSpacing: 1, color: COLORS.text },
-  copyBtn: { backgroundColor: COLORS.primary, borderRadius: 10, paddingHorizontal: 14, minHeight: 40, justifyContent: 'center' },
+  code: { fontSize: 17, fontWeight: '800', letterSpacing: 1, color: C.text },
+  copyBtn: { backgroundColor: C.primary, borderRadius: 10, paddingHorizontal: 14, minHeight: 40, justifyContent: 'center' },
   copyTxt: { color: '#fff', fontWeight: '800', fontSize: 13 },
   row: {
-    flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: COLORS.card,
-    borderWidth: 1, borderColor: COLORS.border, borderRadius: RADIUS.md, padding: 12, marginBottom: 8,
+    flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: C.card,
+    borderWidth: 1, borderColor: C.border, borderRadius: RADIUS.md, padding: 12, marginBottom: 8,
   },
   pts: { fontSize: 16, fontWeight: '800', minWidth: 52, textAlign: 'center' },
-  txt: { fontWeight: '700', color: COLORS.text, fontSize: 14 },
-  muted: { color: COLORS.secondaryText, fontSize: 12, marginTop: 2 },
+  txt: { fontWeight: '700', color: C.text, fontSize: 14 },
+  muted: { color: C.secondaryText, fontSize: 12, marginTop: 2 },
 });

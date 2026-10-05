@@ -1,28 +1,32 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, Text, StyleSheet } from 'react-native';
+import { ScrollView, Text, StyleSheet, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '../../lib/supabase';
 import { logAdminAction } from '../../lib/adminLog';
 import { isLat, isLng } from '../../lib/validation';
 import { Field } from '../ui/Field';
+import { BackButton } from '../ui/BackButton';
 import { PrimaryButton } from '../ui/Buttons';
-import { SectionTitle, OptionsPicker, ImageField, ImageGalleryField, Opt, useLocaleName, AdminGate, friendlyDbError } from './fields';
-import { COLORS } from '../../constants/colors';
+import { SectionTitle, ToggleRow, OptionsPicker, ImageField, ImageGalleryField, Opt, useLocaleName, AdminGate, friendlyDbError } from './fields';
+import { useTheme, Palette } from '../../lib/theme';
+import { sanitizeFor } from '../../lib/saveGuard';
 
 /**
  * Monument Create/Edit with sections:
  * Basic Info | Category & Media (cover + gallery) | Location & Visit | Contact
  */
 export function MonumentForm({ initial, monumentId }: { initial: any; monumentId?: string }) {
+  const { colors: C } = useTheme();
+  const s = React.useMemo(() => getStylesMonumentForm(C), [C]);
   const { t } = useTranslation();
   const router = useRouter();
   const locName = useLocaleName();
   const [v, setV] = useState<any>({
     name_en: '', name_ar: '', description_en: '', description_ar: '',
     category_id: null, image_url: null, gallery_urls: [],
-    location: '', lat: null, lng: null, price: null, currency: 'USD',
-    opening_hours: '', phone: '', website: '', ...initial,
+    location: '', lat: null, lng: null, price: null, citizen_price: null, currency: 'USD',
+    opening_hours: '', phone: '', website: '', verified: false, active: true, ...initial,
   });
   const [cats, setCats] = useState<Opt[]>([]);
   const [err, setErr] = useState<string | null>(null);
@@ -42,7 +46,9 @@ export function MonumentForm({ initial, monumentId }: { initial: any; monumentId
       if (!v.name_en?.trim() || !v.name_ar?.trim()) throw new Error(t('form.reqNames'));
       if (v.lat != null && !isLat(Number(v.lat))) throw new Error(t('form.badLat'));
       if (v.lng != null && !isLng(Number(v.lng))) throw new Error(t('form.badLng'));
-      const payload = {
+      const cz = v.citizen_price === '' || v.citizen_price == null ? null : Number(v.citizen_price);
+      if (cz != null && (isNaN(cz) || cz < 0)) throw new Error(t('form.negBase'));
+      const payload = sanitizeFor('monuments', {
         ...v,
         lat: v.lat ?? null,
         lng: v.lng ?? null,
@@ -50,7 +56,8 @@ export function MonumentForm({ initial, monumentId }: { initial: any; monumentId
         image_url: v.image_url ?? null,
         gallery_urls: v.gallery_urls ?? [],
         price: v.price === '' || v.price == null ? null : Number(v.price),
-      };
+        citizen_price: cz,
+      });
       if (monumentId) {
         const { error } = await supabase.from('monuments').update({ ...payload, updated_at: new Date().toISOString() }).eq('id', monumentId);
         if (error) throw error;
@@ -65,7 +72,9 @@ export function MonumentForm({ initial, monumentId }: { initial: any; monumentId
   };
 
   return (
-    <AdminGate>
+    <View style={{ flex: 1, backgroundColor: C.background }}>
+      <BackButton />
+      <AdminGate>
     <ScrollView style={s.wrap} contentContainerStyle={{ padding: 16, paddingTop: 60, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
       <Text style={s.title}>{monumentId ? t('form.editItem', { name: t('admin.monuments') }) : t('form.addItem', { name: t('admin.monuments') })}</Text>
 
@@ -84,7 +93,9 @@ export function MonumentForm({ initial, monumentId }: { initial: any; monumentId
       <Field label={t('form.location')} value={String(v.location ?? '')} onChangeText={(x) => set('location', x)} />
       <Field label={t('form.lat')} value={v.lat == null ? '' : String(v.lat)} onChangeText={(x) => set('lat', x.trim() === '' ? null : Number(x))} keyboardType="numeric" />
       <Field label={t('form.lng')} value={v.lng == null ? '' : String(v.lng)} onChangeText={(x) => set('lng', x.trim() === '' ? null : Number(x))} keyboardType="numeric" />
-      <Field label={t('form.priceEmpty')} value={v.price == null ? '' : String(v.price)} onChangeText={(x) => set('price', x.trim() === '' ? null : Number(x))} keyboardType="numeric" />
+      <SectionTitle>{t('form.prices')}</SectionTitle>
+      <Field label={t('form.baseTourist')} value={v.price == null ? '' : String(v.price)} onChangeText={(x) => set('price', x.trim() === '' ? null : Number(x))} keyboardType="numeric" />
+      <Field label={t('form.citizenPrice')} value={v.citizen_price == null ? '' : String(v.citizen_price)} onChangeText={(x) => set('citizen_price', x.trim() === '' ? null : Number(x))} keyboardType="numeric" />
       <Field label={t('form.currency')} value={String(v.currency ?? 'USD')} onChangeText={(x) => set('currency', x)} />
       <Field label={t('form.hours')} value={String(v.opening_hours ?? '')} onChangeText={(x) => set('opening_hours', x)} />
 
@@ -92,15 +103,20 @@ export function MonumentForm({ initial, monumentId }: { initial: any; monumentId
       <Field label={t('form.phone')} value={String(v.phone ?? '')} onChangeText={(x) => set('phone', x)} keyboardType="phone-pad" />
       <Field label={t('form.website')} value={String(v.website ?? '')} onChangeText={(x) => set('website', x)} autoCapitalize="none" />
 
+      <SectionTitle>{t('form.publishing')}</SectionTitle>
+      <ToggleRow label={t('form.verified')} value={!!v.verified} onChange={(x) => set('verified', x)} />
+      <ToggleRow label={t('form.active')} value={!!v.active} onChange={(x) => set('active', x)} />
+
       {err ? <Text style={s.err}>{err}</Text> : null}
       <PrimaryButton title={busy ? '…' : t('common.save')} onPress={save} disabled={busy} />
     </ScrollView>
-    </AdminGate>
+      </AdminGate>
+    </View>
   );
 }
 
-const s = StyleSheet.create({
-  wrap: { flex: 1, backgroundColor: COLORS.background },
-  title: { fontSize: 22, fontWeight: '800', color: COLORS.text },
-  err: { color: COLORS.error, marginVertical: 8 },
+const getStylesMonumentForm = (C: Palette) => StyleSheet.create({
+  wrap: { flex: 1, backgroundColor: C.background },
+  title: { fontSize: 22, fontWeight: '800', color: C.text },
+  err: { color: C.error, marginVertical: 8 },
 });

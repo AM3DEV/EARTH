@@ -51,7 +51,8 @@
     "map": "地图",
     "monument": "古迹",
     "erth": "Erth",
-    "profile": "我的"
+    "profile": "我的",
+    "activities": "活动"
   },
   "map": {
     "searchPlaceholder": "搜索商家...",
@@ -71,7 +72,16 @@
     "title": "探索",
     "categories": "分类",
     "all": "全部",
-    "nearEvent": "附近"
+    "nearEvent": "附近",
+    "heroTitle": "活动",
+    "heroSub": "发现精彩体验，让旅程难忘",
+    "searchPh": "搜索活动、地点或体验...",
+    "emptyTitle": "未找到活动",
+    "emptyDesc": "试试其他分类或地点。",
+    "clearFilters": "清除筛选",
+    "loadFail": "无法加载活动，请检查网络。",
+    "chooseGov": "选择省份",
+    "detectFail": "无法检测—请选择："
   },
   "detail": {
     "description": "介绍",
@@ -89,7 +99,12 @@
     "website": "网站",
     "book": "立即预订",
     "services": "服务",
-    "noServices": "暂无服务。"
+    "noServices": "暂无服务。",
+    "branches": "分支",
+    "addBranch": "添加子公司",
+    "partOf": "隶属于",
+    "tourist": "游客",
+    "citizen": "公民"
   },
   "booking": {
     "title": "预订服务",
@@ -162,7 +177,11 @@
     "settings": "设置",
     "logout": "退出",
     "language": "语言",
-    "rtlHint": "RTL布局仅适用于阿拉伯语。"
+    "rtlHint": "RTL布局仅适用于阿拉伯语。",
+    "title": "个人资料",
+    "tagline": "约旦之旅从这里开始",
+    "nextReward": "下一奖励：{{count}}",
+    "loadFail": "无法加载资料，请重试。"
   },
   "settings": {
     "title": "设置",
@@ -172,7 +191,10 @@
     "notifications": "通知",
     "aboutBody": "Jordan Tourism Guide 是探索约旦的现代平台——古迹、活动、商家与可预订服务，服务端透明计价与附近扶持折扣。",
     "privacyBody": "个人资料、收藏、订单与通知安全存储（Supabase RLS），不泄露管理密钥与他人邮箱。",
-    "termsBody": "订单需服务端确认，价格随需求浮动。推广仅提升曝光，不保证位置。"
+    "termsBody": "订单需服务端确认，价格随需求浮动。推广仅提升曝光，不保证位置。",
+    "theme": "外观",
+    "light": "浅色",
+    "dark": "深色"
   },
   "common": {
     "loading": "加载中…",
@@ -444,6 +466,39 @@
     "sameAsTourist": "同游客价",
     "custom": "自定义…",
     "pickPrice": "选择价格",
-    "pickCurrency": "选择货币"
+    "pickCurrency": "选择货币",
+    "governorate": "省"
+  },
+  "menu": {
+    "editSub": "更新个人信息",
+    "scanSub": "扫码赢奖励",
+    "loyalSub": "查看积分与奖励",
+    "storeSub": "选购专属商品",
+    "transSub": "查看交易记录",
+    "bookSub": "管理预订",
+    "favSub": "收藏的地点",
+    "notifSub": "管理通知",
+    "setSub": "偏好设置等",
+    "langSub": "更改语言"
+  },
+  "gov": {
+    "amman": "Amman",
+    "balqa": "Balqa",
+    "zarqa": "Zarqa",
+    "madaba": "Madaba",
+    "karak": "Karak",
+    "jerash": "Jerash",
+    "ajloun": "Ajloun",
+    "mafraq": "Mafraq",
+    "irbid": "Irbid",
+    "aqaba": "Aqaba",
+    "maan": "Ma'an",
+    "tafilah": "Tafilah"
+  },
+  "sheet": {
+    "title": "预订体验",
+    "date": "选择日期",
+    "people": "人",
+    "total": "总计"
   }
 }

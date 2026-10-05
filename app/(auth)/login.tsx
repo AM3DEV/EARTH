@@ -8,11 +8,12 @@ import { signInWithEmailOrUsername, getMyRole } from '../../lib/auth';
 import { Field } from '../../components/ui/Field';
 import { PrimaryButton } from '../../components/ui/Buttons';
 import { ErrorState } from '../../components/ui/States';
-import { COLORS } from '../../constants/colors';
+import { useTheme, Palette } from '../../lib/theme';
 import { LOGIN_BG } from '../../constants/photos';
 import { LanguageButton, LanguageSheet } from '../../components/LanguagePicker';
 
 export default function Login() {
+  const { colors: C } = useTheme();
   const { t, i18n } = useTranslation();
   const rtl = i18n.language === 'ar';
   const router = useRouter();
@@ -32,6 +33,8 @@ export default function Login() {
       else router.replace('/(tabs)/map');
     } catch (e: any) { setErr(e.message); } finally { setBusy(false); }
   };
+
+  const s = React.useMemo(() => getStyles(C), [C]);
 
   return (
     <View style={s.root}>
@@ -69,8 +72,8 @@ export default function Login() {
   );
 }
 
-const s = StyleSheet.create({
-  root: { flex: 1, backgroundColor: COLORS.darkestGreen },
+const getStyles = (C: Palette) => StyleSheet.create({
+  root: { flex: 1, backgroundColor: C.darkestGreen },
   avoid: { flex: 1 },
   langWrap: { position: 'absolute', top: 60, left: 20, zIndex: 5 },
   scroll: { flexGrow: 1, justifyContent: 'flex-end', padding: 20, paddingBottom: 28 },
@@ -82,11 +85,11 @@ const s = StyleSheet.create({
   },
   brandSub: { color: 'rgba(255,255,255,0.9)', fontSize: 14, marginTop: 4, textAlign: 'center' },
   card: {
-    backgroundColor: 'rgba(250,250,247,0.98)', borderRadius: 24, padding: 22,
+    backgroundColor: C.card, borderRadius: 24, padding: 22, borderWidth: 1, borderColor: C.border,
     shadowColor: '#000', shadowOffset: { width: 0, height: 12 }, shadowOpacity: 0.3, shadowRadius: 28, elevation: 10,
   },
-  title: { fontSize: 24, fontWeight: '800', color: COLORS.text },
-  sub: { color: COLORS.secondaryText, marginTop: 2, marginBottom: 16, fontSize: 14 },
-  forgot: { color: COLORS.primaryDark, fontWeight: '700', marginBottom: 14, fontSize: 14 },
-  switch: { marginTop: 16, color: COLORS.primaryDark, fontWeight: '700', textAlign: 'center', fontSize: 15 },
+  title: { fontSize: 24, fontWeight: '800', color: C.text },
+  sub: { color: C.secondaryText, marginTop: 2, marginBottom: 16, fontSize: 14 },
+  forgot: { color: C.primaryDark, fontWeight: '700', marginBottom: 14, fontSize: 14 },
+  switch: { marginTop: 16, color: C.primaryDark, fontWeight: '700', textAlign: 'center', fontSize: 15 },
 });

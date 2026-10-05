@@ -5,7 +5,8 @@ import { ArrowLeft } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '../../lib/supabase';
 import { logAdminAction } from '../../lib/adminLog';
-import { COLORS, RADIUS, SHADOW } from '../../constants/colors';
+import { RADIUS, SHADOW } from '../../constants/colors';
+import { useTheme, Palette } from '../../lib/theme';
 import { LoadingState, EmptyState } from '../ui/States';
 import { friendlyDbError } from './fields';
 import { VerifiedBadge } from '../VerifiedBadge';
@@ -17,6 +18,8 @@ export function AdminList({ table, titleKey, createHref, editBase, nameOf, bare,
   table: string; titleKey: string; createHref: string; editBase: string;
   nameOf: (r: any, lang: string) => string; bare?: boolean; hideToggle?: boolean;
 }) {
+  const { colors: C } = useTheme();
+  const s = React.useMemo(() => getStylesAdminList(C), [C]);
   const { t, i18n } = useTranslation();
   const router = useRouter();
   const [rows, setRows] = useState<any[]>([]);
@@ -106,7 +109,7 @@ export function AdminList({ table, titleKey, createHref, editBase, nameOf, bare,
                 {'verified' in item ? (
                   <Pressable onPress={() => toggleVerified(item)}><Text style={s.act}>{item.verified ? t('common.unverify') : t('common.verify')}</Text></Pressable>
                 ) : null}
-                <Pressable onPress={() => remove(item)}><Text style={[s.act, { color: COLORS.error }]}>{t('common.delete')}</Text></Pressable>
+                <Pressable onPress={() => remove(item)}><Text style={[s.act, { color: C.error }]}>{t('common.delete')}</Text></Pressable>
               </View>
             </View>
           )} />
@@ -116,7 +119,7 @@ export function AdminList({ table, titleKey, createHref, editBase, nameOf, bare,
     <View style={s.wrap}>
       <View style={s.head}>
         <Pressable onPress={() => router.back()} style={s.backBtn} accessibilityRole="button" accessibilityLabel={t('common.back')}>
-          <ArrowLeft color={COLORS.text} size={20} />
+          <ArrowLeft color={C.text} size={20} />
         </Pressable>
         <Text style={s.title}>{t(titleKey)}</Text>
         <Pressable style={s.create} onPress={() => router.push(createHref as any)}><Text style={s.createT}>+ {t('common.create')}</Text></Pressable>
@@ -127,18 +130,18 @@ export function AdminList({ table, titleKey, createHref, editBase, nameOf, bare,
   );
 }
 
-const s = StyleSheet.create({
-  wrap: { flex: 1, backgroundColor: COLORS.background, paddingTop: 60 },
-  bare: { flex: 1, backgroundColor: COLORS.background },
+const getStylesAdminList = (C: Palette) => StyleSheet.create({
+  wrap: { flex: 1, backgroundColor: C.background, paddingTop: 60 },
+  bare: { flex: 1, backgroundColor: C.background },
   head: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, gap: 8 },
-  backBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: COLORS.card, borderWidth: 1, borderColor: COLORS.border, alignItems: 'center', justifyContent: 'center' },
-  title: { flex: 1, fontSize: 22, fontWeight: '800', color: COLORS.text },
-  create: { backgroundColor: COLORS.primary, borderRadius: 10, paddingHorizontal: 12, minHeight: 40, justifyContent: 'center' },
+  backBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: C.card, borderWidth: 1, borderColor: C.border, alignItems: 'center', justifyContent: 'center' },
+  title: { flex: 1, fontSize: 22, fontWeight: '800', color: C.text },
+  create: { backgroundColor: C.primary, borderRadius: 10, paddingHorizontal: 12, minHeight: 40, justifyContent: 'center' },
   createT: { color: '#fff', fontWeight: '700' },
-  card: { backgroundColor: COLORS.card, borderWidth: 1, borderColor: COLORS.border, borderRadius: RADIUS.md, padding: 12, marginBottom: 8, ...SHADOW.card },
-  err: { color: COLORS.error, paddingHorizontal: 16, marginTop: 8, fontSize: 13, fontWeight: '600' },
+  card: { backgroundColor: C.card, borderWidth: 1, borderColor: C.border, borderRadius: RADIUS.md, padding: 12, marginBottom: 8, ...SHADOW.card },
+  err: { color: C.error, paddingHorizontal: 16, marginTop: 8, fontSize: 13, fontWeight: '600' },
   nameRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  name: { flexShrink: 1, fontWeight: '700', color: COLORS.text, fontSize: 15 },
+  name: { flexShrink: 1, fontWeight: '700', color: C.text, fontSize: 15 },
   row: { flexDirection: 'row', gap: 16, marginTop: 8, flexWrap: 'wrap' },
-  act: { color: COLORS.primaryDark, fontWeight: '600' },
+  act: { color: C.primaryDark, fontWeight: '600' },
 });

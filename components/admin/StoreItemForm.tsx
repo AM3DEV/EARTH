@@ -5,9 +5,10 @@ import { useTranslation } from 'react-i18next';
 import { supabase } from '../../lib/supabase';
 import { logAdminAction } from '../../lib/adminLog';
 import { Field } from '../ui/Field';
+import { BackButton } from '../ui/BackButton';
 import { PrimaryButton } from '../ui/Buttons';
 import { SectionTitle, ToggleRow, OptionsPicker, ImageField, Opt, AdminGate, friendlyDbError } from './fields';
-import { COLORS } from '../../constants/colors';
+import { useTheme, Palette } from '../../lib/theme';
 
 const KINDS: Opt[] = [
   { id: 'percent', label: 'Percent %' },
@@ -21,6 +22,8 @@ const DISCOUNT_OPTS: Opt[] = ['5', '10', '15', '20', '25', '30', '35', '40', '45
 
 /** Store coupon Create/Edit: title, kind/value, points cost, image, active. */
 export function StoreItemForm({ initial, itemId }: { initial: any; itemId?: string }) {
+  const { colors: C } = useTheme();
+  const s = React.useMemo(() => getStylesStoreItemForm(C), [C]);
   const { t } = useTranslation();
   const router = useRouter();
   const [v, setV] = useState<any>({
@@ -83,7 +86,9 @@ export function StoreItemForm({ initial, itemId }: { initial: any; itemId?: stri
   };
 
   return (
-    <AdminGate>
+    <View style={{ flex: 1, backgroundColor: C.background }}>
+      <BackButton />
+      <AdminGate>
     <ScrollView style={s.wrap} contentContainerStyle={{ padding: 16, paddingTop: 60, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
       <Text style={s.title}>{itemId ? t('form.editItem', { name: t('store.title') }) : t('form.addItem', { name: t('store.title') })}</Text>
 
@@ -125,7 +130,7 @@ export function StoreItemForm({ initial, itemId }: { initial: any; itemId?: stri
           {codes.map((c) => (
             <View key={c.code} style={s.codeRow}>
               <Text style={s.code} selectable>{c.code}</Text>
-              <Text style={[s.codeSt, { color: c.status === 'active' ? COLORS.success : COLORS.secondaryText }]}>{c.status === 'active' ? t('common.active') : t('store.used')}</Text>
+              <Text style={[s.codeSt, { color: c.status === 'active' ? C.success : C.secondaryText }]}>{c.status === 'active' ? t('common.active') : t('store.used')}</Text>
             </View>
           ))}
         </>
@@ -134,19 +139,20 @@ export function StoreItemForm({ initial, itemId }: { initial: any; itemId?: stri
       {err ? <Text style={s.err}>{err}</Text> : null}
       <PrimaryButton title={busy ? '…' : t('common.save')} onPress={save} disabled={busy} />
     </ScrollView>
-    </AdminGate>
+      </AdminGate>
+    </View>
   );
 }
 
-const s = StyleSheet.create({
-  wrap: { flex: 1, backgroundColor: COLORS.background },
-  title: { fontSize: 22, fontWeight: '800', color: COLORS.text },
-  hint: { color: COLORS.secondaryText, fontSize: 13, marginTop: 4 },
-  err: { color: COLORS.error, marginVertical: 8 },
-  mint: { backgroundColor: COLORS.primary, borderRadius: 10, minHeight: 46, alignItems: 'center', justifyContent: 'center', marginTop: 4 },
+const getStylesStoreItemForm = (C: Palette) => StyleSheet.create({
+  wrap: { flex: 1, backgroundColor: C.background },
+  title: { fontSize: 22, fontWeight: '800', color: C.text },
+  hint: { color: C.secondaryText, fontSize: 13, marginTop: 4 },
+  err: { color: C.error, marginVertical: 8 },
+  mint: { backgroundColor: C.primary, borderRadius: 10, minHeight: 46, alignItems: 'center', justifyContent: 'center', marginTop: 4 },
   mintTxt: { color: '#fff', fontWeight: '800', fontSize: 15 },
-  mintOk: { color: COLORS.success, fontSize: 13, marginTop: 8, fontWeight: '600' },
-  codeRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderWidth: 1, borderColor: COLORS.border, borderRadius: 10, padding: 10, marginTop: 6, backgroundColor: COLORS.card },
-  code: { fontWeight: '800', letterSpacing: 1, color: COLORS.text, fontSize: 14 },
+  mintOk: { color: C.success, fontSize: 13, marginTop: 8, fontWeight: '600' },
+  codeRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderWidth: 1, borderColor: C.border, borderRadius: 10, padding: 10, marginTop: 6, backgroundColor: C.card },
+  code: { fontWeight: '800', letterSpacing: 1, color: C.text, fontSize: 14 },
   codeSt: { fontSize: 12, fontWeight: '700' },
 });

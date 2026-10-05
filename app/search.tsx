@@ -3,11 +3,14 @@ import { View, Text, StyleSheet, TextInput, FlatList, Pressable } from 'react-na
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { searchPlaces } from '../lib/search';
-import { COLORS, RADIUS } from '../constants/colors';
+import { RADIUS } from '../constants/colors';
+import { useTheme, Palette } from '../lib/theme';
 import { EmptyState } from '../components/ui/States';
+import { BackButton } from '../components/ui/BackButton';
 import { GenericCard } from '../components/cards/Cards';
 
 export default function SearchScreen() {
+  const { colors: C } = useTheme();
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
   const router = useRouter();
@@ -25,10 +28,12 @@ export default function SearchScreen() {
     }, 250);
     return () => clearTimeout(h);
   }, [q]);
+  const s = React.useMemo(() => getStyles(C), [C]);
 
   return (
     <View style={s.wrap}>
-      <TextInput value={q} onChangeText={setQ} placeholder={t('common.search')} placeholderTextColor={COLORS.secondaryText} style={s.input} autoFocus />
+      <BackButton />
+      <TextInput value={q} onChangeText={setQ} placeholder={t('common.search')} placeholderTextColor={C.secondaryText} style={s.input} autoFocus />
       <FlatList
         data={rows}
         keyExtractor={(r) => r.id}
@@ -51,7 +56,7 @@ export default function SearchScreen() {
     </View>
   );
 }
-const s = StyleSheet.create({
-  wrap: { flex: 1, backgroundColor: COLORS.background, paddingTop: 60 },
-  input: { marginHorizontal: 16, backgroundColor: '#fff', borderWidth: 1, borderColor: COLORS.border, borderRadius: RADIUS.full, minHeight: 50, paddingHorizontal: 18, fontSize: 16, color: COLORS.text },
+const getStyles = (C: Palette) => StyleSheet.create({
+  wrap: { flex: 1, backgroundColor: C.background, paddingTop: 110 },
+  input: { marginHorizontal: 16, backgroundColor: '#fff', borderWidth: 1, borderColor: C.border, borderRadius: RADIUS.full, minHeight: 50, paddingHorizontal: 18, fontSize: 16, color: '#2A2320' },
 });

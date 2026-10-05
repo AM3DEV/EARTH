@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Field } from '../ui/Field';
 import { PrimaryButton } from '../ui/Buttons';
-import { COLORS } from '../../constants/colors';
+import { useTheme, Palette } from '../../lib/theme';
 
 export type FieldDef = { key: string; label: string; multiline?: boolean; numeric?: boolean; placeholder?: string };
 
@@ -12,6 +12,8 @@ export type FieldDef = { key: string; label: string; multiline?: boolean; numeri
 export function AdminForm({ title, fields, initial, onSubmit }: {
   title: string; fields: FieldDef[]; initial: Record<string, any>; onSubmit: (v: Record<string, any>) => Promise<void>;
 }) {
+  const { colors: C } = useTheme();
+  const s = React.useMemo(() => getStylesAdminForm(C), [C]);
   const { t } = useTranslation();
   const router = useRouter();
   const [v, setV] = useState<Record<string, any>>(initial);
@@ -37,8 +39,8 @@ export function AdminForm({ title, fields, initial, onSubmit }: {
     </ScrollView>
   );
 }
-const s = StyleSheet.create({
-  wrap: { flex: 1, backgroundColor: '#fff' },
-  title: { fontSize: 22, fontWeight: '800', color: COLORS.text, marginBottom: 12 },
-  err: { color: COLORS.error, marginBottom: 8 },
+const getStylesAdminForm = (C: Palette) => StyleSheet.create({
+  wrap: { flex: 1, backgroundColor: C.background },
+  title: { fontSize: 22, fontWeight: '800', color: C.text, marginBottom: 12 },
+  err: { color: C.error, marginBottom: 8 },
 });

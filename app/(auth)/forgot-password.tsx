@@ -5,9 +5,11 @@ import { useTranslation } from 'react-i18next';
 import { supabase } from '../../lib/supabase';
 import { Field } from '../../components/ui/Field';
 import { PrimaryButton } from '../../components/ui/Buttons';
-import { COLORS } from '../../constants/colors';
+import { BackButton } from '../../components/ui/BackButton';
+import { useTheme, Palette } from '../../lib/theme';
 
 export default function ForgotPassword() {
+  const { colors: C } = useTheme();
   const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [msg, setMsg] = useState<string | null>(null);
@@ -15,8 +17,10 @@ export default function ForgotPassword() {
     const { error } = await supabase.auth.resetPasswordForEmail(email.trim().toLowerCase());
     setMsg(error ? error.message : t('auth.checkEmail'));
   };
+  const s = React.useMemo(() => getStyles(C), [C]);
   return (
     <View style={s.wrap}>
+      <BackButton />
       <Text style={s.title}>{t('auth.forgotTitle')}</Text>
       <Field label={t('auth.email')} value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address" />
       <PrimaryButton title={t('auth.sendLink')} onPress={go} />
@@ -25,9 +29,9 @@ export default function ForgotPassword() {
     </View>
   );
 }
-const s = StyleSheet.create({
-  wrap: { flex: 1, padding: 24, backgroundColor: '#fff', justifyContent: 'center' },
-  title: { fontSize: 24, fontWeight: '800', color: COLORS.text, marginBottom: 16 },
-  msg: { marginTop: 12, color: COLORS.secondaryText },
-  link: { marginTop: 16, color: COLORS.primary },
+const getStyles = (C: Palette) => StyleSheet.create({
+  wrap: { flex: 1, padding: 24, backgroundColor: C.background, justifyContent: 'center' },
+  title: { fontSize: 24, fontWeight: '800', color: C.text, marginBottom: 16 },
+  msg: { marginTop: 12, color: C.secondaryText },
+  link: { marginTop: 16, color: C.primary },
 });

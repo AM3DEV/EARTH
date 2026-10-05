@@ -51,7 +51,8 @@
     "map": "Kaart",
     "monument": "Monumenten",
     "erth": "Erth",
-    "profile": "Profiel"
+    "profile": "Profiel",
+    "activities": "Activiteiten"
   },
   "map": {
     "searchPlaceholder": "Zoek bedrijven...",
@@ -71,7 +72,16 @@
     "title": "Ontdek",
     "categories": "Categorieën",
     "all": "Alles",
-    "nearEvent": "Dichtbij"
+    "nearEvent": "Dichtbij",
+    "heroTitle": "Activiteiten",
+    "heroSub": "Ontdek geweldige ervaringen en maak je reis onvergetelijk",
+    "searchPh": "Zoek activiteiten, plekken of ervaringen...",
+    "emptyTitle": "Geen activiteiten gevonden",
+    "emptyDesc": "Probeer een andere categorie of plek.",
+    "clearFilters": "Filters wissen",
+    "loadFail": "Activiteiten konden niet worden geladen. Controleer je verbinding.",
+    "chooseGov": "Kies je provincie",
+    "detectFail": "Niet gedetecteerd — kies:"
   },
   "detail": {
     "description": "Beschrijving",
@@ -89,7 +99,12 @@
     "website": "Website",
     "book": "Nu boeken",
     "services": "Diensten",
-    "noServices": "Nog geen diensten."
+    "noServices": "Nog geen diensten.",
+    "branches": "Vestigingen",
+    "addBranch": "Subbedrijf toevoegen",
+    "partOf": "Onderdeel van",
+    "tourist": "Toerist",
+    "citizen": "Burger"
   },
   "booking": {
     "title": "Dienst boeken",
@@ -162,7 +177,11 @@
     "settings": "Instellingen",
     "logout": "Uitloggen",
     "language": "Taal",
-    "rtlHint": "RTL-lay-out geldt alleen voor Arabisch."
+    "rtlHint": "RTL-lay-out geldt alleen voor Arabisch.",
+    "title": "Profiel",
+    "tagline": "Je Jordanië-reis begint hier",
+    "nextReward": "Volgende beloning bij {{count}}",
+    "loadFail": "Profiel kon niet worden geladen."
   },
   "settings": {
     "title": "Instellingen",
@@ -172,7 +191,10 @@
     "notifications": "Meldingen",
     "aboutBody": "Jordan Tourism Guide is een modern platform om Jordanië te ontdekken — monumenten, evenementen, bedrijven en boekbare diensten met transparante serverprijzen en buurtkortingen.",
     "privacyBody": "Profiel, favorieten, boekingen en meldingen veilig opgeslagen (Supabase RLS). Geen geheimen of e-mails blootgelegd.",
-    "termsBody": "Boekingen vereisen serverbevestiging. Prijzen variëren met de vraag. Promoties geven zichtbaarheid, nooit gegarandeerde posities."
+    "termsBody": "Boekingen vereisen serverbevestiging. Prijzen variëren met de vraag. Promoties geven zichtbaarheid, nooit gegarandeerde posities.",
+    "theme": "Weergave",
+    "light": "Licht",
+    "dark": "Donker"
   },
   "common": {
     "loading": "Laden…",
@@ -444,6 +466,39 @@
     "sameAsTourist": "Zelfde toeristenprijs",
     "custom": "Aangepast…",
     "pickPrice": "Kies prijs",
-    "pickCurrency": "Kies valuta"
+    "pickCurrency": "Kies valuta",
+    "governorate": "Provincie"
+  },
+  "menu": {
+    "editSub": "Werk je gegevens bij",
+    "scanSub": "Scan en verdien",
+    "loyalSub": "Je punten en beloningen",
+    "storeSub": "Exclusieve items",
+    "transSub": "Je geschiedenis",
+    "bookSub": "Beheer reserveringen",
+    "favSub": "Opgeslagen plekken",
+    "notifSub": "Beheer meldingen",
+    "setSub": "Voorkeuren en meer",
+    "langSub": "Taal wijzigen"
+  },
+  "gov": {
+    "amman": "Amman",
+    "balqa": "Balqa",
+    "zarqa": "Zarqa",
+    "madaba": "Madaba",
+    "karak": "Karak",
+    "jerash": "Jerash",
+    "ajloun": "Ajloun",
+    "mafraq": "Mafraq",
+    "irbid": "Irbid",
+    "aqaba": "Aqaba",
+    "maan": "Ma'an",
+    "tafilah": "Tafilah"
+  },
+  "sheet": {
+    "title": "Boek je ervaring",
+    "date": "Kies datum",
+    "people": "personen",
+    "total": "Totaal"
   }
 }

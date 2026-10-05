@@ -2,10 +2,13 @@ import React from 'react';
 import { View, Text, StyleSheet, Pressable, Modal, FlatList } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { LANGS, applyLocale } from '../lib/i18n';
-import { COLORS, RADIUS } from '../constants/colors';
+import { RADIUS } from '../constants/colors';
+import { useTheme, Palette } from '../lib/theme';
 
 /** Frosted globe pill for photo backgrounds (splash, onboarding, login). */
 export function LanguageButton({ onPress }: { onPress: () => void }) {
+  const { colors: C } = useTheme();
+  const s = React.useMemo(() => getStyles(C), [C]);
   const { i18n } = useTranslation();
   return (
     <Pressable onPress={onPress} style={s.btn} accessibilityRole="button" accessibilityLabel="Language">
@@ -17,6 +20,8 @@ export function LanguageButton({ onPress }: { onPress: () => void }) {
 
 /** Bottom-sheet list of the 10 app languages. */
 export function LanguageSheet({ visible, onClose }: { visible: boolean; onClose: () => void }) {
+  const { colors: C } = useTheme();
+  const s = React.useMemo(() => getStyles(C), [C]);
   const { i18n } = useTranslation();
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
@@ -50,7 +55,7 @@ export function LanguageSheet({ visible, onClose }: { visible: boolean; onClose:
   );
 }
 
-const s = StyleSheet.create({
+const getStyles = (C: Palette) => StyleSheet.create({
   btn: {
     flexDirection: 'row', alignItems: 'center', gap: 6,
     backgroundColor: 'rgba(255,255,255,0.18)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.45)',
@@ -59,13 +64,13 @@ const s = StyleSheet.create({
   globe: { fontSize: 17 },
   txt: { color: '#fff', fontWeight: '800', fontSize: 13, letterSpacing: 1 },
   overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.45)', justifyContent: 'flex-end' },
-  sheet: { backgroundColor: COLORS.card, borderTopLeftRadius: 24, borderTopRightRadius: 24, maxHeight: '70%', paddingBottom: 28 },
-  sheetHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderColor: COLORS.border },
-  sheetTitle: { fontSize: 17, fontWeight: '800', color: COLORS.text },
+  sheet: { backgroundColor: C.card, borderTopLeftRadius: 24, borderTopRightRadius: 24, maxHeight: '70%', paddingBottom: 28 },
+  sheetHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderColor: C.border },
+  sheetTitle: { fontSize: 17, fontWeight: '800', color: C.text },
   closeBtn: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
-  closeTxt: { fontSize: 18, color: COLORS.secondaryText },
-  opt: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingVertical: 13, borderBottomWidth: 1, borderColor: COLORS.border },
-  optActive: { backgroundColor: COLORS.softGreen },
-  optTxt: { fontSize: 16, color: COLORS.text, fontWeight: '600' },
-  check: { color: COLORS.primaryDark, fontWeight: '800', fontSize: 16 },
+  closeTxt: { fontSize: 18, color: C.secondaryText },
+  opt: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingVertical: 13, borderBottomWidth: 1, borderColor: C.border },
+  optActive: { backgroundColor: C.softGreen },
+  optTxt: { fontSize: 16, color: C.text, fontWeight: '600' },
+  check: { color: C.primaryDark, fontWeight: '800', fontSize: 16 },
 });

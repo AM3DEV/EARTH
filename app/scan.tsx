@@ -5,12 +5,14 @@ import { useTranslation } from 'react-i18next';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { ArrowLeft } from 'lucide-react-native';
 import { scanCompanyQr } from '../hooks/useBookings';
-import { COLORS, RADIUS } from '../constants/colors';
+import { RADIUS } from '../constants/colors';
+import { useTheme, Palette } from '../lib/theme';
 import { LoadingState } from '../components/ui/States';
 import { PrimaryButton, SecondaryButton } from '../components/ui/Buttons';
 
 /** Scan a store QR (JG1:token) to earn loyalty points. One award per store per day (server-enforced). */
 export default function ScanScreen() {
+  const { colors: C } = useTheme();
   const { t, i18n } = useTranslation();
   const rtl = i18n.language === 'ar';
   const router = useRouter();
@@ -30,6 +32,7 @@ export default function ScanScreen() {
       setBusy(false);
     }, [])
   );
+  const s = React.useMemo(() => getStyles(C), [C]);
 
   if (!permission) return <LoadingState />;
   if (!permission.granted) {
@@ -62,7 +65,7 @@ export default function ScanScreen() {
     <View style={s.wrap}>
       <View style={s.head}>
         <Pressable onPress={() => router.back()} style={s.backBtn} accessibilityRole="button" accessibilityLabel={t('common.back')}>
-          {rtl ? <ArrowLeft color={COLORS.text} size={20} style={{ transform: [{ scaleX: -1 }] }} /> : <ArrowLeft color={COLORS.text} size={20} />}
+          {rtl ? <ArrowLeft color={C.text} size={20} style={{ transform: [{ scaleX: -1 }] }} /> : <ArrowLeft color={C.text} size={20} />}
         </Pressable>
         <Text style={s.title}>{t('loyalty.scanTitle')}</Text>
       </View>
@@ -101,17 +104,17 @@ export default function ScanScreen() {
   );
 }
 
-const s = StyleSheet.create({
-  wrap: { flex: 1, backgroundColor: COLORS.background, paddingTop: 60 },
-  center: { flex: 1, backgroundColor: COLORS.background, alignItems: 'center', justifyContent: 'center', padding: 24 },
+const getStyles = (C: Palette) => StyleSheet.create({
+  wrap: { flex: 1, backgroundColor: C.background, paddingTop: 60 },
+  center: { flex: 1, backgroundColor: C.background, alignItems: 'center', justifyContent: 'center', padding: 24 },
   head: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, paddingBottom: 10 },
-  backBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: COLORS.card, borderWidth: 1, borderColor: COLORS.border, alignItems: 'center', justifyContent: 'center' },
-  title: { flex: 1, fontSize: 22, fontWeight: '800', color: COLORS.text },
+  backBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: C.card, borderWidth: 1, borderColor: C.border, alignItems: 'center', justifyContent: 'center' },
+  title: { flex: 1, fontSize: 22, fontWeight: '800', color: C.text },
   camWrap: { borderRadius: RADIUS.xl, overflow: 'hidden', backgroundColor: '#000', alignSelf: 'center', marginTop: 16 },
   cam: { flex: 1 },
   frame: { position: 'absolute', left: '12%', right: '12%', top: '12%', bottom: '12%', borderWidth: 3, borderColor: 'rgba(255,255,255,0.85)', borderRadius: 18 },
   sheet: { padding: 20, alignItems: 'center' },
-  muted: { color: COLORS.secondaryText, textAlign: 'center', fontSize: 14 },
-  err: { color: COLORS.error, textAlign: 'center', fontWeight: '600' },
-  win: { fontSize: 34, fontWeight: '800', color: COLORS.primaryDark },
+  muted: { color: C.secondaryText, textAlign: 'center', fontSize: 14 },
+  err: { color: C.error, textAlign: 'center', fontWeight: '600' },
+  win: { fontSize: 34, fontWeight: '800', color: C.primaryDark },
 });

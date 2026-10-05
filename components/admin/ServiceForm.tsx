@@ -5,10 +5,12 @@ import { useTranslation } from 'react-i18next';
 import { supabase } from '../../lib/supabase';
 import { logAdminAction } from '../../lib/adminLog';
 import { Field } from '../ui/Field';
+import { BackButton } from '../ui/BackButton';
 import { PrimaryButton } from '../ui/Buttons';
 import { SectionTitle, ToggleRow, OptionsPicker, ImageField, ImageGalleryField, Opt, useLocaleName, AdminGate, friendlyDbError } from './fields';
 import { CURRENCIES } from '../../lib/currency';
-import { COLORS } from '../../constants/colors';
+import { useTheme, Palette } from '../../lib/theme';
+import { sanitizeFor } from '../../lib/saveGuard';
 
 const PRICE_OPTS = ['5', '10', '15', '20', '25', '30', '40', '50', '75', '100', '150', '200', '250', '300', '500'];
 const isCustomPrice = (val: any) => val !== '' && val != null && !PRICE_OPTS.includes(String(val));
@@ -45,6 +47,8 @@ function PricePicker({ label, value, allowEmpty, onChange }: {
   );
 }
 export function ServiceForm({ initial, serviceId }: { initial: any; serviceId?: string }) {
+  const { colors: C } = useTheme();
+  const s = React.useMemo(() => getStylesServiceForm(C), [C]);
   const { t } = useTranslation();
   const router = useRouter();
   const locName = useLocaleName();
@@ -85,7 +89,7 @@ export function ServiceForm({ initial, serviceId }: { initial: any; serviceId?: 
       const from = String(v.available_from ?? '').trim() || null;
       const to = String(v.available_to ?? '').trim() || null;
       if (from && to && from > to) throw new Error(t('form.badDates'));
-      const payload = {
+      const payload = sanitizeFor('services', {
         ...v,
         company_id: v.company_id ?? null,
         category_id: v.category_id ?? null,
@@ -97,7 +101,7 @@ export function ServiceForm({ initial, serviceId }: { initial: any; serviceId?: 
         citizen_price: cz,
         max_booking: Number(v.max_booking) || 0,
         current_booking: Number(v.current_booking) || 0,
-      };
+      });
       if (serviceId) {
         const { error } = await supabase.from('services').update({ ...payload, updated_at: new Date().toISOString() }).eq('id', serviceId);
         if (error) throw error;
@@ -112,7 +116,9 @@ export function ServiceForm({ initial, serviceId }: { initial: any; serviceId?: 
   };
 
   return (
-    <AdminGate>
+    <View style={{ flex: 1, backgroundColor: C.background }}>
+      <BackButton />
+      <AdminGate>
     <ScrollView style={s.wrap} contentContainerStyle={{ padding: 16, paddingTop: 60, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
       <Text style={s.title}>{serviceId ? t('form.editItem', { name: t('admin.services') }) : t('form.addItem', { name: t('admin.services') })}</Text>
 
@@ -160,15 +166,16 @@ export function ServiceForm({ initial, serviceId }: { initial: any; serviceId?: 
       {err ? <Text style={s.err}>{err}</Text> : null}
       <PrimaryButton title={busy ? '…' : t('common.save')} onPress={save} disabled={busy} />
     </ScrollView>
-    </AdminGate>
+      </AdminGate>
+    </View>
   );
 }
 
-const s = StyleSheet.create({
-  wrap: { flex: 1, backgroundColor: '#fff' },
-  title: { fontSize: 22, fontWeight: '800', color: COLORS.text },
-  err: { color: COLORS.error, marginVertical: 8 },
-  readonly: { backgroundColor: '#FAFAFA', borderWidth: 1, borderColor: COLORS.border, borderRadius: 12, padding: 12, marginTop: 4 },
-  roLabel: { fontSize: 12, color: COLORS.secondaryText, fontWeight: '600' },
-  roVal: { fontSize: 17, fontWeight: '800', color: COLORS.text, marginTop: 2 },
+const getStylesServiceForm = (C: Palette) => StyleSheet.create({
+  wrap: { flex: 1, backgroundColor: C.background },
+  title: { fontSize: 22, fontWeight: '800', color: C.text },
+  err: { color: C.error, marginVertical: 8 },
+  readonly: { backgroundColor: C.card, borderWidth: 1, borderColor: C.border, borderRadius: 12, padding: 12, marginTop: 4 },
+  roLabel: { fontSize: 12, color: C.secondaryText, fontWeight: '600' },
+  roVal: { fontSize: 17, fontWeight: '800', color: C.text, marginTop: 2 },
 });

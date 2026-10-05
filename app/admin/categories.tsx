@@ -5,12 +5,14 @@ import { ArrowLeft } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { Image } from 'expo-image';
 import { supabase } from '../../lib/supabase';
-import { COLORS } from '../../constants/colors';
+import { useTheme, Palette } from '../../lib/theme';
 import { LoadingState, EmptyState } from '../../components/ui/States';
 
 /** Easy category management: image, both names, usage type, edit/delete. */
 export default function AdminCategories() {
   const { t, i18n } = useTranslation();
+  const { colors: C } = useTheme();
+  const s = React.useMemo(() => getStyles(C), [C]);
   const lang = i18n.language;
   const router = useRouter();
   const [rows, setRows] = useState<any[]>([]);
@@ -31,7 +33,7 @@ export default function AdminCategories() {
     <View style={s.wrap}>
       <View style={s.head}>
         <Pressable onPress={() => router.back()} style={s.backBtn} accessibilityRole="button" accessibilityLabel={t('common.back')}>
-          <ArrowLeft color={COLORS.text} size={20} />
+          <ArrowLeft color={C.text} size={20} />
         </Pressable>
         <Text style={s.title}>{t('admin.categories')}</Text>
         <Pressable style={s.create} onPress={() => router.push('/admin/category-create' as any)}>
@@ -56,7 +58,7 @@ export default function AdminCategories() {
                     <Text style={s.act}>{t('common.edit')}</Text>
                   </Pressable>
                   <Pressable onPress={async () => { await supabase.from('categories').delete().eq('id', item.id); load(); }}>
-                    <Text style={[s.act, { color: COLORS.error }]}>{t('common.delete')}</Text>
+                    <Text style={[s.act, { color: C.error }]}>{t('common.delete')}</Text>
                   </Pressable>
                 </View>
               </View>
@@ -68,18 +70,18 @@ export default function AdminCategories() {
   );
 }
 
-const s = StyleSheet.create({
-  wrap: { flex: 1, backgroundColor: COLORS.background, paddingTop: 60 },
+const getStyles = (C: Palette) => StyleSheet.create({
+  wrap: { flex: 1, backgroundColor: C.background, paddingTop: 60 },
   head: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, gap: 8 },
-  backBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: COLORS.card, borderWidth: 1, borderColor: COLORS.border, alignItems: 'center', justifyContent: 'center' },
-  title: { flex: 1, fontSize: 22, fontWeight: '800', color: COLORS.text },
-  create: { backgroundColor: COLORS.primary, borderRadius: 10, paddingHorizontal: 12, minHeight: 40, justifyContent: 'center' },
+  backBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: C.card, borderWidth: 1, borderColor: C.border, alignItems: 'center', justifyContent: 'center' },
+  title: { flex: 1, fontSize: 22, fontWeight: '800', color: C.text },
+  create: { backgroundColor: C.primary, borderRadius: 10, paddingHorizontal: 12, minHeight: 40, justifyContent: 'center' },
   createT: { color: '#fff', fontWeight: '700' },
-  card: { flexDirection: 'row', borderWidth: 1, borderColor: COLORS.border, borderRadius: 12, overflow: 'hidden', marginBottom: 10 },
+  card: { flexDirection: 'row', borderWidth: 1, borderColor: C.border, borderRadius: 12, overflow: 'hidden', marginBottom: 10 },
   thumb: { width: 84, height: 84 },
   body: { flex: 1, padding: 10 },
-  name: { fontWeight: '700', color: COLORS.text, fontSize: 15 },
-  muted: { color: COLORS.secondaryText, fontSize: 12, marginTop: 2 },
+  name: { fontWeight: '700', color: C.text, fontSize: 15 },
+  muted: { color: C.secondaryText, fontSize: 12, marginTop: 2 },
   row: { flexDirection: 'row', gap: 16, marginTop: 8 },
-  act: { color: COLORS.primaryDark, fontWeight: '700' },
+  act: { color: C.primaryDark, fontWeight: '700' },
 });

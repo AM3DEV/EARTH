@@ -4,7 +4,8 @@ import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { AdminList } from '../../components/admin/AdminList';
 import { AdminHeader } from '../../components/admin/AdminHeader';
-import { COLORS, RADIUS } from '../../constants/colors';
+import { RADIUS } from '../../constants/colors';
+import { useTheme, Palette } from '../../lib/theme';
 
 /**
  * Experiences: Services + Events merged into ONE admin section.
@@ -13,6 +14,8 @@ import { COLORS, RADIUS } from '../../constants/colors';
  */
 export default function AdminExperiences() {
   const { t, i18n } = useTranslation();
+  const { colors: C } = useTheme();
+  const s = React.useMemo(() => getStyles(C), [C]);
   const router = useRouter();
   const lang = i18n.language;
   const [tab, setTab] = useState<'services' | 'events'>('services');
@@ -72,14 +75,14 @@ export default function AdminExperiences() {
   );
 }
 
-const s = StyleSheet.create({
-  wrap: { flex: 1, backgroundColor: '#fff', paddingTop: 60 },
+const getStyles = (C: Palette) => StyleSheet.create({
+  wrap: { flex: 1, backgroundColor: C.background, paddingTop: 60 },
   tabsRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, marginTop: 12, gap: 8 },
-  tabs: { flex: 1, flexDirection: 'row', backgroundColor: '#F4F4F4', borderRadius: RADIUS.full, padding: 4, gap: 4 },
+  tabs: { flex: 1, flexDirection: 'row', backgroundColor: C.softGreen, borderRadius: RADIUS.full, padding: 4, gap: 4 },
   tab: { flex: 1, borderRadius: RADIUS.full, minHeight: 40, alignItems: 'center', justifyContent: 'center' },
-  tabActive: { backgroundColor: '#fff', borderWidth: 1, borderColor: COLORS.border },
-  tabTxt: { fontWeight: '700', color: COLORS.secondaryText, fontSize: 14 },
-  tabTxtActive: { color: COLORS.text },
-  create: { backgroundColor: COLORS.primary, borderRadius: 10, paddingHorizontal: 12, minHeight: 40, justifyContent: 'center' },
+  tabActive: { backgroundColor: C.card, borderWidth: 1, borderColor: C.border },
+  tabTxt: { fontWeight: '700', color: C.secondaryText, fontSize: 14 },
+  tabTxtActive: { color: C.text },
+  create: { backgroundColor: C.primary, borderRadius: 10, paddingHorizontal: 12, minHeight: 40, justifyContent: 'center' },
   createT: { color: '#fff', fontWeight: '700' },
 });

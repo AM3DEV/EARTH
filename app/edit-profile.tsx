@@ -8,9 +8,10 @@ import { useProfile } from '../hooks/useAuth';
 import { Field } from '../components/ui/Field';
 import { PrimaryButton } from '../components/ui/Buttons';
 import { pickImage, uploadImage } from '../lib/storage';
-import { COLORS, RADIUS } from '../constants/colors';
+import { useTheme, Palette } from '../lib/theme';
 
 export default function EditProfile() {
+  const { colors: C } = useTheme();
   const { t } = useTranslation();
   const router = useRouter();
   const { profile } = useProfile();
@@ -66,6 +67,7 @@ export default function EditProfile() {
       );
     } finally { setBusy(false); }
   };
+  const s = React.useMemo(() => getStyles(C), [C]);
 
   return (
     <ScrollView style={s.wrap} contentContainerStyle={{ padding: 16, paddingTop: 60 }} keyboardShouldPersistTaps="handled">
@@ -79,7 +81,7 @@ export default function EditProfile() {
           </View>
         )}
         <Pressable onPress={changePhoto} disabled={busy} style={s.photoBtn} accessibilityRole="button" accessibilityLabel={t('auth.changePhoto')}>
-          {busy ? <ActivityIndicator size="small" color={COLORS.primary} /> : <Text style={s.photoTxt}>{t('auth.changePhoto')}</Text>}
+          {busy ? <ActivityIndicator size="small" color={C.primary} /> : <Text style={s.photoTxt}>{t('auth.changePhoto')}</Text>}
         </Pressable>
       </View>
       <Field label={t('auth.firstName')} value={f.first_name} onChangeText={(v) => setF({ ...f, first_name: v })} />
@@ -90,14 +92,14 @@ export default function EditProfile() {
     </ScrollView>
   );
 }
-const s = StyleSheet.create({
-  wrap: { flex: 1, backgroundColor: '#fff' },
-  title: { fontSize: 24, fontWeight: '800', color: COLORS.text, marginBottom: 12 },
+const getStyles = (C: Palette) => StyleSheet.create({
+  wrap: { flex: 1, backgroundColor: C.background },
+  title: { fontSize: 24, fontWeight: '800', color: C.text, marginBottom: 12 },
   avatarRow: { alignItems: 'center', marginBottom: 16 },
-  avatar: { width: 96, height: 96, borderRadius: 48, backgroundColor: '#eee', borderWidth: 1, borderColor: COLORS.border },
-  avatarFallback: { backgroundColor: COLORS.softGreen, alignItems: 'center', justifyContent: 'center' },
-  avatarTxt: { fontWeight: '800', color: COLORS.primaryDark, fontSize: 32 },
+  avatar: { width: 96, height: 96, borderRadius: 48, backgroundColor: C.softGreen, borderWidth: 1, borderColor: C.border },
+  avatarFallback: { backgroundColor: C.softGreen, alignItems: 'center', justifyContent: 'center' },
+  avatarTxt: { fontWeight: '800', color: C.primaryDark, fontSize: 32 },
   photoBtn: { marginTop: 10, minHeight: 44, justifyContent: 'center', paddingHorizontal: 16 },
-  photoTxt: { color: COLORS.primary, fontWeight: '700', fontSize: 15 },
-  err: { color: COLORS.error, marginBottom: 8 },
+  photoTxt: { color: C.primary, fontWeight: '700', fontSize: 15 },
+  err: { color: C.error, marginBottom: 8 },
 });

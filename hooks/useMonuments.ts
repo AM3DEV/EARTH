@@ -10,7 +10,7 @@ export function useMonuments(categoryId?: string | string[]) {
   const load = useCallback(async () => {
     setLoading(true); setError(null);
     try {
-      let q = supabase.from('monuments').select('*, categories(name_en,name_ar)').order('name_en').limit(100);
+      let q = supabase.from('monuments').select('*, categories(name_en,name_ar)').eq('active', true).order('name_en').limit(100);
       const ids = Array.isArray(categoryId) ? categoryId : categoryId ? [categoryId] : [];
       if (ids.length > 0) q = q.in('category_id', ids);
       const { data, error } = await q;

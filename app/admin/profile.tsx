@@ -2,12 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '../../lib/supabase';
-import { COLORS } from '../../constants/colors';
+import { useTheme, Palette } from '../../lib/theme';
 import { AdminHeader } from '../../components/admin/AdminHeader';
 import { Card } from '../../components/ui/Card';
 
 export default function AdminProfile() {
   const { t } = useTranslation();
+  const { colors: C } = useTheme();
+  const s = React.useMemo(() => getStyles(C), [C]);
   const [row, setRow] = useState<any>(null);
   const [role, setRole] = useState('');
   useEffect(() => {
@@ -32,9 +34,9 @@ export default function AdminProfile() {
     </ScrollView>
   );
 }
-const s = StyleSheet.create({
-  wrap: { flex: 1, backgroundColor: COLORS.background },
-  title: { fontSize: 22, fontWeight: '800', color: COLORS.text, marginBottom: 12 },
-  name: { fontWeight: '800', fontSize: 18, color: COLORS.text },
-  muted: { color: COLORS.secondaryText, marginTop: 2 },
+const getStyles = (C: Palette) => StyleSheet.create({
+  wrap: { flex: 1, backgroundColor: C.background },
+  title: { fontSize: 22, fontWeight: '800', color: C.text, marginBottom: 12 },
+  name: { fontWeight: '800', fontSize: 18, color: C.text },
+  muted: { color: C.secondaryText, marginTop: 2 },
 });

@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, FlatList, Pressable } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '../../lib/supabase';
 import { getMyRole } from '../../lib/auth';
-import { COLORS } from '../../constants/colors';
+import { useTheme, Palette } from '../../lib/theme';
 import { AdminHeader } from '../../components/admin/AdminHeader';
 import { LoadingState } from '../../components/ui/States';
 import { Field } from '../../components/ui/Field';
@@ -11,6 +11,8 @@ import { Field } from '../../components/ui/Field';
 /** Boss admin only: create/deactivate/reactivate admins, change roles. Deactivate preferred over delete. */
 export default function Administrators() {
   const { t } = useTranslation();
+  const { colors: C } = useTheme();
+  const s = React.useMemo(() => getStyles(C), [C]);
   const [rows, setRows] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [email, setEmail] = useState('');
@@ -56,12 +58,12 @@ export default function Administrators() {
     </View>
   );
 }
-const s = StyleSheet.create({
-  wrap: { flex: 1, backgroundColor: COLORS.background, paddingTop: 60 },
-  title: { fontSize: 22, fontWeight: '800', color: COLORS.text, paddingHorizontal: 16 },
-  msg: { color: COLORS.secondaryText, paddingHorizontal: 16 },
-  card: { borderWidth: 1, borderColor: COLORS.border, borderRadius: 12, padding: 12, marginBottom: 8 },
-  name: { fontWeight: '700', color: COLORS.text },
+const getStyles = (C: Palette) => StyleSheet.create({
+  wrap: { flex: 1, backgroundColor: C.background, paddingTop: 60 },
+  title: { fontSize: 22, fontWeight: '800', color: C.text, paddingHorizontal: 16 },
+  msg: { color: C.secondaryText, paddingHorizontal: 16 },
+  card: { borderWidth: 1, borderColor: C.border, borderRadius: 12, padding: 12, marginBottom: 8 },
+  name: { fontWeight: '700', color: C.text },
   row: { flexDirection: 'row', gap: 14, marginTop: 8 },
-  act: { color: COLORS.primaryDark, fontWeight: '700' },
+  act: { color: C.primaryDark, fontWeight: '700' },
 });

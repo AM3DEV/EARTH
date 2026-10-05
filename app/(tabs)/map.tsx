@@ -11,7 +11,8 @@ import { supabase } from '../../lib/supabase';
 import { searchPlaces } from '../../lib/search';
 import { fallbackPhoto } from '../../constants/photos';
 import { JORDAN_REGION } from '../../constants/jordan';
-import { COLORS, RADIUS } from '../../constants/colors';
+import { RADIUS } from '../../constants/colors';
+import { useTheme, Palette } from '../../lib/theme';
 import { useProfile } from '../../hooks/useAuth';
 import { getWallet } from '../../hooks/useBookings';
 import { EmptyState } from '../../components/ui/States';
@@ -20,6 +21,7 @@ import { Stars } from '../../components/ui/Card';
 type MarkerItem = { id: string; kind: 'monument' | 'event' | 'company'; lat: number; lng: number; raw: any };
 
 export default function MapHome() {
+  const { colors: C } = useTheme();
   const { t, i18n } = useTranslation();
   const router = useRouter();
   const lang = i18n.language;
@@ -117,7 +119,8 @@ export default function MapHome() {
     else router.push(`/event/${mk.raw.id}` as any);
   };
 
-  const pinColor = (k: string) => (k === 'monument' ? COLORS.sandstone : k === 'event' ? COLORS.primary : COLORS.success);
+  const pinColor = (k: string) => (k === 'monument' ? C.sandstone : k === 'event' ? C.primary : C.success);
+  const s = React.useMemo(() => getStyles(C), [C]);
 
   return (
     <View style={s.wrap}>
@@ -145,7 +148,7 @@ export default function MapHome() {
           {points != null && points > 0 ? <Text style={s.pts}>★ {points}</Text> : null}
         </Pressable>
         <Pressable accessibilityRole="button" accessibilityLabel={t('settings.title')} onPress={() => router.push('/settings' as any)} style={s.iconBtn}>
-          <Settings color={COLORS.text} size={20} />
+          <Settings color={C.text} size={20} />
         </Pressable>
       </View>
 
@@ -153,7 +156,7 @@ export default function MapHome() {
       {!expanded ? (
         <Animated.View style={s.barWrap}>
           <Pressable accessibilityRole="search" accessibilityLabel={t('map.searchLabel')} onPress={openSearch} style={s.bar}>
-            <Search color={COLORS.secondaryText} size={18} />
+            <Search color={C.secondaryText} size={18} />
             <Text style={s.barText}>{t('map.searchPlaceholder')}</Text>
           </Pressable>
         </Animated.View>
@@ -165,23 +168,23 @@ export default function MapHome() {
           <Animated.View style={[s.panel, panelStyle]} pointerEvents="auto">
             <View style={s.searchRow}>
               <Pressable accessibilityLabel={t('map.closeLabel')} onPress={closeSearch} style={s.iconBtn}>
-                <ArrowLeft color={COLORS.text} size={20} />
+                <ArrowLeft color={C.text} size={20} />
               </Pressable>
               <View style={s.inputWrap}>
-                <Search color={COLORS.secondaryText} size={16} />
+                <Search color={C.secondaryText} size={16} />
                 <TextInput
                   ref={inputRef}
                   value={query}
                   onChangeText={setQuery}
                   placeholder={t('map.searchPlaceholder')}
-                  placeholderTextColor={COLORS.secondaryText}
+                  placeholderTextColor={C.secondaryText}
                   style={s.input}
                   autoCorrect={false}
                   returnKeyType="search"
                 />
                 {query ? (
                   <Pressable accessibilityLabel={t('map.clearLabel')} onPress={() => setQuery('')}>
-                    <X color={COLORS.secondaryText} size={16} />
+                    <X color={C.secondaryText} size={16} />
                   </Pressable>
                 ) : null}
               </View>
@@ -239,29 +242,29 @@ export default function MapHome() {
   );
 }
 
-const s = StyleSheet.create({
-  wrap: { flex: 1, backgroundColor: COLORS.background },
+const getStyles = (C: Palette) => StyleSheet.create({
+  wrap: { flex: 1, backgroundColor: C.background },
   header: { position: 'absolute', top: 54, left: 14, right: 14, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  profileChip: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.92)', borderWidth: 1, borderColor: COLORS.border, borderRadius: RADIUS.full, paddingHorizontal: 10, paddingVertical: 6, maxWidth: 220, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.08, shadowRadius: 6, elevation: 3 },
-  avatar: { width: 30, height: 30, borderRadius: 15, backgroundColor: '#eee' },
-  avatarFallback: { alignItems: 'center', justifyContent: 'center', backgroundColor: COLORS.primaryLight },
-  avatarTxt: { fontWeight: '800', color: COLORS.primaryDark },
-  profileName: { marginLeft: 8, fontWeight: '600', fontSize: 13, color: COLORS.text, flexShrink: 1 },
-  pts: { marginLeft: 6, fontWeight: '800', fontSize: 13, color: COLORS.gold },
-  iconBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: 'rgba(255,255,255,0.92)', borderWidth: 1, borderColor: COLORS.border, alignItems: 'center', justifyContent: 'center' },
+  profileChip: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.92)', borderWidth: 1, borderColor: C.border, borderRadius: RADIUS.full, paddingHorizontal: 10, paddingVertical: 6, maxWidth: 220, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.08, shadowRadius: 6, elevation: 3 },
+  avatar: { width: 30, height: 30, borderRadius: 15, backgroundColor: C.softGreen },
+  avatarFallback: { alignItems: 'center', justifyContent: 'center', backgroundColor: C.primaryLight },
+  avatarTxt: { fontWeight: '800', color: C.primaryDark },
+  profileName: { marginLeft: 8, fontWeight: '700', fontSize: 13, color: '#2A2320', flexShrink: 1 },
+  pts: { marginLeft: 6, fontWeight: '800', fontSize: 13, color: C.gold },
+  iconBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: 'rgba(255,255,255,0.92)', borderWidth: 1, borderColor: C.border, alignItems: 'center', justifyContent: 'center' },
   barWrap: { position: 'absolute', left: 14, right: 14, bottom: 18 },
-  bar: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: 'rgba(255,255,255,0.9)', borderWidth: 1, borderColor: COLORS.border, borderRadius: RADIUS.full, paddingHorizontal: 16, minHeight: 52, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 12, elevation: 4 },
-  barText: { color: COLORS.secondaryText, fontSize: 15 },
+  bar: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: 'rgba(255,255,255,0.9)', borderWidth: 1, borderColor: C.border, borderRadius: RADIUS.full, paddingHorizontal: 16, minHeight: 52, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 12, elevation: 4 },
+  barText: { color: C.secondaryText, fontSize: 15 },
   panelAnchor: { ...StyleSheet.absoluteFill, justifyContent: 'flex-end' },
-  panel: { backgroundColor: 'rgba(255,255,255,0.97)', borderTopLeftRadius: 22, borderTopRightRadius: 22, borderTopWidth: 1, borderLeftWidth: 1, borderRightWidth: 1, borderColor: COLORS.border, maxHeight: '78%', minHeight: '60%', padding: 12 },
+  panel: { backgroundColor: C.card, borderTopLeftRadius: 22, borderTopRightRadius: 22, borderTopWidth: 1, borderLeftWidth: 1, borderRightWidth: 1, borderColor: C.border, maxHeight: '78%', minHeight: '60%', padding: 12 },
   searchRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 },
-  inputWrap: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#fff', borderWidth: 1, borderColor: COLORS.border, borderRadius: RADIUS.full, paddingHorizontal: 14, minHeight: 48 },
-  input: { flex: 1, fontSize: 16, color: COLORS.text },
-  hint: { color: COLORS.secondaryText, paddingHorizontal: 6, marginBottom: 4 },
-  card: { flexDirection: 'row', backgroundColor: '#fff', borderWidth: 1, borderColor: COLORS.border, borderRadius: RADIUS.lg, overflow: 'hidden', marginBottom: 10 },
+  inputWrap: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#fff', borderWidth: 1, borderColor: C.border, borderRadius: RADIUS.full, paddingHorizontal: 14, minHeight: 48 },
+  input: { flex: 1, fontSize: 16, color: '#2A2320' },
+  hint: { color: C.secondaryText, paddingHorizontal: 6, marginBottom: 4 },
+  card: { flexDirection: 'row', backgroundColor: C.card, borderWidth: 1, borderColor: C.border, borderRadius: RADIUS.lg, overflow: 'hidden', marginBottom: 10 },
   cardImg: { width: 92, height: 92 },
   cardBody: { flex: 1, padding: 10 },
-  cardName: { fontWeight: '700', fontSize: 15, color: COLORS.text },
-  kind: { fontSize: 11, fontWeight: '800', letterSpacing: 0.5, color: COLORS.primaryDark, marginTop: 2 },
-  muted: { color: COLORS.secondaryText, fontSize: 12, marginTop: 2 },
+  cardName: { fontWeight: '700', fontSize: 15, color: C.text },
+  kind: { fontSize: 11, fontWeight: '800', letterSpacing: 0.5, color: C.primaryDark, marginTop: 2 },
+  muted: { color: C.secondaryText, fontSize: 12, marginTop: 2 },
 });

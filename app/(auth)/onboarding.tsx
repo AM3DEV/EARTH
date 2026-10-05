@@ -6,7 +6,8 @@ import { useTranslation } from 'react-i18next';
 import Animated, { FadeInUp } from 'react-native-reanimated';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
-import { COLORS, RADIUS } from '../../constants/colors';
+import { RADIUS } from '../../constants/colors';
+import { useTheme, Palette } from '../../lib/theme';
 import { ONBOARDING_PHOTOS } from '../../constants/photos';
 import { LanguageButton, LanguageSheet } from '../../components/LanguagePicker';
 import { PrimaryButton } from '../../components/ui/Buttons';
@@ -15,6 +16,7 @@ const SLIDES = ['s1t', 's2t', 's3t', 's4t', 's5t'] as const;
 const DESCS = ['s1d', 's2d', 's3d', 's4d', 's5d'] as const;
 
 export default function Onboarding() {
+  const { colors: C } = useTheme();
   const { t, i18n } = useTranslation();
   const rtl = i18n.language === 'ar';
   const router = useRouter();
@@ -26,6 +28,8 @@ export default function Onboarding() {
     await AsyncStorage.setItem('jg.onboarded', '1');
     router.replace('/(auth)/login');
   };
+
+  const s = React.useMemo(() => getStyles(C), [C]);
 
   return (
     <View style={s.wrap}>
@@ -68,8 +72,8 @@ export default function Onboarding() {
   );
 }
 
-const s = StyleSheet.create({
-  wrap: { flex: 1, backgroundColor: '#fff', justifyContent: 'flex-end' },
+const getStyles = (C: Palette) => StyleSheet.create({
+  wrap: { flex: 1, backgroundColor: C.background, justifyContent: 'flex-end' },
   langWrap: { position: 'absolute', top: 60, left: 20, zIndex: 5 },
   skip: {
     position: 'absolute', top: 60, right: 20, zIndex: 5,
@@ -77,14 +81,14 @@ const s = StyleSheet.create({
   },
   skipTxt: { color: '#fff', fontWeight: '700', fontSize: 13 },
   panel: {
-    backgroundColor: '#fff', borderTopLeftRadius: 30, borderTopRightRadius: 30,
+    backgroundColor: C.card, borderTopLeftRadius: 30, borderTopRightRadius: 30,
     paddingHorizontal: 24, paddingTop: 26, paddingBottom: 34,
     shadowColor: '#2B1A12', shadowOffset: { width: 0, height: -6 }, shadowOpacity: 0.12, shadowRadius: 16, elevation: 8,
   },
-  title: { fontSize: 27, fontWeight: '800', color: COLORS.text, letterSpacing: 0.5 },
-  desc: { fontSize: 15, lineHeight: 23, color: COLORS.secondaryText, marginTop: 10 },
+  title: { fontSize: 27, fontWeight: '800', color: C.text, letterSpacing: 0.5 },
+  desc: { fontSize: 15, lineHeight: 23, color: C.secondaryText, marginTop: 10 },
   dots: { flexDirection: 'row', gap: 6, marginVertical: 20 },
-  dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: COLORS.border },
-  dotActive: { backgroundColor: COLORS.primary, width: 24 },
-  loginLink: { color: COLORS.primaryDark, fontWeight: '700', textAlign: 'center', fontSize: 15 },
+  dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: C.border },
+  dotActive: { backgroundColor: C.primary, width: 24 },
+  loginLink: { color: C.primaryDark, fontWeight: '700', textAlign: 'center', fontSize: 15 },
 });

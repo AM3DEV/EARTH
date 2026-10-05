@@ -51,7 +51,8 @@
     "map": "Map",
     "monument": "Monument",
     "erth": "Erth",
-    "profile": "Profile"
+    "profile": "Profile",
+    "activities": "Activities"
   },
   "map": {
     "searchPlaceholder": "Search businesses...",
@@ -71,7 +72,16 @@
     "title": "Explore",
     "categories": "Categories",
     "all": "All",
-    "nearEvent": "Near Event"
+    "nearEvent": "Near Event",
+    "heroTitle": "Activities",
+    "heroSub": "Discover amazing experiences and make your trip unforgettable",
+    "searchPh": "Search for activities, places, or experiences...",
+    "emptyTitle": "No activities found",
+    "emptyDesc": "Try another category or search for a different place.",
+    "clearFilters": "Clear Filters",
+    "loadFail": "Unable to load activities. Please check your connection and try again.",
+    "chooseGov": "Choose your governorate",
+    "detectFail": "We couldn't detect your governorate — please choose it below."
   },
   "detail": {
     "description": "Description",
@@ -89,7 +99,12 @@
     "website": "Website",
     "book": "Book now",
     "services": "Services",
-    "noServices": "No services yet."
+    "noServices": "No services yet.",
+    "branches": "Branches",
+    "addBranch": "Add sub-company",
+    "partOf": "Part of",
+    "tourist": "Tourist",
+    "citizen": "Citizen"
   },
   "booking": {
     "title": "Book service",
@@ -200,7 +215,11 @@
     "settings": "Settings",
     "logout": "Logout",
     "language": "Language",
-    "rtlHint": "RTL layout applies automatically for Arabic."
+    "rtlHint": "RTL layout applies automatically for Arabic.",
+    "title": "Profile",
+    "tagline": "Your Jordan journey starts here",
+    "nextReward": "Next reward at {{count}}",
+    "loadFail": "Unable to load your profile. Please try again."
   },
   "settings": {
     "title": "Settings",
@@ -210,7 +229,10 @@
     "notifications": "Notifications",
     "aboutBody": "Jordan Tourism Guide is a modern tourism platform for discovering Jordan — monuments, events, companies and bookable services with transparent server-calculated pricing and nearby support discounts.",
     "privacyBody": "We store your profile, favorites, bookings and notifications securely in Supabase with Row Level Security. We never expose admin secrets or other users' emails. Contact support for data requests.",
-    "termsBody": "Bookings require server confirmation. Prices are calculated server-side and may change with demand and support discounts. Promotions provide visibility boosts, never guaranteed positions."
+    "termsBody": "Bookings require server confirmation. Prices are calculated server-side and may change with demand and support discounts. Promotions provide visibility boosts, never guaranteed positions.",
+    "theme": "Appearance",
+    "light": "Light",
+    "dark": "Dark"
   },
   "common": {
     "loading": "Loading…",
@@ -445,6 +467,39 @@
     "sameAsTourist": "Same as tourist",
     "custom": "Custom…",
     "pickPrice": "Pick a price",
-    "pickCurrency": "Pick a currency"
+    "pickCurrency": "Pick a currency",
+    "governorate": "Governorate"
+  },
+  "menu": {
+    "editSub": "Update your personal information",
+    "scanSub": "Scan and get rewards",
+    "loyalSub": "View your points and rewards",
+    "storeSub": "Shop exclusive items",
+    "transSub": "View your transaction history",
+    "bookSub": "Manage your reservations",
+    "favSub": "Your saved activities and places",
+    "notifSub": "Manage your notifications",
+    "setSub": "App preferences and more",
+    "langSub": "Change app language"
+  },
+  "gov": {
+    "amman": "Amman",
+    "balqa": "Balqa",
+    "zarqa": "Zarqa",
+    "madaba": "Madaba",
+    "karak": "Karak",
+    "jerash": "Jerash",
+    "ajloun": "Ajloun",
+    "mafraq": "Mafraq",
+    "irbid": "Irbid",
+    "aqaba": "Aqaba",
+    "maan": "Ma'an",
+    "tafilah": "Tafilah"
+  },
+  "sheet": {
+    "title": "Book your experience",
+    "date": "Select date",
+    "people": "people",
+    "total": "Total"
   }
 }

@@ -6,7 +6,8 @@ import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ArrowLeft, ArrowRight } from 'lucide-react-native';
 import { supabase } from '../../lib/supabase';
-import { COLORS, RADIUS } from '../../constants/colors';
+import { RADIUS } from '../../constants/colors';
+import { useTheme, Palette } from '../../lib/theme';
 import { fallbackPhoto } from '../../constants/photos';
 import { LoadingState, ErrorState } from '../../components/ui/States';
 import { PriceBreakdown } from '../../components/booking/PriceBreakdown';
@@ -20,7 +21,8 @@ import { usePrice } from '../../lib/currency';
  * payment page (CARD / PAYPAL) — booking completes there.
  */
 export default function NewBooking() {
-  const { service_id } = useLocalSearchParams<{ service_id: string }>();
+  const { colors: C } = useTheme();
+  const { service_id, date: d0, qty: q0 } = useLocalSearchParams<{ service_id: string; date?: string; qty?: string }>();
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
   const rtl = lang === 'ar';
@@ -28,8 +30,8 @@ export default function NewBooking() {
   const [row, setRow] = useState<any>(null);
   const [quote, setQuote] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
-  const [qty, setQty] = useState('1');
+  const [date, setDate] = useState(typeof d0 === 'string' && d0 ? d0 : new Date().toISOString().slice(0, 10));
+  const [qty, setQty] = useState(typeof q0 === 'string' && q0 ? q0 : '1');
   const [msg, setMsg] = useState<string | null>(null);
   const [coupon, setCoupon] = useState('');
   const [picked, setPicked] = useState<string | null>(null);
@@ -66,6 +68,7 @@ export default function NewBooking() {
     })();
   }, [service_id]);
 
+  const s = React.useMemo(() => getStyles(C), [C]);
   if (loading) return <LoadingState />;
   if (!row) return <ErrorState message={t('common.error')} onRetry={() => router.back()} />;
 
@@ -75,15 +78,12 @@ export default function NewBooking() {
   const cur = Number(row.current_booking ?? 0);
   const day = date.trim();
 
-  // Availability gate — mirrors the admin's max-people + date window settings.
+  // Availability gate — overbooking past max is allowed (price rises instead).
   let reason: string | null = null;
   if (!row.available) {
     reason = t('booking.unavailable');
   } else if (qn < 1) {
     reason = t('booking.invalidQty');
-  } else if (max > 0 && cur + qn > max) {
-    const left = Math.max(0, max - cur);
-    reason = t('booking.onlyLeft', { count: left });
   } else if (row.available_from && day < String(row.available_from).slice(0, 10)) {
     reason = t('booking.fromDate', { date: String(row.available_from).slice(0, 10) });
   } else if (row.available_to && day > String(row.available_to).slice(0, 10)) {
@@ -93,8 +93,10 @@ export default function NewBooking() {
   const effectiveCoupon = (picked ?? coupon.trim()).toUpperCase();
 
   // Live estimate for the picked coupon (server applies it authoritatively).
+  // Quote is per-person: scale to the full total so coupons work for any quantity.
   const pickedCpn = myCoupons.find((c) => c.code === picked);
-  const pickBase = Number(quote?.final_price ?? row.current_price ?? 0);
+  const unit = Number(quote?.final_price ?? row.current_price ?? 0);
+  const pickBase = Math.round(unit * qn * 100) / 100;
   const pickOff = pickedCpn
     ? pickedCpn.kind === 'percent'
       ? Math.round(pickBase * Math.min(Number(pickedCpn.value), 100)) / 100
@@ -117,7 +119,7 @@ export default function NewBooking() {
         accessibilityRole="button"
         accessibilityLabel={t('common.back')}
       >
-        {rtl ? <ArrowRight color={COLORS.text} size={20} /> : <ArrowLeft color={COLORS.text} size={20} />}
+        {rtl ? <ArrowRight color={C.text} size={20} /> : <ArrowLeft color={C.text} size={20} />}
       </Pressable>
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 40 }}>
         <View>
@@ -173,6 +175,14 @@ export default function NewBooking() {
             </View>
           ) : null}
           {msg && msg !== reason ? <Text style={s.err}>{msg}</Text> : null}
+          {qn > 0 ? (
+            <View style={s.totalBox}>
+              <Text style={s.totalLine}>{t('sheet.total')}: {qn} × {fmt(unit, row.currency)} = {fmt(unit * qn, row.currency)}</Text>
+              {pickOff > 0 ? (
+                <Text style={s.totalAfter}>−{fmt(pickOff, row.currency)} → {fmt(Math.max(unit * qn - pickOff, 0), row.currency)}</Text>
+              ) : null}
+            </View>
+          ) : null}
           <PrimaryButton title={t('booking.confirm')} onPress={goPay} disabled={!!reason} />
         </View>
       </ScrollView>
@@ -180,27 +190,30 @@ export default function NewBooking() {
   );
 }
 
-const s = StyleSheet.create({
-  wrap: { flex: 1, backgroundColor: COLORS.background },
+const getStyles = (C: Palette) => StyleSheet.create({
+  wrap: { flex: 1, backgroundColor: C.background },
   backFab: {
     position: 'absolute', top: 54, width: 44, height: 44, borderRadius: 22,
-    backgroundColor: 'rgba(255,255,255,0.94)', borderWidth: 1, borderColor: COLORS.border,
+    backgroundColor: 'rgba(255,255,255,0.94)', borderWidth: 1, borderColor: C.border,
     alignItems: 'center', justifyContent: 'center', zIndex: 10, elevation: 4,
   },
-  hero: { width: '100%', height: 220, backgroundColor: COLORS.softGreen },
+  hero: { width: '100%', height: 220, backgroundColor: C.softGreen },
   heroShade: { position: 'absolute', left: 0, right: 0, bottom: 0, height: 100 },
-  body: { padding: 16, marginTop: -24, borderTopLeftRadius: 24, borderTopRightRadius: 24, backgroundColor: '#fff' },
-  name: { fontSize: 22, fontWeight: '800', color: COLORS.text },
-  muted: { color: COLORS.secondaryText, marginTop: 4 },
-  secLabel: { fontSize: 13, color: COLORS.secondaryText, marginBottom: 6, fontWeight: '600' },
+  body: { padding: 16, marginTop: -24, borderTopLeftRadius: 24, borderTopRightRadius: 24, backgroundColor: C.card },
+  name: { fontSize: 22, fontWeight: '800', color: C.text },
+  muted: { color: C.secondaryText, marginTop: 4 },
+  secLabel: { fontSize: 13, color: C.secondaryText, marginBottom: 6, fontWeight: '600' },
   couponRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 12 },
-  coupon: { borderWidth: 1, borderColor: COLORS.border, borderRadius: RADIUS.md, paddingHorizontal: 12, paddingVertical: 8, backgroundColor: '#fff', alignItems: 'center' },
-  couponOn: { borderColor: COLORS.primary, backgroundColor: COLORS.softGreen },
-  couponCode: { fontWeight: '800', color: COLORS.text, fontSize: 13, letterSpacing: 0.5 },
-  couponCodeOn: { color: COLORS.primaryDark },
-  couponVal: { fontWeight: '700', color: COLORS.secondaryText, fontSize: 12 },
-  couponOff: { fontSize: 15, fontWeight: '800', color: COLORS.success, marginBottom: 12 },
-  why: { backgroundColor: '#FAF0D7', borderWidth: 1, borderColor: COLORS.gold, borderRadius: RADIUS.md, padding: 12, marginBottom: 12 },
-  whyTxt: { color: COLORS.text, fontWeight: '600', fontSize: 14 },
-  err: { color: COLORS.error, marginBottom: 8 },
+  coupon: { borderWidth: 1, borderColor: C.border, borderRadius: RADIUS.md, paddingHorizontal: 12, paddingVertical: 8, backgroundColor: C.card, alignItems: 'center' },
+  couponOn: { borderColor: C.primary, backgroundColor: C.softGreen },
+  couponCode: { fontWeight: '800', color: C.text, fontSize: 13, letterSpacing: 0.5 },
+  couponCodeOn: { color: C.primaryDark },
+  couponVal: { fontWeight: '700', color: C.secondaryText, fontSize: 12 },
+  couponOff: { fontSize: 15, fontWeight: '800', color: C.success, marginBottom: 12 },
+  why: { backgroundColor: '#FAF0D7', borderWidth: 1, borderColor: C.gold, borderRadius: RADIUS.md, padding: 12, marginBottom: 12 },
+  whyTxt: { color: C.text, fontWeight: '600', fontSize: 14 },
+  err: { color: C.error, marginBottom: 8 },
+  totalBox: { backgroundColor: C.softGreen, borderRadius: RADIUS.md, padding: 12, marginBottom: 12 },
+  totalLine: { fontSize: 16, fontWeight: '800', color: C.text },
+  totalAfter: { fontSize: 15, fontWeight: '800', color: C.success, marginTop: 4 },
 });

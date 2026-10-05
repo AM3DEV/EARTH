@@ -2,13 +2,16 @@ import React from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView, FlatList, useWindowDimensions } from 'react-native';
 import { Image } from 'expo-image';
 import { useTranslation } from 'react-i18next';
-import { COLORS, RADIUS, SHADOW } from '../../constants/colors';
+import { RADIUS, SHADOW } from '../../constants/colors';
+import { useTheme, Palette } from '../../lib/theme';
 import { fallbackPhoto } from '../../constants/photos';
 import { Stars } from '../ui/Card';
 import { VerifiedBadge } from '../VerifiedBadge';
 import type { Company } from '../../types';
 
 export function CompanyCard({ item, onPress, lang }: { item: Company; onPress: () => void; lang: string }) {
+  const { colors: C } = useTheme();
+  const s = React.useMemo(() => getStyles(C), [C]);
   const { t } = useTranslation();
   const name = lang === 'ar' ? item.name_ar : item.name_en;
   const rating = (item as any).avg_rating ?? item.rating;
@@ -32,6 +35,8 @@ export function CompanyCard({ item, onPress, lang }: { item: Company; onPress: (
  * pagination dots. Used as the hero on detail pages.
  */
 export function PhotoSlider({ urls, height = 280 }: { urls?: (string | number | null)[] | null; height?: number }) {
+  const { colors: C } = useTheme();
+  const s = React.useMemo(() => getStyles(C), [C]);
   const [pg, setPg] = React.useState(0);
   const { width: W } = useWindowDimensions();
   const w = W - 32;
@@ -66,6 +71,8 @@ export function PhotoSlider({ urls, height = 280 }: { urls?: (string | number | 
 }
 
 export function GalleryStrip({ urls }: { urls?: string[] | null }) {
+  const { colors: C } = useTheme();
+  const s = React.useMemo(() => getStyles(C), [C]);
   const list = (urls ?? []).filter(Boolean);
   if (!list.length) return null;
   return (
@@ -78,6 +85,8 @@ export function GalleryStrip({ urls }: { urls?: string[] | null }) {
 }
 
 export function GenericCard({ image, title, subtitle, meta, onPress, verified }: { image?: string | null; title: string; subtitle?: string; meta?: string; onPress: () => void; verified?: boolean }) {
+  const { colors: C } = useTheme();
+  const s = React.useMemo(() => getStyles(C), [C]);
   const img = image ?? fallbackPhoto(title ?? 'place');
   return (
     <Pressable accessibilityRole="button" accessibilityLabel={title} onPress={onPress} style={s.card}>
@@ -94,17 +103,17 @@ export function GenericCard({ image, title, subtitle, meta, onPress, verified }:
   );
 }
 
-const s = StyleSheet.create({
-  card: { backgroundColor: COLORS.card, borderWidth: 1, borderColor: COLORS.border, borderRadius: RADIUS.lg, overflow: 'hidden', marginBottom: 12, ...SHADOW.card },
-  img: { width: '100%', height: 170, backgroundColor: COLORS.softGreen },
+const getStyles = (C: Palette) => StyleSheet.create({
+  card: { backgroundColor: C.card, borderWidth: 1, borderColor: C.border, borderRadius: RADIUS.lg, overflow: 'hidden', marginBottom: 12, ...SHADOW.card },
+  img: { width: '100%', height: 170, backgroundColor: C.softGreen },
   body: { padding: 12 },
   titleRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  name: { flexShrink: 1, fontSize: 16, fontWeight: '700', color: COLORS.text },
-  muted: { fontSize: 13, color: COLORS.secondaryText, marginTop: 2 },
-  loc: { fontSize: 13, color: COLORS.secondaryText, marginTop: 2 },
+  name: { flexShrink: 1, fontSize: 16, fontWeight: '700', color: C.text },
+  muted: { fontSize: 13, color: C.secondaryText, marginTop: 2 },
+  loc: { fontSize: 13, color: C.secondaryText, marginTop: 2 },
   galRow: { gap: 8, paddingVertical: 4 },
-  gal: { width: 140, height: 100, borderRadius: RADIUS.md, backgroundColor: COLORS.softGreen },
-  slideWrap: { borderRadius: RADIUS.xl, overflow: 'hidden', backgroundColor: COLORS.softGreen, ...SHADOW.card },
+  gal: { width: 140, height: 100, borderRadius: RADIUS.md, backgroundColor: C.softGreen },
+  slideWrap: { borderRadius: RADIUS.xl, overflow: 'hidden', backgroundColor: C.softGreen, ...SHADOW.card },
   slideDots: { position: 'absolute', left: 0, right: 0, bottom: 12, flexDirection: 'row', justifyContent: 'center', gap: 6 },
   dot: { width: 7, height: 7, borderRadius: 4, backgroundColor: 'rgba(255,255,255,0.6)' },
   dotOn: { backgroundColor: '#fff', width: 20 },

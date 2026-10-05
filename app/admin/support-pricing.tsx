@@ -3,7 +3,8 @@ import { View, Text, StyleSheet, FlatList, Pressable } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import MapView, { Marker } from '../../components/maps/NativeMap';
 import { supabase } from '../../lib/supabase';
-import { COLORS, RADIUS } from '../../constants/colors';
+import { RADIUS } from '../../constants/colors';
+import { useTheme, Palette } from '../../lib/theme';
 import { AdminHeader } from '../../components/admin/AdminHeader';
 import { LoadingState, EmptyState } from '../../components/ui/States';
 import { adminStatusKey } from '../../lib/status';
@@ -11,6 +12,8 @@ import { adminStatusKey } from '../../lib/status';
 /** Support Pricing dashboard: cards + source->target list + optional map (red source, green target). */
 export default function SupportPricing() {
   const { t } = useTranslation();
+  const { colors: C } = useTheme();
+  const s = React.useMemo(() => getStyles(C), [C]);
   const [rows, setRows] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [events, setEvents] = useState<any[]>([]);
@@ -86,16 +89,16 @@ export default function SupportPricing() {
     />
   );
 }
-const s = StyleSheet.create({
-  title: { fontSize: 22, fontWeight: '800', color: COLORS.text, marginBottom: 10 },
+const getStyles = (C: Palette) => StyleSheet.create({
+  title: { fontSize: 22, fontWeight: '800', color: C.text, marginBottom: 10 },
   cards: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 10 },
-  stat: { width: '48%', borderWidth: 1, borderColor: COLORS.border, borderRadius: RADIUS.lg, padding: 12 },
-  statV: { fontSize: 20, fontWeight: '800', color: COLORS.text },
-  statK: { color: COLORS.secondaryText, fontSize: 12 },
+  stat: { width: '48%', borderWidth: 1, borderColor: C.border, borderRadius: RADIUS.lg, padding: 12 },
+  statV: { fontSize: 20, fontWeight: '800', color: C.text },
+  statK: { color: C.secondaryText, fontSize: 12 },
   map: { height: 220, borderRadius: RADIUS.lg, marginBottom: 12 },
-  card: { borderWidth: 1, borderColor: COLORS.border, borderRadius: 12, padding: 12, marginBottom: 8, backgroundColor: COLORS.card },
-  name: { fontWeight: '700', color: COLORS.text },
-  muted: { color: COLORS.secondaryText, fontSize: 12, marginTop: 2 },
+  card: { borderWidth: 1, borderColor: C.border, borderRadius: 12, padding: 12, marginBottom: 8, backgroundColor: C.card },
+  name: { fontWeight: '700', color: C.text },
+  muted: { color: C.secondaryText, fontSize: 12, marginTop: 2 },
   row: { flexDirection: 'row', gap: 14, marginTop: 8 },
-  act: { color: COLORS.primaryDark, fontWeight: '700' },
+  act: { color: C.primaryDark, fontWeight: '700' },
 });

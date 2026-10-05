@@ -12,11 +12,14 @@ import { supabase } from '../../lib/supabase';
 import { Field } from '../../components/ui/Field';
 import { PrimaryButton } from '../../components/ui/Buttons';
 import { ErrorState } from '../../components/ui/States';
-import { COLORS, RADIUS } from '../../constants/colors';
+import { RADIUS } from '../../constants/colors';
+import { useTheme, Palette } from '../../lib/theme';
 import { REGISTER_BG } from '../../constants/photos';
 import { CURRENCIES } from '../../lib/currency';
 
 function KindArt({ kind }: { kind: 'citizen' | 'tourist' }) {
+  const { colors: C } = useTheme();
+  const s = React.useMemo(() => getStyles(C), [C]);
   const src = kind === 'citizen'
     ? require('../../assets/citizen.png')
     : require('../../assets/tourist.png');
@@ -31,6 +34,7 @@ function KindArt({ kind }: { kind: 'citizen' | 'tourist' }) {
  * Account is created once at the end (no orphans on abandon).
  */
 export default function Register() {
+  const { colors: C } = useTheme();
   const { t, i18n } = useTranslation();
   const rtl = i18n.language === 'ar';
   const router = useRouter();
@@ -108,6 +112,8 @@ export default function Register() {
       setBusy(false);
     }
   };
+
+  const s = React.useMemo(() => getStyles(C), [C]);
 
   return (
     <View style={s.root}>
@@ -223,8 +229,8 @@ export default function Register() {
   );
 }
 
-const s = StyleSheet.create({
-  root: { flex: 1, backgroundColor: COLORS.darkestGreen },
+const getStyles = (C: Palette) => StyleSheet.create({
+  root: { flex: 1, backgroundColor: C.darkestGreen },
   avoid: { flex: 1 },
   scroll: { flexGrow: 1, justifyContent: 'flex-end', padding: 20, paddingBottom: 28 },
   topRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 },
@@ -237,33 +243,33 @@ const s = StyleSheet.create({
   dot: { width: 26, height: 6, borderRadius: 3, backgroundColor: 'rgba(255,255,255,0.35)' },
   dotOn: { backgroundColor: '#fff' },
   card: {
-    backgroundColor: 'rgba(250,250,247,0.98)', borderRadius: 24, padding: 22,
+    backgroundColor: C.card, borderRadius: 24, padding: 22,
     shadowColor: '#000', shadowOffset: { width: 0, height: 12 }, shadowOpacity: 0.3, shadowRadius: 28, elevation: 10,
   },
-  title: { fontSize: 24, fontWeight: '800', color: COLORS.text },
-  sub: { color: COLORS.secondaryText, marginTop: 2, marginBottom: 16, fontSize: 14 },
-  switch: { marginTop: 16, color: COLORS.primaryDark, fontWeight: '700', textAlign: 'center', fontSize: 15 },
+  title: { fontSize: 24, fontWeight: '800', color: C.text },
+  sub: { color: C.secondaryText, marginTop: 2, marginBottom: 16, fontSize: 14 },
+  switch: { marginTop: 16, color: C.primaryDark, fontWeight: '700', textAlign: 'center', fontSize: 15 },
   photoCenter: { alignItems: 'center', marginBottom: 14 },
-  photoBig: { width: 110, height: 110, borderRadius: 55, backgroundColor: COLORS.softGreen },
-  photoEmpty: { alignItems: 'center', justifyContent: 'center', borderWidth: 1.5, borderColor: COLORS.primary, borderStyle: 'dashed' },
-  plusTxt: { fontSize: 42, fontWeight: '700', color: COLORS.primaryDark },
+  photoBig: { width: 110, height: 110, borderRadius: 55, backgroundColor: C.softGreen },
+  photoEmpty: { alignItems: 'center', justifyContent: 'center', borderWidth: 1.5, borderColor: C.primary, borderStyle: 'dashed' },
+  plusTxt: { fontSize: 42, fontWeight: '700', color: C.primaryDark },
   xBadge: {
     position: 'absolute', top: -2, right: -2, width: 32, height: 32, borderRadius: 16,
-    backgroundColor: COLORS.error, alignItems: 'center', justifyContent: 'center',
+    backgroundColor: C.error, alignItems: 'center', justifyContent: 'center',
     borderWidth: 2, borderColor: '#fff',
   },
   xTxt: { color: '#fff', fontSize: 17, fontWeight: '800', lineHeight: 20 },
   kind: {
-    flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: '#fff',
-    borderWidth: 1.5, borderColor: COLORS.border, borderRadius: RADIUS.lg, padding: 16, marginBottom: 10,
+    flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: C.card,
+    borderWidth: 1.5, borderColor: C.border, borderRadius: RADIUS.lg, padding: 16, marginBottom: 10,
   },
-  kindOn: { borderColor: COLORS.primary, backgroundColor: COLORS.softGreen },
+  kindOn: { borderColor: C.primary, backgroundColor: C.softGreen },
   kindImg: { width: 56, height: 56, borderRadius: 28 },
   curRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 12 },
-  cur: { borderWidth: 1, borderColor: COLORS.border, borderRadius: RADIUS.full, paddingHorizontal: 14, minHeight: 42, alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff' },
-  curOn: { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
-  curTxt: { fontWeight: '800', color: COLORS.text, fontSize: 14 },
+  cur: { borderWidth: 1, borderColor: C.border, borderRadius: RADIUS.full, paddingHorizontal: 14, minHeight: 42, alignItems: 'center', justifyContent: 'center', backgroundColor: C.card },
+  curOn: { backgroundColor: C.primary, borderColor: C.primary },
+  curTxt: { fontWeight: '800', color: C.text, fontSize: 14 },
   curTxtOn: { color: '#fff' },
-  kindTxt: { flex: 1, fontSize: 17, fontWeight: '800', color: COLORS.text },
-  kindCheck: { color: COLORS.primaryDark, fontWeight: '800', fontSize: 20 },
+  kindTxt: { flex: 1, fontSize: 17, fontWeight: '800', color: C.text },
+  kindCheck: { color: C.primaryDark, fontWeight: '800', fontSize: 20 },
 });

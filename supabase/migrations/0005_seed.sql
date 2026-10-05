@@ -13,14 +13,14 @@ on conflict do nothing;
 
 -- Monuments (demo, price NULL)
 insert into monuments (name_en, name_ar, description_en, description_ar, location, lat, lng, price, opening_hours) values
-  ('Petra','البترا','[DEMO] Ancient Nabataean city, UNESCO site.','[DEMO] مدينة نبطية أثرية.','Ma''an',30.3285,35.4444,NULL,'06:00-18:00'),
-  ('Wadi Rum','وادي رم','[DEMO] Desert valley with dramatic sandstone.','[DEMO] وادي صحراوي ساحر.','Aqaba',29.5321,35.4194,NULL,NULL),
-  ('Jerash','جرش','[DEMO] Roman ruins, among best preserved.','[DEMO] آثار رومانية محفوظة.','Jerash',32.2723,35.8912,NULL,'08:00-19:00'),
-  ('Amman Citadel','قلعة عمان','[DEMO] Historic hilltop citadel.','[DEMO] قلعة تاريخية وسط عمان.','Amman',31.9539,35.9344,NULL,'08:00-19:00'),
-  ('Roman Theatre','المدرج الروماني','[DEMO] 2nd-century theatre downtown.','[DEMO] مسرح روماني وسط البلد.','Amman',31.9514,35.9393,NULL,'08:00-19:00'),
-  ('Dead Sea','البحر الميت','[DEMO] Lowest point on earth.','[DEMO] أخفض نقطة على الأرض.','Madaba',31.4979,35.5484,NULL,NULL),
-  ('Aqaba','العقبة','[DEMO] Red Sea resort city.','[DEMO] مدينة ساحلية على البحر الأحمر.','Aqaba',29.5321,35.0067,NULL,NULL),
-  ('Ajloun Castle','قلعة عجلون','[DEMO] 12th-century hilltop castle.','[DEMO] قلعة من القرن الثاني عشر.','Ajloun',32.3258,35.7269,NULL,'08:00-19:00')
+  ('Petra','البترا','Ancient Nabataean city, UNESCO site.','مدينة نبطية أثرية.','Ma''an',30.3285,35.4444,NULL,'06:00-18:00'),
+  ('Wadi Rum','وادي رم','Desert valley with dramatic sandstone.','وادي صحراوي ساحر.','Aqaba',29.5321,35.4194,NULL,NULL),
+  ('Jerash','جرش','Roman ruins, among best preserved.','آثار رومانية محفوظة.','Jerash',32.2723,35.8912,NULL,'08:00-19:00'),
+  ('Amman Citadel','قلعة عمان','Historic hilltop citadel.','قلعة تاريخية وسط عمان.','Amman',31.9539,35.9344,NULL,'08:00-19:00'),
+  ('Roman Theatre','المدرج الروماني','2nd-century theatre downtown.','مسرح روماني وسط البلد.','Amman',31.9514,35.9393,NULL,'08:00-19:00'),
+  ('Dead Sea','البحر الميت','Lowest point on earth.','أخفض نقطة على الأرض.','Madaba',31.4979,35.5484,NULL,NULL),
+  ('Aqaba','العقبة','Red Sea resort city.','مدينة ساحلية على البحر الأحمر.','Aqaba',29.5321,35.0067,NULL,NULL),
+  ('Ajloun Castle','قلعة عجلون','12th-century hilltop castle.','قلعة من القرن الثاني عشر.','Ajloun',32.3258,35.7269,NULL,'08:00-19:00')
 on conflict do nothing;
 
 -- Demo companies (searchable on map; lat/lng set)

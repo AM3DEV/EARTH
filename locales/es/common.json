@@ -51,7 +51,8 @@
     "map": "Mapa",
     "monument": "Monumentos",
     "erth": "Erth",
-    "profile": "Perfil"
+    "profile": "Perfil",
+    "activities": "Actividades"
   },
   "map": {
     "searchPlaceholder": "Buscar negocios...",
@@ -71,7 +72,16 @@
     "title": "Explorar",
     "categories": "Categorías",
     "all": "Todo",
-    "nearEvent": "Cercano"
+    "nearEvent": "Cercano",
+    "heroTitle": "Actividades",
+    "heroSub": "Descubre experiencias increíbles y haz tu viaje inolvidable",
+    "searchPh": "Buscar actividades, lugares o experiencias...",
+    "emptyTitle": "Sin actividades",
+    "emptyDesc": "Prueba otra categoría u otro lugar.",
+    "clearFilters": "Borrar filtros",
+    "loadFail": "No se pudieron cargar las actividades. Revisa tu conexión.",
+    "chooseGov": "Elige tu gobernación",
+    "detectFail": "No se pudo detectar — elige:"
   },
   "detail": {
     "description": "Descripción",
@@ -89,7 +99,12 @@
     "website": "Web",
     "book": "Reservar",
     "services": "Servicios",
-    "noServices": "Sin servicios todavía."
+    "noServices": "Sin servicios todavía.",
+    "branches": "Sucursales",
+    "addBranch": "Añadir filial",
+    "partOf": "Parte de",
+    "tourist": "Turista",
+    "citizen": "Ciudadano"
   },
   "booking": {
     "title": "Reservar servicio",
@@ -162,7 +177,11 @@
     "settings": "Ajustes",
     "logout": "Salir",
     "language": "Idioma",
-    "rtlHint": "El diseño RTL se aplica solo al árabe."
+    "rtlHint": "El diseño RTL se aplica solo al árabe.",
+    "title": "Perfil",
+    "tagline": "Tu viaje por Jordania empieza aquí",
+    "nextReward": "Próxima recompensa: {{count}}",
+    "loadFail": "No se pudo cargar tu perfil."
   },
   "settings": {
     "title": "Ajustes",
@@ -172,7 +191,10 @@
     "notifications": "Notificaciones",
     "aboutBody": "Jordan Tourism Guide es una plataforma moderna para descubrir Jordania — monumentos, eventos, empresas y servicios reservables con precios de servidor transparentes y descuentos de apoyo.",
     "privacyBody": "Guardamos tu perfil, favoritos, reservas y notificaciones con seguridad (Supabase RLS). Nunca exponemos secretos ni correos.",
-    "termsBody": "Las reservas requieren confirmación del servidor. Los precios pueden variar con la demanda. Las promociones dan visibilidad, nunca posiciones garantizadas."
+    "termsBody": "Las reservas requieren confirmación del servidor. Los precios pueden variar con la demanda. Las promociones dan visibilidad, nunca posiciones garantizadas.",
+    "theme": "Apariencia",
+    "light": "Claro",
+    "dark": "Oscuro"
   },
   "common": {
     "loading": "Cargando…",
@@ -444,6 +466,39 @@
     "sameAsTourist": "Mismo precio turista",
     "custom": "Personalizado…",
     "pickPrice": "Elige precio",
-    "pickCurrency": "Elige moneda"
+    "pickCurrency": "Elige moneda",
+    "governorate": "Gobernación"
+  },
+  "menu": {
+    "editSub": "Actualiza tus datos",
+    "scanSub": "Escanea y gana",
+    "loyalSub": "Tus puntos y recompensas",
+    "storeSub": "Artículos exclusivos",
+    "transSub": "Tu historial",
+    "bookSub": "Gestiona tus reservas",
+    "favSub": "Tus lugares guardados",
+    "notifSub": "Gestiona notificaciones",
+    "setSub": "Preferencias y más",
+    "langSub": "Cambiar idioma"
+  },
+  "gov": {
+    "amman": "Amman",
+    "balqa": "Balqa",
+    "zarqa": "Zarqa",
+    "madaba": "Madaba",
+    "karak": "Karak",
+    "jerash": "Jerash",
+    "ajloun": "Ajloun",
+    "mafraq": "Mafraq",
+    "irbid": "Irbid",
+    "aqaba": "Aqaba",
+    "maan": "Ma'an",
+    "tafilah": "Tafilah"
+  },
+  "sheet": {
+    "title": "Reserva tu experiencia",
+    "date": "Elige la fecha",
+    "people": "personas",
+    "total": "Total"
   }
 }

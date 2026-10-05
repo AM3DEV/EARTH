@@ -5,17 +5,22 @@ import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { COLORS, RADIUS } from '../../constants/colors';
+import { RADIUS } from '../../constants/colors';
+import { useTheme, Palette } from '../../lib/theme';
 import { pickImage, uploadImage } from '../../lib/storage';
 import { getMyRole } from '../../lib/auth';
 import i18n from '../../lib/i18n';
 import { PrimaryButton } from '../ui/Buttons';
 
 export function SectionTitle({ children }: { children: React.ReactNode }) {
+  const { colors: C } = useTheme();
+  const s = React.useMemo(() => getStylesFields(C), [C]);
   return <Text style={s.h}>{children}</Text>;
 }
 
 export function ToggleRow({ label, value, onChange }: { label: string; value: boolean; onChange: (v: boolean) => void }) {
+  const { colors: C } = useTheme();
+  const s = React.useMemo(() => getStylesFields(C), [C]);
   return (
     <View style={s.row}>
       <Text style={s.rowT}>{label}</Text>
@@ -30,6 +35,8 @@ export interface Opt { id: string; label: string; sub?: string }
 export function OptionsPicker({ label, value, options, onChange, placeholder }: {
   label: string; value?: string | null; options: Opt[]; onChange: (id: string | null) => void; placeholder?: string;
 }) {
+  const { colors: C } = useTheme();
+  const s = React.useMemo(() => getStylesFields(C), [C]);
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const selected = options.find((o) => o.id === value);
@@ -91,6 +98,8 @@ export function ImageField({ label, bucket, value, onChange }: {
   label: string; bucket: 'avatar' | 'monument' | 'event' | 'company' | 'service' | 'category';
   value?: string | null; onChange: (url: string | null) => void;
 }) {
+  const { colors: C } = useTheme();
+  const s = React.useMemo(() => getStylesFields(C), [C]);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
@@ -116,7 +125,7 @@ export function ImageField({ label, bucket, value, onChange }: {
         )}
         <View style={s.imgBtns}>
           <Pressable onPress={pick} disabled={busy} style={s.imgBtn} accessibilityRole="button" accessibilityLabel={`${i18n.t('form.pick')} ${label}`}>
-            {busy ? <ActivityIndicator size="small" color={COLORS.primary} /> : <Text style={s.imgBtnTxt}>{value ? i18n.t('form.change') : i18n.t('form.upload')}</Text>}
+            {busy ? <ActivityIndicator size="small" color={C.primary} /> : <Text style={s.imgBtnTxt}>{value ? i18n.t('form.change') : i18n.t('form.upload')}</Text>}
           </Pressable>
           {value ? (
             <Pressable onPress={() => onChange(null)} style={s.imgBtnGhost}><Text style={s.imgBtnGhostTxt}>{i18n.t('form.remove')}</Text></Pressable>
@@ -133,6 +142,8 @@ export function ImageGalleryField({ label, bucket, value, onChange, max = 8 }: {
   label: string; bucket: 'avatar' | 'monument' | 'event' | 'company' | 'service' | 'category';
   value?: string[] | null; onChange: (urls: string[]) => void; max?: number;
 }) {
+  const { colors: C } = useTheme();
+  const s = React.useMemo(() => getStylesFields(C), [C]);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const urls = value ?? [];
@@ -172,7 +183,7 @@ export function ImageGalleryField({ label, bucket, value, onChange, max = 8 }: {
         ))}
         {urls.length < max ? (
           <Pressable onPress={add} disabled={busy} style={[s.thumb, s.thumbEmpty]} accessibilityRole="button" accessibilityLabel={i18n.t('form.upload')}>
-            {busy ? <ActivityIndicator size="small" color={COLORS.primary} /> : <Text style={s.galPlus}>＋</Text>}
+            {busy ? <ActivityIndicator size="small" color={C.primary} /> : <Text style={s.galPlus}>＋</Text>}
           </Pressable>
         ) : null}
       </ScrollView>
@@ -214,6 +225,8 @@ export function friendlyDbError(e: any): string {
 
 /** Blocks non-admins from create/edit forms with a clear message instead of an RLS failure. */
 export function AdminGate({ children }: { children: React.ReactNode }) {
+  const { colors: C } = useTheme();
+  const s = React.useMemo(() => getStylesFields(C), [C]);
   const { t } = useTranslation();
   const router = useRouter();
   const [role, setRole] = useState<string | null>(null);
@@ -223,7 +236,7 @@ export function AdminGate({ children }: { children: React.ReactNode }) {
   if (role === null) {
     return (
       <View style={s.gate}>
-        <ActivityIndicator size="large" color={COLORS.primary} />
+        <ActivityIndicator size="large" color={C.primary} />
       </View>
     );
   }
@@ -240,46 +253,46 @@ export function AdminGate({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-const s = StyleSheet.create({
-  h: { fontSize: 18, fontWeight: '800', color: COLORS.text, marginTop: 18, marginBottom: 8 },
-  row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 10, borderBottomWidth: 1, borderColor: COLORS.border },
-  rowT: { fontWeight: '600', color: COLORS.text },
+const getStylesFields = (C: Palette) => StyleSheet.create({
+  h: { fontSize: 18, fontWeight: '800', color: C.text, marginTop: 18, marginBottom: 8 },
+  row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 10, borderBottomWidth: 1, borderColor: C.border },
+  rowT: { fontWeight: '600', color: C.text },
   field: { marginBottom: 12 },
-  label: { fontSize: 13, color: COLORS.secondaryText, marginBottom: 6, fontWeight: '600' },
-  select: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderWidth: 1, borderColor: COLORS.border, borderRadius: RADIUS.md, minHeight: 48, paddingHorizontal: 14, backgroundColor: '#fff' },
-  selectTxt: { fontSize: 16, color: COLORS.text, flex: 1 },
-  placeholder: { color: COLORS.secondaryText },
-  chev: { color: COLORS.secondaryText, fontSize: 20, transform: [{ rotate: '90deg' }] },
+  label: { fontSize: 13, color: C.secondaryText, marginBottom: 6, fontWeight: '600' },
+  select: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderWidth: 1, borderColor: C.border, borderRadius: RADIUS.md, minHeight: 48, paddingHorizontal: 14, backgroundColor: C.card },
+  selectTxt: { fontSize: 16, color: C.text, flex: 1 },
+  placeholder: { color: C.secondaryText },
+  chev: { color: C.secondaryText, fontSize: 20, transform: [{ rotate: '90deg' }] },
   overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.35)', justifyContent: 'flex-end' },
-  sheet: { backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '70%', paddingBottom: 24 },
-  sheetHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderColor: COLORS.border },
-  sheetTitle: { fontSize: 17, fontWeight: '800', color: COLORS.text },
+  sheet: { backgroundColor: C.card, borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '70%', paddingBottom: 24 },
+  sheetHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderColor: C.border },
+  sheetTitle: { fontSize: 17, fontWeight: '800', color: C.text },
   closeBtn: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
-  closeTxt: { fontSize: 18, color: COLORS.secondaryText },
-  opt: { paddingHorizontal: 16, paddingVertical: 13, borderBottomWidth: 1, borderColor: COLORS.border },
-  optActive: { backgroundColor: COLORS.softGreen },
-  optTxt: { fontSize: 15, color: COLORS.text, fontWeight: '600' },
-  optTxtActive: { color: COLORS.primaryDark },
-  optSub: { fontSize: 12, color: COLORS.secondaryText, marginTop: 2 },
+  closeTxt: { fontSize: 18, color: C.secondaryText },
+  opt: { paddingHorizontal: 16, paddingVertical: 13, borderBottomWidth: 1, borderColor: C.border },
+  optActive: { backgroundColor: C.softGreen },
+  optTxt: { fontSize: 15, color: C.text, fontWeight: '600' },
+  optTxtActive: { color: C.primaryDark },
+  optSub: { fontSize: 12, color: C.secondaryText, marginTop: 2 },
   imgRow: { flexDirection: 'row', gap: 12, alignItems: 'center' },
-  thumb: { width: 84, height: 84, borderRadius: 12, backgroundColor: '#eee', borderWidth: 1, borderColor: COLORS.border },
+  thumb: { width: 84, height: 84, borderRadius: 12, backgroundColor: '#eee', borderWidth: 1, borderColor: C.border },
   thumbEmpty: { alignItems: 'center', justifyContent: 'center' },
-  thumbTxt: { color: COLORS.secondaryText, fontSize: 12 },
+  thumbTxt: { color: C.secondaryText, fontSize: 12 },
   imgBtns: { flex: 1, gap: 6 },
-  imgBtn: { borderWidth: 1, borderColor: COLORS.primary, borderRadius: RADIUS.md, minHeight: 44, alignItems: 'center', justifyContent: 'center' },
-  imgBtnTxt: { color: COLORS.primaryDark, fontWeight: '700' },
+  imgBtn: { borderWidth: 1, borderColor: C.primary, borderRadius: RADIUS.md, minHeight: 44, alignItems: 'center', justifyContent: 'center' },
+  imgBtnTxt: { color: C.primaryDark, fontWeight: '700' },
   imgBtnGhost: { minHeight: 40, alignItems: 'center', justifyContent: 'center' },
-  imgBtnGhostTxt: { color: COLORS.error, fontWeight: '600' },
+  imgBtnGhostTxt: { color: C.error, fontWeight: '600' },
   galRow: { gap: 8, paddingVertical: 2, alignItems: 'center' },
   galWrap: { position: 'relative' },
   galX: {
     position: 'absolute', top: -8, right: -8, width: 26, height: 26, borderRadius: 13,
-    backgroundColor: COLORS.error, alignItems: 'center', justifyContent: 'center',
+    backgroundColor: C.error, alignItems: 'center', justifyContent: 'center',
   },
   galXTxt: { color: '#fff', fontSize: 12, fontWeight: '800' },
-  galPlus: { color: COLORS.primaryDark, fontSize: 26, fontWeight: '700' },
-  err: { color: COLORS.error, marginTop: 6, fontSize: 13 },
-  gate: { flex: 1, backgroundColor: '#fff', padding: 24, justifyContent: 'center' },
-  gateTitle: { fontSize: 20, fontWeight: '800', color: COLORS.text, textAlign: 'center' },
-  gateTxt: { color: COLORS.secondaryText, textAlign: 'center', marginTop: 8 },
+  galPlus: { color: C.primaryDark, fontSize: 26, fontWeight: '700' },
+  err: { color: C.error, marginTop: 6, fontSize: 13 },
+  gate: { flex: 1, backgroundColor: C.background, padding: 24, justifyContent: 'center' },
+  gateTitle: { fontSize: 20, fontWeight: '800', color: C.text, textAlign: 'center' },
+  gateTxt: { color: C.secondaryText, textAlign: 'center', marginTop: 8 },
 });

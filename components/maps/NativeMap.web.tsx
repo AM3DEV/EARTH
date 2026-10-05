@@ -1,5 +1,6 @@
 import React, { useEffect, useImperativeHandle, useRef, useState, forwardRef } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { useTheme } from '../../lib/theme';
 
 type AnyProps = { style?: any; children?: React.ReactNode; [key: string]: any };
 
@@ -29,14 +30,19 @@ const WebMapInner = forwardRef<any, AnyProps>(function WebMapInner({ style, ...r
   );
 
   if (!ClientMap) {
-    return (
-      <View style={[style, s.ph]}>
-        <Text style={s.t}>Loading map…</Text>
-      </View>
-    );
+    return <MapPlaceholder style={style} />;
   }
   return <ClientMap {...rest} style={style} ref={innerRef} />;
 });
+
+function MapPlaceholder({ style }: { style?: any }) {
+  const { colors: C } = useTheme();
+  return (
+    <View style={[style, s.ph, { backgroundColor: C.softGreen }]}>
+      <Text style={[s.t, { color: C.secondaryText }]}>Loading map…</Text>
+    </View>
+  );
+}
 
 export default WebMapInner;
 

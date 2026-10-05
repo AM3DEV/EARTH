@@ -51,7 +51,8 @@
     "map": "Harita",
     "monument": "Anıtlar",
     "erth": "Erth",
-    "profile": "Profil"
+    "profile": "Profil",
+    "activities": "Aktiviteler"
   },
   "map": {
     "searchPlaceholder": "İşletme ara...",
@@ -71,7 +72,16 @@
     "title": "Keşfet",
     "categories": "Kategoriler",
     "all": "Tümü",
-    "nearEvent": "Yakınında"
+    "nearEvent": "Yakınında",
+    "heroTitle": "Aktiviteler",
+    "heroSub": "Harika deneyimler keşfet, gezini unutulmaz kıl",
+    "searchPh": "Aktivite, yer veya deneyim ara...",
+    "emptyTitle": "Aktivite bulunamadı",
+    "emptyDesc": "Başka kategori veya yer dene.",
+    "clearFilters": "Filtreleri temizle",
+    "loadFail": "Aktiviteler yüklenemedi. Bağlantını kontrol et.",
+    "chooseGov": "İlini seç",
+    "detectFail": "Tespit edilemedi — seç:"
   },
   "detail": {
     "description": "Açıklama",
@@ -89,7 +99,12 @@
     "website": "Web sitesi",
     "book": "Hemen Rezervasyon",
     "services": "Hizmetler",
-    "noServices": "Henüz hizmet yok."
+    "noServices": "Henüz hizmet yok.",
+    "branches": "Şubeler",
+    "addBranch": "Alt şirket ekle",
+    "partOf": "Parçası",
+    "tourist": "Turist",
+    "citizen": "Vatandaş"
   },
   "booking": {
     "title": "Hizmet rezervasyonu",
@@ -162,7 +177,11 @@
     "settings": "Ayarlar",
     "logout": "Çıkış",
     "language": "Dil",
-    "rtlHint": "RTL düzeni yalnızca Arapça için uygulanır."
+    "rtlHint": "RTL düzeni yalnızca Arapça için uygulanır.",
+    "title": "Profil",
+    "tagline": "Ürdün yolculuğun burada başlıyor",
+    "nextReward": "Sonraki ödül: {{count}}",
+    "loadFail": "Profil yüklenemedi."
   },
   "settings": {
     "title": "Ayarlar",
@@ -172,7 +191,10 @@
     "notifications": "Bildirimler",
     "aboutBody": "Jordan Tourism Guide, Ürdün'ü keşfetmek için modern bir platformdur: anıtlar, etkinlikler, şirketler ve şeffaf sunucu fiyatlarıyla rezerve edilebilir hizmetler.",
     "privacyBody": "Profil, favoriler, rezervasyonlar ve bildirimler güvenle saklanır (Supabase RLS). Sırlar ve e-postalar paylaşılmaz.",
-    "termsBody": "Rezervasyonlar sunucu onayı gerektirir. Fiyatlar talebe göre değişir. Promosyonlar görünürlük verir, garanti vermez."
+    "termsBody": "Rezervasyonlar sunucu onayı gerektirir. Fiyatlar talebe göre değişir. Promosyonlar görünürlük verir, garanti vermez.",
+    "theme": "Görünüm",
+    "light": "Açık",
+    "dark": "Koyu"
   },
   "common": {
     "loading": "Yükleniyor…",
@@ -444,6 +466,39 @@
     "sameAsTourist": "Aynı turist fiyatı",
     "custom": "Özel…",
     "pickPrice": "Fiyat seç",
-    "pickCurrency": "Para birimi seç"
+    "pickCurrency": "Para birimi seç",
+    "governorate": "İl"
+  },
+  "menu": {
+    "editSub": "Bilgilerini güncelle",
+    "scanSub": "Tara ve kazan",
+    "loyalSub": "Puanların ve ödüllerin",
+    "storeSub": "Özel ürünler",
+    "transSub": "İşlem geçmişin",
+    "bookSub": "Rezervasyonlarını yönet",
+    "favSub": "Kaydedilen yerlerin",
+    "notifSub": "Bildirimleri yönet",
+    "setSub": "Tercihler ve daha fazlası",
+    "langSub": "Dili değiştir"
+  },
+  "gov": {
+    "amman": "Amman",
+    "balqa": "Balqa",
+    "zarqa": "Zarqa",
+    "madaba": "Madaba",
+    "karak": "Karak",
+    "jerash": "Jerash",
+    "ajloun": "Ajloun",
+    "mafraq": "Mafraq",
+    "irbid": "Irbid",
+    "aqaba": "Aqaba",
+    "maan": "Ma'an",
+    "tafilah": "Tafilah"
+  },
+  "sheet": {
+    "title": "Deneyimini ayırt",
+    "date": "Tarih seç",
+    "people": "kişi",
+    "total": "Toplam"
   }
 }

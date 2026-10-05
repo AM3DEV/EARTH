@@ -186,7 +186,7 @@ create table if not exists pricing_rules (
   service_id uuid not null unique references services(id) on delete cascade,
   enabled boolean not null default true,
   max_increase_percentage numeric(5,2) not null default 20 check (max_increase_percentage >= 0),
-  booking_thresholds jsonb not null default '[{"min":0,"max":100,"increase":0},{"min":101,"max":106,"increase":3},{"min":107,"max":110,"increase":10},{"min":111,"max":115,"increase":15},{"min":116,"max":9999,"increase":20}]'::jsonb,
+  booking_thresholds jsonb not null default '[{"min":0,"max":49,"increase":0},{"min":50,"max":69,"increase":5},{"min":70,"max":84,"increase":10},{"min":85,"max":109,"increase":15},{"min":110,"max":99999,"increase":20}]'::jsonb,
   support_discount_enabled boolean not null default true,
   maximum_support_discount_percentage numeric(5,2) not null default 30,
   maximum_support_radius_km numeric(8,2) not null default 25,

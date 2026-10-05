@@ -4,7 +4,8 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, ArrowRight } from 'lucide-react-native';
 import { supabase } from '../../lib/supabase';
-import { COLORS, RADIUS } from '../../constants/colors';
+import { RADIUS } from '../../constants/colors';
+import { useTheme, Palette } from '../../lib/theme';
 import { fallbackPhoto } from '../../constants/photos';
 import { LoadingState, ErrorState } from '../../components/ui/States';
 import { PriceBreakdown } from '../../components/booking/PriceBreakdown';
@@ -14,6 +15,7 @@ import { ReviewsSection } from '../../components/reviews/ReviewsSection';
 import { PrimaryButton } from '../../components/ui/Buttons';
 
 export default function ServiceDetail() {
+  const { colors: C } = useTheme();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
@@ -39,6 +41,7 @@ export default function ServiceDetail() {
   };
   useEffect(() => { load(); }, [id]);
 
+  const s = React.useMemo(() => getStyles(C), [C]);
   if (loading) return <LoadingState />;
   if (!row) return <ErrorState message={t('common.error')} onRetry={() => router.back()} />;
 
@@ -52,7 +55,7 @@ export default function ServiceDetail() {
         accessibilityRole="button"
         accessibilityLabel={t('common.back')}
       >
-        {rtl ? <ArrowRight color={COLORS.text} size={20} /> : <ArrowLeft color={COLORS.text} size={20} />}
+        {rtl ? <ArrowRight color={C.text} size={20} /> : <ArrowLeft color={C.text} size={20} />}
       </Pressable>
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingTop: 110, paddingBottom: 40 }}>
         <View style={{ paddingHorizontal: 16 }}>
@@ -72,14 +75,14 @@ export default function ServiceDetail() {
     </View>
   );
 }
-const s = StyleSheet.create({
-  wrap: { flex: 1, backgroundColor: COLORS.background },
+const getStyles = (C: Palette) => StyleSheet.create({
+  wrap: { flex: 1, backgroundColor: C.background },
   backFab: {
     position: 'absolute', top: 54, width: 44, height: 44, borderRadius: 22,
-    backgroundColor: 'rgba(255,255,255,0.94)', borderWidth: 1, borderColor: COLORS.border,
+    backgroundColor: 'rgba(255,255,255,0.94)', borderWidth: 1, borderColor: C.border,
     alignItems: 'center', justifyContent: 'center', zIndex: 10, elevation: 4,
   },
   body: { padding: 16 },
-  name: { fontSize: 22, fontWeight: '800', color: COLORS.text },
-  muted: { color: COLORS.secondaryText, marginTop: 4 },
+  name: { fontSize: 22, fontWeight: '800', color: C.text },
+  muted: { color: C.secondaryText, marginTop: 4 },
 });

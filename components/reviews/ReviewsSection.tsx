@@ -3,7 +3,8 @@ import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { Image } from 'expo-image';
 import { useTranslation } from 'react-i18next';
 import { useReviews } from '../../hooks/useFavorites';
-import { COLORS, RADIUS, SHADOW } from '../../constants/colors';
+import { RADIUS, SHADOW } from '../../constants/colors';
+import { useTheme, Palette } from '../../lib/theme';
 import { Stars } from '../ui/Card';
 import { Field } from '../ui/Field';
 import { PrimaryButton } from '../ui/Buttons';
@@ -14,6 +15,8 @@ import { PrimaryButton } from '../ui/Buttons';
  * monument, event, company and service pages.
  */
 export function ReviewsSection({ targetType, targetId }: { targetType: string; targetId: string }) {
+  const { colors: C } = useTheme();
+  const s = React.useMemo(() => getStyles(C), [C]);
   const { t } = useTranslation();
   const { rows: reviews, add } = useReviews(targetType, targetId);
   const [comment, setComment] = useState('');
@@ -96,24 +99,24 @@ export function ReviewsSection({ targetType, targetId }: { targetType: string; t
   );
 }
 
-const s = StyleSheet.create({
-  secTitle: { fontSize: 18, fontWeight: '800', color: COLORS.text, marginTop: 20, marginBottom: 8 },
+const getStyles = (C: Palette) => StyleSheet.create({
+  secTitle: { fontSize: 18, fontWeight: '800', color: C.text, marginTop: 20, marginBottom: 8 },
   rev: {
-    backgroundColor: COLORS.card, borderWidth: 1, borderColor: COLORS.border,
+    backgroundColor: C.card, borderWidth: 1, borderColor: C.border,
     borderRadius: RADIUS.md, padding: 12, marginBottom: 8, ...SHADOW.card,
   },
   revHead: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  revAv: { width: 40, height: 40, borderRadius: 20, backgroundColor: COLORS.softGreen },
+  revAv: { width: 40, height: 40, borderRadius: 20, backgroundColor: C.softGreen },
   revAvF: { alignItems: 'center', justifyContent: 'center' },
-  revAvT: { fontWeight: '800', color: COLORS.primaryDark, fontSize: 16 },
-  revName: { fontWeight: '700', color: COLORS.text, fontSize: 14 },
-  revDate: { color: COLORS.muted, fontSize: 11 },
-  revTxt: { marginTop: 8, color: COLORS.text, fontSize: 14, lineHeight: 20 },
+  revAvT: { fontWeight: '800', color: C.primaryDark, fontSize: 16 },
+  revName: { fontWeight: '700', color: C.text, fontSize: 14 },
+  revDate: { color: C.muted, fontSize: 11 },
+  revTxt: { marginTop: 8, color: C.text, fontSize: 14, lineHeight: 20 },
   addRev: { marginTop: 12 },
-  writeTitle: { fontSize: 16, fontWeight: '800', color: COLORS.text, marginBottom: 6 },
+  writeTitle: { fontSize: 16, fontWeight: '800', color: C.text, marginBottom: 6 },
   stars: { flexDirection: 'row', gap: 4, marginBottom: 10 },
   starBtn: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
-  star: { fontSize: 30, color: COLORS.border },
-  starOn: { color: COLORS.gold },
-  err: { color: COLORS.error, marginBottom: 8 },
+  star: { fontSize: 30, color: C.border },
+  starOn: { color: C.gold },
+  err: { color: C.error, marginBottom: 8 },
 });

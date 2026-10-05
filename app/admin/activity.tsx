@@ -4,7 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { useFocusEffect } from 'expo-router';
 import { supabase } from '../../lib/supabase';
 import { getMyRole } from '../../lib/auth';
-import { COLORS, RADIUS, SHADOW } from '../../constants/colors';
+import { RADIUS, SHADOW } from '../../constants/colors';
+import { useTheme, Palette } from '../../lib/theme';
 import { AdminHeader } from '../../components/admin/AdminHeader';
 import { LoadingState, EmptyState, ErrorState } from '../../components/ui/States';
 import { friendlyDbError } from '../../components/admin/fields';
@@ -13,6 +14,8 @@ import { logActionLabel, targetKindLabel } from '../../lib/status';
 /** Activity timeline: every admin create/update/delete/activate + server booking & promotion events. Normal admin sees own logs; boss sees all (RLS). */
 export default function ActivityLogs() {
   const { t } = useTranslation();
+  const { colors: C } = useTheme();
+  const s = React.useMemo(() => getStyles(C), [C]);
   const [rows, setRows] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -59,12 +62,12 @@ export default function ActivityLogs() {
   );
 }
 
-function dotColor(action: string): string {
+function dotColor(action: string, C: Palette): string {
   const a = String(action ?? '').toLowerCase();
-  if (a.includes('delete') || a.includes('reject') || a.includes('cancel')) return COLORS.error;
-  if (a.includes('create') || a.includes('activate') || a.includes('confirm') || a.includes('approv')) return COLORS.success;
-  if (a.includes('update') || a.includes('deactivate') || a.includes('pending') || a.includes('schedul')) return COLORS.gold;
-  return COLORS.primary;
+  if (a.includes('delete') || a.includes('reject') || a.includes('cancel')) return C.error;
+  if (a.includes('create') || a.includes('activate') || a.includes('confirm') || a.includes('approv')) return C.success;
+  if (a.includes('update') || a.includes('deactivate') || a.includes('pending') || a.includes('schedul')) return C.gold;
+  return C.primary;
 }
 
 function fmtDate(iso: string): string {
@@ -77,12 +80,14 @@ function fmtDate(iso: string): string {
 
 function LogRow({ item }: { item: any }) {
   const { t } = useTranslation();
+  const { colors: C } = useTheme();
+  const s = React.useMemo(() => getStyles(C), [C]);
   const when = fmtDate(item.created_at);
   const entity = [targetKindLabel(item.entity_type, t), item.entity_name].filter(Boolean).join(' · ');
   return (
     <View style={s.row}>
       <View style={s.rail}>
-        <View style={[s.dot, { backgroundColor: dotColor(item.action) }]} />
+        <View style={[s.dot, { backgroundColor: dotColor(item.action, C) }]} />
         <View style={s.line} />
       </View>
       <View style={s.card}>
@@ -95,18 +100,18 @@ function LogRow({ item }: { item: any }) {
   );
 }
 
-const s = StyleSheet.create({
-  wrap: { flex: 1, backgroundColor: COLORS.background, paddingTop: 60 },
+const getStyles = (C: Palette) => StyleSheet.create({
+  wrap: { flex: 1, backgroundColor: C.background, paddingTop: 60 },
   row: { flexDirection: 'row', gap: 10 },
   rail: { alignItems: 'center', paddingTop: 16 },
   dot: { width: 12, height: 12, borderRadius: 6 },
-  line: { flex: 1, width: 2, backgroundColor: COLORS.border, marginTop: 4, minHeight: 12 },
+  line: { flex: 1, width: 2, backgroundColor: C.border, marginTop: 4, minHeight: 12 },
   card: {
-    flex: 1, backgroundColor: COLORS.card, borderWidth: 1, borderColor: COLORS.border,
+    flex: 1, backgroundColor: C.card, borderWidth: 1, borderColor: C.border,
     borderRadius: RADIUS.md, padding: 12, marginBottom: 12, ...SHADOW.card,
   },
-  action: { fontWeight: '800', color: COLORS.text, fontSize: 15, textTransform: 'capitalize' },
-  entity: { color: COLORS.primaryDark, fontWeight: '600', fontSize: 13, marginTop: 2 },
-  desc: { color: COLORS.secondaryText, fontSize: 13, marginTop: 2 },
-  meta: { color: COLORS.muted, fontSize: 12, marginTop: 6 },
+  action: { fontWeight: '800', color: C.text, fontSize: 15, textTransform: 'capitalize' },
+  entity: { color: C.primaryDark, fontWeight: '600', fontSize: 13, marginTop: 2 },
+  desc: { color: C.secondaryText, fontSize: 13, marginTop: 2 },
+  meta: { color: C.muted, fontSize: 12, marginTop: 6 },
 });

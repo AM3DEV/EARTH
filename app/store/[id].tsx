@@ -7,12 +7,14 @@ import { ArrowLeft } from 'lucide-react-native';
 import * as Clipboard from 'expo-clipboard';
 import { supabase } from '../../lib/supabase';
 import { buyStoreItem, getWallet } from '../../hooks/useBookings';
-import { COLORS, RADIUS, SHADOW } from '../../constants/colors';
+import { RADIUS, SHADOW } from '../../constants/colors';
+import { useTheme, Palette } from '../../lib/theme';
 import { LoadingState, ErrorState } from '../../components/ui/States';
 import { PrimaryButton } from '../../components/ui/Buttons';
 
 /** Store item detail: full picture, description, cost, buy → code + copy. */
 export default function StoreItemDetail() {
+  const { colors: C } = useTheme();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { t, i18n } = useTranslation();
   const rtl = i18n.language === 'ar';
@@ -40,6 +42,7 @@ export default function StoreItemDetail() {
   }, [id]);
 
   useFocusEffect(useCallback(() => { load(); }, [load]));
+  const s = React.useMemo(() => getStyles(C), [C]);
   if (loading) return <LoadingState />;
   if (!item) return <ErrorState message={t('common.error')} onRetry={() => router.back()} />;
 
@@ -62,7 +65,7 @@ export default function StoreItemDetail() {
     <ScrollView style={s.wrap} contentContainerStyle={{ paddingBottom: 40 }}>
       <View style={s.head}>
         <Pressable onPress={() => router.back()} style={s.backBtn} accessibilityRole="button" accessibilityLabel={t('common.back')}>
-          {rtl ? <ArrowLeft color={COLORS.text} size={20} style={{ transform: [{ scaleX: -1 }] }} /> : <ArrowLeft color={COLORS.text} size={20} />}
+          {rtl ? <ArrowLeft color={C.text} size={20} style={{ transform: [{ scaleX: -1 }] }} /> : <ArrowLeft color={C.text} size={20} />}
         </Pressable>
         <Text style={s.title} numberOfLines={1}>{lang === 'ar' ? item.title_ar : item.title_en}</Text>
         <Text style={s.bal}>★ {balance}</Text>
@@ -113,25 +116,25 @@ export default function StoreItemDetail() {
   );
 }
 
-const s = StyleSheet.create({
-  wrap: { flex: 1, backgroundColor: COLORS.background, paddingTop: 60 },
+const getStyles = (C: Palette) => StyleSheet.create({
+  wrap: { flex: 1, backgroundColor: C.background, paddingTop: 60 },
   head: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, paddingBottom: 10 },
-  backBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: COLORS.card, borderWidth: 1, borderColor: COLORS.border, alignItems: 'center', justifyContent: 'center' },
-  title: { flex: 1, fontSize: 20, fontWeight: '800', color: COLORS.text },
-  bal: { fontSize: 16, fontWeight: '800', color: COLORS.gold },
-  hero: { width: '100%', height: 220, backgroundColor: COLORS.softGreen },
+  backBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: C.card, borderWidth: 1, borderColor: C.border, alignItems: 'center', justifyContent: 'center' },
+  title: { flex: 1, fontSize: 20, fontWeight: '800', color: C.text },
+  bal: { fontSize: 16, fontWeight: '800', color: C.gold },
+  hero: { width: '100%', height: 220, backgroundColor: C.softGreen },
   body: { padding: 16 },
-  off: { fontSize: 22, fontWeight: '800', color: COLORS.primaryDark },
-  desc: { fontSize: 15, lineHeight: 22, color: COLORS.text, marginTop: 8 },
-  cost: { fontSize: 17, fontWeight: '800', color: COLORS.gold, marginTop: 10 },
-  muted: { color: COLORS.secondaryText, fontSize: 13, marginTop: 6, textAlign: 'center' },
-  err: { color: COLORS.error, fontWeight: '600', textAlign: 'center', marginTop: 8 },
+  off: { fontSize: 22, fontWeight: '800', color: C.primaryDark },
+  desc: { fontSize: 15, lineHeight: 22, color: C.text, marginTop: 8 },
+  cost: { fontSize: 17, fontWeight: '800', color: C.gold, marginTop: 10 },
+  muted: { color: C.secondaryText, fontSize: 13, marginTop: 6, textAlign: 'center' },
+  err: { color: C.error, fontWeight: '600', textAlign: 'center', marginTop: 8 },
   codeBox: {
-    marginTop: 14, backgroundColor: COLORS.card, borderWidth: 1.5, borderColor: COLORS.gold,
+    marginTop: 14, backgroundColor: C.card, borderWidth: 1.5, borderColor: C.gold,
     borderRadius: RADIUS.lg, padding: 16, alignItems: 'center', ...SHADOW.card,
   },
-  codeLabel: { fontSize: 13, color: COLORS.secondaryText, fontWeight: '700' },
-  code: { fontSize: 28, fontWeight: '800', letterSpacing: 2, color: COLORS.text, marginVertical: 6 },
-  copyBtn: { backgroundColor: COLORS.primary, borderRadius: 10, paddingHorizontal: 22, minHeight: 44, justifyContent: 'center', marginVertical: 10 },
+  codeLabel: { fontSize: 13, color: C.secondaryText, fontWeight: '700' },
+  code: { fontSize: 28, fontWeight: '800', letterSpacing: 2, color: C.text, marginVertical: 6 },
+  copyBtn: { backgroundColor: C.primary, borderRadius: 10, paddingHorizontal: 22, minHeight: 44, justifyContent: 'center', marginVertical: 10 },
   copyTxt: { color: '#fff', fontWeight: '800', fontSize: 15 },
 });

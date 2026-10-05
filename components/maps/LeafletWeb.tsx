@@ -5,6 +5,8 @@ import { View } from 'react-native';
 import { MapContainer, TileLayer, Marker as RLMarker, Tooltip } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { useTheme } from '../../lib/theme';
+import { CARTO_DAY, CARTO_NIGHT, cartoWebUrl, tileAttribution } from '../../constants/mapStyle';
 
 export type WebRegion = {
   latitude: number;
@@ -45,6 +47,7 @@ export const LeafletMap = forwardRef<any, MapProps>(function LeafletMap(
   ref
 ) {
   const mapRef = useRef<L.Map | null>(null);
+  const { dark } = useTheme();
   useImperativeHandle(
     ref,
     () => ({
@@ -74,8 +77,8 @@ export const LeafletMap = forwardRef<any, MapProps>(function LeafletMap(
         style={{ width: '100%', height: '100%' }}
       >
         <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url={cartoWebUrl(dark ? CARTO_NIGHT : CARTO_DAY)}
+          attribution={tileAttribution()}
         />
         {children}
       </MapContainer>

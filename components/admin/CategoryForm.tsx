@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
-import { ScrollView, Text, StyleSheet } from 'react-native';
+import { ScrollView, Text, StyleSheet, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '../../lib/supabase';
 import { logAdminAction } from '../../lib/adminLog';
 import { Field } from '../ui/Field';
+import { BackButton } from '../ui/BackButton';
 import { PrimaryButton } from '../ui/Buttons';
 import { SectionTitle, ToggleRow, OptionsPicker, ImageField, AdminGate, friendlyDbError } from './fields';
-import { COLORS } from '../../constants/colors';
+import { useTheme, Palette } from '../../lib/theme';
 
 const TYPES = [
   { id: 'monument', labelKey: 'admin.monuments' },
@@ -21,6 +22,8 @@ const TYPES = [
  * across monuments, events, companies and services.
  */
 export function CategoryForm({ initial, categoryId }: { initial: any; categoryId?: string }) {
+  const { colors: C } = useTheme();
+  const s = React.useMemo(() => getStylesCategoryForm(C), [C]);
   const { t } = useTranslation();
   const router = useRouter();
   const [v, setV] = useState<any>({ name_en: '', name_ar: '', description_en: '', description_ar: '', image_url: null, type: 'company', ...initial });
@@ -50,7 +53,9 @@ export function CategoryForm({ initial, categoryId }: { initial: any; categoryId
   };
 
   return (
-    <AdminGate>
+    <View style={{ flex: 1, backgroundColor: C.background }}>
+      <BackButton />
+      <AdminGate>
     <ScrollView style={s.wrap} contentContainerStyle={{ padding: 16, paddingTop: 60, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
       <Text style={s.title}>{categoryId ? t('form.editItem', { name: t('admin.categories') }) : t('form.addItem', { name: t('admin.categories') })}</Text>
 
@@ -70,13 +75,14 @@ export function CategoryForm({ initial, categoryId }: { initial: any; categoryId
       {err ? <Text style={s.err}>{err}</Text> : null}
       <PrimaryButton title={busy ? '…' : t('common.save')} onPress={save} disabled={busy} />
     </ScrollView>
-    </AdminGate>
+      </AdminGate>
+    </View>
   );
 }
 
-const s = StyleSheet.create({
-  wrap: { flex: 1, backgroundColor: '#fff' },
-  title: { fontSize: 22, fontWeight: '800', color: COLORS.text },
-  hint: { fontSize: 13, color: COLORS.secondaryText, marginTop: 2 },
-  err: { color: COLORS.error, marginVertical: 8 },
+const getStylesCategoryForm = (C: Palette) => StyleSheet.create({
+  wrap: { flex: 1, backgroundColor: C.background },
+  title: { fontSize: 22, fontWeight: '800', color: C.text },
+  hint: { fontSize: 13, color: C.secondaryText, marginTop: 2 },
+  err: { color: C.error, marginVertical: 8 },
 });

@@ -5,7 +5,8 @@ import { useTranslation } from 'react-i18next';
 import { CreditCard, Wallet } from 'lucide-react-native';
 import { ArrowLeft, ArrowRight } from 'lucide-react-native';
 import { supabase } from '../../lib/supabase';
-import { COLORS, RADIUS, SHADOW } from '../../constants/colors';
+import { RADIUS, SHADOW } from '../../constants/colors';
+import { useTheme, Palette } from '../../lib/theme';
 import { LoadingState, ErrorState } from '../../components/ui/States';
 import { PriceBreakdown } from '../../components/booking/PriceBreakdown';
 import { createBookingServer } from '../../hooks/useBookings';
@@ -16,6 +17,7 @@ import { usePrice } from '../../lib/currency';
  * no real charge. Receives ?service_id=&date=&qty=&coupon=.
  */
 export default function BookingPay() {
+  const { colors: C } = useTheme();
   const { service_id, date, qty, coupon } = useLocalSearchParams<{
     service_id: string; date: string; qty: string; coupon?: string;
   }>();
@@ -62,12 +64,16 @@ export default function BookingPay() {
     })();
   }, [code]);
 
+  const s = React.useMemo(() => getStyles(C), [C]);
   if (loading) return <LoadingState />;
   if (!row) return <ErrorState message={t('common.error')} onRetry={() => router.back()} />;
 
   const name = lang === 'ar' ? row.name_ar : row.name_en;
 
-  const baseTotal = Number(quote?.final_price ?? row.current_price ?? 0);
+  // Totals scale with quantity: quote is per-person, total = unit × people.
+  // Server computes the same (per_unit × qty, coupon off the total).
+  const unitPrice = Number(quote?.final_price ?? row.current_price ?? 0);
+  const baseTotal = Math.round(unitPrice * qn * 100) / 100;
   const estOff = cpn
     ? cpn.kind === 'percent'
       ? Math.round(baseTotal * Math.min(Number(cpn.value), 100)) / 100
@@ -96,14 +102,14 @@ export default function BookingPay() {
     <ScrollView style={s.wrap} contentContainerStyle={{ padding: 20, paddingTop: 64, paddingBottom: 40 }}>
       <View style={[s.head, rtl && { flexDirection: 'row-reverse' }]}>
         <Pressable onPress={() => router.back()} style={s.backBtn} accessibilityRole="button" accessibilityLabel={t('common.back')}>
-          {rtl ? <ArrowRight color={COLORS.text} size={20} /> : <ArrowLeft color={COLORS.text} size={20} />}
+          {rtl ? <ArrowRight color={C.text} size={20} /> : <ArrowLeft color={C.text} size={20} />}
         </Pressable>
         <Text style={s.title}>{t('booking.payTitle')}</Text>
       </View>
 
       <View style={s.summary}>
         <Text style={s.name} numberOfLines={1}>{name}</Text>
-        <Text style={s.muted}>{String(date).slice(0, 10)} · {t('booking.quantity')}: {qn}</Text>
+        <Text style={s.muted}>{String(date).slice(0, 10)} · {fmt(unitPrice, row.currency)} × {qn}</Text>
         {code ? <Text style={s.coupon}>{code}</Text> : null}
         {estOff > 0 ? (
           <>
@@ -125,7 +131,7 @@ export default function BookingPay() {
         accessibilityRole="button"
         accessibilityLabel={t('booking.payCard')}
       >
-        <CreditCard color={COLORS.primaryDark} size={26} />
+        <CreditCard color={C.primaryDark} size={26} />
         <Text style={s.methodTxt}>{busy === 'card' ? '…' : t('booking.payCard')}</Text>
       </Pressable>
 
@@ -136,7 +142,7 @@ export default function BookingPay() {
         accessibilityRole="button"
         accessibilityLabel={t('booking.payPal')}
       >
-        <Wallet color={COLORS.primaryDark} size={26} />
+        <Wallet color={C.primaryDark} size={26} />
         <Text style={s.methodTxt}>{busy === 'paypal' ? '…' : t('booking.payPal')}</Text>
       </Pressable>
 
@@ -145,25 +151,25 @@ export default function BookingPay() {
   );
 }
 
-const s = StyleSheet.create({
-  wrap: { flex: 1, backgroundColor: COLORS.background },
+const getStyles = (C: Palette) => StyleSheet.create({
+  wrap: { flex: 1, backgroundColor: C.background },
   head: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 16 },
-  backBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: COLORS.card, borderWidth: 1, borderColor: COLORS.border, alignItems: 'center', justifyContent: 'center' },
-  title: { flex: 1, fontSize: 22, fontWeight: '800', color: COLORS.text },
-  summary: { backgroundColor: COLORS.card, borderWidth: 1, borderColor: COLORS.border, borderRadius: RADIUS.lg, padding: 16, ...SHADOW.card },
-  name: { fontSize: 17, fontWeight: '800', color: COLORS.text },
-  muted: { color: COLORS.secondaryText, fontSize: 13, marginTop: 4 },
-  coupon: { marginTop: 6, fontWeight: '800', letterSpacing: 1, color: COLORS.primaryDark },
-  total: { fontSize: 26, fontWeight: '800', color: COLORS.text, marginTop: 10 },
-  wasTotal: { fontSize: 17, fontWeight: '600', color: COLORS.muted, marginTop: 10, textDecorationLine: 'line-through' },
-  couponOff: { fontSize: 16, fontWeight: '800', color: COLORS.success, marginTop: 4 },
-  test: { color: COLORS.secondaryText, fontSize: 13, textAlign: 'center', marginVertical: 16, fontStyle: 'italic' },
+  backBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: C.card, borderWidth: 1, borderColor: C.border, alignItems: 'center', justifyContent: 'center' },
+  title: { flex: 1, fontSize: 22, fontWeight: '800', color: C.text },
+  summary: { backgroundColor: C.card, borderWidth: 1, borderColor: C.border, borderRadius: RADIUS.lg, padding: 16, ...SHADOW.card },
+  name: { fontSize: 17, fontWeight: '800', color: C.text },
+  muted: { color: C.secondaryText, fontSize: 13, marginTop: 4 },
+  coupon: { marginTop: 6, fontWeight: '800', letterSpacing: 1, color: C.primaryDark },
+  total: { fontSize: 26, fontWeight: '800', color: C.text, marginTop: 10 },
+  wasTotal: { fontSize: 17, fontWeight: '600', color: C.muted, marginTop: 10, textDecorationLine: 'line-through' },
+  couponOff: { fontSize: 16, fontWeight: '800', color: C.success, marginTop: 4 },
+  test: { color: C.secondaryText, fontSize: 13, textAlign: 'center', marginVertical: 16, fontStyle: 'italic' },
   method: {
-    flexDirection: 'row', alignItems: 'center', gap: 14, backgroundColor: COLORS.card,
-    borderWidth: 1.5, borderColor: COLORS.border, borderRadius: RADIUS.lg, padding: 18, marginBottom: 12, ...SHADOW.card,
+    flexDirection: 'row', alignItems: 'center', gap: 14, backgroundColor: C.card,
+    borderWidth: 1.5, borderColor: C.border, borderRadius: RADIUS.lg, padding: 18, marginBottom: 12, ...SHADOW.card,
   },
   methodBusy: { opacity: 0.6 },
   pressed: { opacity: 0.7, transform: [{ scale: 0.98 }] },
-  methodTxt: { fontSize: 18, fontWeight: '800', color: COLORS.text },
-  err: { color: COLORS.error, marginTop: 8, textAlign: 'center', fontWeight: '600' },
+  methodTxt: { fontSize: 18, fontWeight: '800', color: C.text },
+  err: { color: C.error, marginTop: 8, textAlign: 'center', fontWeight: '600' },
 });

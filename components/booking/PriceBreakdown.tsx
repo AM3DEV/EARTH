@@ -1,11 +1,13 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { COLORS } from '../../constants/colors';
+import { useTheme, Palette } from '../../lib/theme';
 import { Badge } from '../ui/Card';
 import { usePrice } from '../../lib/currency';
 
 export function PriceBreakdown({ quote, supportPct }: { quote: any; supportPct?: number }) {
+  const { colors: C } = useTheme();
+  const s = React.useMemo(() => getStyles(C), [C]);
   const { t } = useTranslation();
   const { fmt } = usePrice();
   if (!quote) return null;
@@ -28,16 +30,18 @@ export function PriceBreakdown({ quote, supportPct }: { quote: any; supportPct?:
   );
 }
 function Row({ k, v, bold }: { k: string; v: string; bold?: boolean }) {
+  const { colors: C } = useTheme();
+  const s = React.useMemo(() => getStyles(C), [C]);
   return (
     <View style={s.row}>
-      <Text style={[s.k, bold && { fontWeight: '800', color: COLORS.text }]}>{k}</Text>
-      <Text style={[s.v, bold && { fontWeight: '800', color: COLORS.text }]}>{v}</Text>
+      <Text style={[s.k, bold && { fontWeight: '800', color: C.text }]}>{k}</Text>
+      <Text style={[s.v, bold && { fontWeight: '800', color: C.text }]}>{v}</Text>
     </View>
   );
 }
-const s = StyleSheet.create({
-  wrap: { backgroundColor: '#fff', borderWidth: 1, borderColor: COLORS.border, borderRadius: 12, padding: 14 },
+const getStyles = (C: Palette) => StyleSheet.create({
+  wrap: { backgroundColor: C.card, borderWidth: 1, borderColor: C.border, borderRadius: 12, padding: 14 },
   row: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 4 },
-  k: { color: COLORS.secondaryText, fontSize: 14 },
-  v: { color: COLORS.text, fontSize: 14, fontWeight: '600' },
+  k: { color: C.secondaryText, fontSize: 14 },
+  v: { color: C.text, fontSize: 14, fontWeight: '600' },
 });

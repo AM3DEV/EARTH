@@ -6,11 +6,13 @@ import { Image } from 'expo-image';
 import { ArrowLeft } from 'lucide-react-native';
 import { supabase } from '../lib/supabase';
 import { getWallet } from '../hooks/useBookings';
-import { COLORS, RADIUS, SHADOW } from '../constants/colors';
+import { RADIUS, SHADOW } from '../constants/colors';
+import { useTheme, Palette } from '../lib/theme';
 import { LoadingState, EmptyState } from '../components/ui/States';
 
 /** Points store: compact rows → detail page with description + buy. */
 export default function StoreScreen() {
+  const { colors: C } = useTheme();
   const { t, i18n } = useTranslation();
   const rtl = i18n.language === 'ar';
   const lang = i18n.language;
@@ -38,6 +40,7 @@ export default function StoreScreen() {
   }, []);
 
   useFocusEffect(useCallback(() => { load(); }, [load]));
+  const s = React.useMemo(() => getStyles(C), [C]);
   if (loading) return <LoadingState />;
 
   const valueTxt = (it: any) => (it.kind === 'percent' ? `${it.value}%` : `${it.value}`);
@@ -46,7 +49,7 @@ export default function StoreScreen() {
     <ScrollView style={s.wrap} contentContainerStyle={{ paddingBottom: 40 }}>
       <View style={s.head}>
         <Pressable onPress={() => router.back()} style={s.backBtn} accessibilityRole="button" accessibilityLabel={t('common.back')}>
-          {rtl ? <ArrowLeft color={COLORS.text} size={20} style={{ transform: [{ scaleX: -1 }] }} /> : <ArrowLeft color={COLORS.text} size={20} />}
+          {rtl ? <ArrowLeft color={C.text} size={20} style={{ transform: [{ scaleX: -1 }] }} /> : <ArrowLeft color={C.text} size={20} />}
         </Pressable>
         <Text style={s.title}>{t('store.title')}</Text>
         <Text style={s.bal}>★ {balance}</Text>
@@ -84,7 +87,7 @@ export default function StoreScreen() {
         coupons.map((c) => (
           <View key={c.id} style={s.coupon}>
             <Text style={s.codeSm} selectable>{c.code}</Text>
-            <Text style={[s.pill, { backgroundColor: c.status === 'active' ? '#E3F3E9' : '#F1F1F1', color: c.status === 'active' ? COLORS.success : COLORS.secondaryText }]}>
+            <Text style={[s.pill, { backgroundColor: c.status === 'active' ? '#E3F3E9' : '#F1F1F1', color: c.status === 'active' ? C.success : C.secondaryText }]}>
               {c.status === 'active' ? t('common.active') : t('store.used')} · {c.kind === 'percent' ? `${c.value}%` : c.value}
             </Text>
           </View>
@@ -94,28 +97,28 @@ export default function StoreScreen() {
   );
 }
 
-const s = StyleSheet.create({
-  wrap: { flex: 1, backgroundColor: COLORS.background, paddingTop: 60 },
+const getStyles = (C: Palette) => StyleSheet.create({
+  wrap: { flex: 1, backgroundColor: C.background, paddingTop: 60 },
   head: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, paddingBottom: 10 },
-  backBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: COLORS.card, borderWidth: 1, borderColor: COLORS.border, alignItems: 'center', justifyContent: 'center' },
-  title: { flex: 1, fontSize: 22, fontWeight: '800', color: COLORS.text },
-  bal: { fontSize: 16, fontWeight: '800', color: COLORS.gold },
-  muted: { color: COLORS.secondaryText, fontSize: 13, marginTop: 4 },
+  backBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: C.card, borderWidth: 1, borderColor: C.border, alignItems: 'center', justifyContent: 'center' },
+  title: { flex: 1, fontSize: 22, fontWeight: '800', color: C.text },
+  bal: { fontSize: 16, fontWeight: '800', color: C.gold },
+  muted: { color: C.secondaryText, fontSize: 13, marginTop: 4 },
   row: {
-    flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: COLORS.card,
-    borderWidth: 1, borderColor: COLORS.border, borderRadius: RADIUS.lg, padding: 10, marginBottom: 10, ...SHADOW.card,
+    flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: C.card,
+    borderWidth: 1, borderColor: C.border, borderRadius: RADIUS.lg, padding: 10, marginBottom: 10, ...SHADOW.card,
   },
-  thumb: { width: 64, height: 64, borderRadius: 12, backgroundColor: COLORS.softGreen },
+  thumb: { width: 64, height: 64, borderRadius: 12, backgroundColor: C.softGreen },
   thumbEmpty: { alignItems: 'center', justifyContent: 'center' },
   gift: { fontSize: 28 },
-  name: { fontSize: 15, fontWeight: '800', color: COLORS.text },
-  off: { fontSize: 13, fontWeight: '800', color: COLORS.primaryDark, marginTop: 2 },
-  chev: { color: COLORS.secondaryText, fontSize: 22, fontWeight: '700' },
-  secTitle: { fontSize: 18, fontWeight: '800', color: COLORS.text, paddingHorizontal: 16, marginTop: 8, marginBottom: 8 },
+  name: { fontSize: 15, fontWeight: '800', color: C.text },
+  off: { fontSize: 13, fontWeight: '800', color: C.primaryDark, marginTop: 2 },
+  chev: { color: C.secondaryText, fontSize: 22, fontWeight: '700' },
+  secTitle: { fontSize: 18, fontWeight: '800', color: C.text, paddingHorizontal: 16, marginTop: 8, marginBottom: 8 },
   coupon: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginHorizontal: 16, marginBottom: 8,
-    backgroundColor: COLORS.card, borderWidth: 1, borderColor: COLORS.border, borderRadius: RADIUS.md, padding: 12,
+    backgroundColor: C.card, borderWidth: 1, borderColor: C.border, borderRadius: RADIUS.md, padding: 12,
   },
-  codeSm: { fontSize: 16, fontWeight: '800', letterSpacing: 1, color: COLORS.text },
+  codeSm: { fontSize: 16, fontWeight: '800', letterSpacing: 1, color: C.text },
   pill: { fontSize: 12, fontWeight: '800', paddingHorizontal: 10, paddingVertical: 4, borderRadius: RADIUS.full, overflow: 'hidden' },
 });

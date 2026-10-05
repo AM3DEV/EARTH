@@ -3,7 +3,8 @@ import { View, Text, StyleSheet, FlatList, Pressable, ScrollView, ActivityIndica
 import { useTranslation } from 'react-i18next';
 import { useFocusEffect } from 'expo-router';
 import { supabase } from '../../lib/supabase';
-import { COLORS, RADIUS } from '../../constants/colors';
+import { RADIUS } from '../../constants/colors';
+import { useTheme, Palette } from '../../lib/theme';
 import { AdminHeader } from '../../components/admin/AdminHeader';
 import { LoadingState, ErrorState, EmptyState } from '../../components/ui/States';
 import { friendlyDbError } from '../../components/admin/fields';
@@ -12,14 +13,16 @@ import { bookingStatusKey } from '../../lib/status';
 
 const FILTERS = ['all', 'pending', 'confirmed', 'completed', 'rejected', 'cancelled'] as const;
 
-function pillColors(st: string): { bg: string; fg: string } {
-  if (st === 'confirmed' || st === 'completed') return { bg: '#E3F3E9', fg: COLORS.success };
+function pillColors(st: string, C: Palette): { bg: string; fg: string } {
+  if (st === 'confirmed' || st === 'completed') return { bg: '#E3F3E9', fg: C.success };
   if (st === 'pending') return { bg: '#FAF0D7', fg: '#A5760A' };
-  return { bg: '#FDE7E9', fg: COLORS.error };
+  return { bg: '#FDE7E9', fg: C.error };
 }
 
 export default function AdminBookings() {
   const { t, i18n } = useTranslation();
+  const { colors: C } = useTheme();
+  const s = React.useMemo(() => getStyles(C), [C]);
   const lang = i18n.language;
   const [rows, setRows] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -109,7 +112,7 @@ export default function AdminBookings() {
           renderItem={({ item }) => {
             const st = String(item.status ?? '');
             const stKey = bookingStatusKey(st);
-            const pc = pillColors(st);
+            const pc = pillColors(st, C);
             const busy = busyId === item.id;
             return (
             <View style={s.card}>
@@ -141,7 +144,7 @@ export default function AdminBookings() {
                   </Pressable>
                   );
                 })}
-                {busy ? <ActivityIndicator size="small" color={COLORS.primary} /> : null}
+                {busy ? <ActivityIndicator size="small" color={C.primary} /> : null}
               </View>
             </View>
             );
@@ -150,23 +153,23 @@ export default function AdminBookings() {
     </View>
   );
 }
-const s = StyleSheet.create({
-  wrap: { flex: 1, backgroundColor: COLORS.background, paddingTop: 60 },
+const getStyles = (C: Palette) => StyleSheet.create({
+  wrap: { flex: 1, backgroundColor: C.background, paddingTop: 60 },
   chips: { maxHeight: 52, marginTop: 4 },
   chipsIn: { gap: 8, paddingHorizontal: 16, alignItems: 'center' },
-  chip: { borderWidth: 1, borderColor: COLORS.border, borderRadius: RADIUS.full, paddingHorizontal: 14, height: 36, justifyContent: 'center', backgroundColor: COLORS.card },
-  chipOn: { backgroundColor: COLORS.text, borderColor: COLORS.text },
-  chipTxt: { color: COLORS.text, fontWeight: '600' },
+  chip: { borderWidth: 1, borderColor: C.border, borderRadius: RADIUS.full, paddingHorizontal: 14, height: 36, justifyContent: 'center', backgroundColor: C.card },
+  chipOn: { backgroundColor: C.text, borderColor: C.text },
+  chipTxt: { color: C.text, fontWeight: '600' },
   chipTxtOn: { color: '#fff' },
-  notice: { color: COLORS.error, paddingHorizontal: 16, marginTop: 6, fontSize: 13, fontWeight: '600' },
-  card: { backgroundColor: COLORS.card, borderWidth: 1, borderColor: COLORS.border, borderRadius: 12, padding: 12, marginBottom: 8 },
+  notice: { color: C.error, paddingHorizontal: 16, marginTop: 6, fontSize: 13, fontWeight: '600' },
+  card: { backgroundColor: C.card, borderWidth: 1, borderColor: C.border, borderRadius: 12, padding: 12, marginBottom: 8 },
   top: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
-  ref: { fontWeight: '800', color: COLORS.text, flex: 1 },
+  ref: { fontWeight: '800', color: C.text, flex: 1 },
   pill: { fontSize: 12, fontWeight: '800', paddingHorizontal: 10, paddingVertical: 4, borderRadius: RADIUS.full, overflow: 'hidden' },
-  name: { fontWeight: '600', color: COLORS.text, fontSize: 13, marginTop: 2 },
-  muted: { color: COLORS.secondaryText, fontSize: 12, marginTop: 2 },
+  name: { fontWeight: '600', color: C.text, fontSize: 13, marginTop: 2 },
+  muted: { color: C.secondaryText, fontSize: 12, marginTop: 2 },
   row: { flexDirection: 'row', gap: 14, marginTop: 8, flexWrap: 'wrap', alignItems: 'center' },
-  act: { color: COLORS.primaryDark, fontWeight: '700' },
-  actCur: { color: COLORS.success, fontWeight: '800' },
+  act: { color: C.primaryDark, fontWeight: '700' },
+  actCur: { color: C.success, fontWeight: '800' },
   actBusy: { opacity: 0.5 },
 });

@@ -5,7 +5,8 @@ import { useTranslation } from 'react-i18next';
 import { supabase } from '../../lib/supabase';
 import { getMyRole } from '../../lib/auth';
 import { LoadingState } from '../../components/ui/States';
-import { COLORS, RADIUS, SHADOW } from '../../constants/colors';
+import { RADIUS, SHADOW } from '../../constants/colors';
+import { useTheme, Palette } from '../../lib/theme';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAdminStats } from '../../hooks/useAdmin';
 import {
@@ -33,6 +34,8 @@ const SECTIONS = [
 
 export default function AdminDashboard() {
   const { t } = useTranslation();
+  const { colors: C } = useTheme();
+  const s = React.useMemo(() => getStyles(C), [C]);
   const router = useRouter();
   const [role, setRole] = useState<string>('admin');
   const [name, setName] = useState('');
@@ -74,7 +77,7 @@ export default function AdminDashboard() {
 
   return (
     <ScrollView style={s.wrap} contentContainerStyle={{ paddingBottom: 40 }}>
-      <LinearGradient colors={[COLORS.darkestGreen, COLORS.deepGreen]} style={s.hero}>
+      <LinearGradient colors={[C.darkestGreen, C.deepGreen]} style={s.hero}>
         <Text style={s.eyebrow}>Jordan Guide · {t('admin.badgeAdmin')}</Text>
         <Text style={s.hello}>{t('auth.welcomeAdmin', { name: name || t('admin.defaultName') })}</Text>
         <View style={s.roleBadge}>
@@ -109,7 +112,7 @@ export default function AdminDashboard() {
                 accessibilityLabel={t(`admin.${sec.key}`)}
               >
                 <View style={s.iconWrap}>
-                  <Icon color={COLORS.primaryDark} size={24} />
+                  <Icon color={C.primaryDark} size={24} />
                 </View>
                 <Text style={s.btnTxt} numberOfLines={2}>{t(`admin.${sec.key}`)}</Text>
               </Pressable>
@@ -121,23 +124,23 @@ export default function AdminDashboard() {
   );
 }
 
-const s = StyleSheet.create({
-  wrap: { flex: 1, backgroundColor: COLORS.background },
+const getStyles = (C: Palette) => StyleSheet.create({
+  wrap: { flex: 1, backgroundColor: C.background },
   hero: { padding: 20, paddingTop: 64, paddingBottom: 24, borderBottomLeftRadius: 28, borderBottomRightRadius: 28 },
   eyebrow: { fontSize: 12, fontWeight: '700', letterSpacing: 1.5, color: 'rgba(255,255,255,0.72)' },
   hello: { fontSize: 24, fontWeight: '800', color: '#fff', marginTop: 4 },
-  roleBadge: { alignSelf: 'flex-start', backgroundColor: COLORS.gold, borderRadius: RADIUS.full, paddingHorizontal: 12, paddingVertical: 5, marginTop: 8 },
-  roleTxt: { color: COLORS.darkestGreen, fontSize: 11, fontWeight: '800', letterSpacing: 1 },
+  roleBadge: { alignSelf: 'flex-start', backgroundColor: C.gold, borderRadius: RADIUS.full, paddingHorizontal: 12, paddingVertical: 5, marginTop: 8 },
+  roleTxt: { color: C.darkestGreen, fontSize: 11, fontWeight: '800', letterSpacing: 1 },
   body: { padding: 16 },
-  secTitle: { fontSize: 17, fontWeight: '800', color: COLORS.text, marginTop: 20, marginBottom: 10 },
+  secTitle: { fontSize: 17, fontWeight: '800', color: C.text, marginTop: 20, marginBottom: 10 },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
-  stat: { width: '48%', backgroundColor: COLORS.card, borderWidth: 1, borderColor: COLORS.border, borderRadius: RADIUS.lg, padding: 12, ...SHADOW.card },
-  statV: { fontSize: 22, fontWeight: '800', color: COLORS.primaryDark },
-  statK: { color: COLORS.secondaryText, fontSize: 12, marginTop: 2 },
+  stat: { width: '48%', backgroundColor: C.card, borderWidth: 1, borderColor: C.border, borderRadius: RADIUS.lg, padding: 12, ...SHADOW.card },
+  statV: { fontSize: 22, fontWeight: '800', color: C.primaryDark },
+  statK: { color: C.secondaryText, fontSize: 12, marginTop: 2 },
   btn: {
-    width: '48%', backgroundColor: COLORS.card, borderWidth: 1, borderColor: COLORS.border, borderRadius: RADIUS.lg,
+    width: '48%', backgroundColor: C.card, borderWidth: 1, borderColor: C.border, borderRadius: RADIUS.lg,
     padding: 14, alignItems: 'flex-start', gap: 10, minHeight: 110, ...SHADOW.card,
   },
-  iconWrap: { width: 44, height: 44, borderRadius: 12, backgroundColor: COLORS.softGreen, alignItems: 'center', justifyContent: 'center' },
-  btnTxt: { fontWeight: '700', color: COLORS.text, fontSize: 14 },
+  iconWrap: { width: 44, height: 44, borderRadius: 12, backgroundColor: C.softGreen, alignItems: 'center', justifyContent: 'center' },
+  btnTxt: { fontWeight: '700', color: C.text, fontSize: 14 },
 });
